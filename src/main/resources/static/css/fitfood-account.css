@@ -1,0 +1,388 @@
+/* FITFOOD — Thanh tài khoản và hồ sơ; không ảnh hưởng CSS khác */
+.fit-account-dropdown {
+    position: relative;
+    flex: 0 0 auto;
+    font-family: "Be Vietnam Pro", Arial, sans-serif;
+}
+.fit-account-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    list-style: none;
+    color: #123f2e;
+    border: 1px solid #d9ebe0;
+    background: #f4faf6;
+    padding: 6px 11px 6px 6px;
+    border-radius: 30px;
+    font-weight: 700;
+    font-size: 12px;
+    max-width: 190px;
+}
+.fit-account-toggle::-webkit-details-marker {
+    display: none;
+}
+.fit-account-toggle:focus-visible {
+    outline: 3px solid #7bce9d;
+}
+.fit-account-avatar {
+    width: 31px;
+    height: 31px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: #087f5b;
+    color: white;
+    font-size: 13px;
+}
+.fit-account-name {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 115px;
+}
+.fit-account-popup {
+    position: absolute;
+    top: calc(100% + 10px);
+    right: 0;
+    z-index: 200;
+    min-width: 265px;
+    background: #fff;
+    border: 1px solid #e2eee5;
+    box-shadow: 0 22px 60px #154b2926;
+    border-radius: 17px;
+    padding: 9px;
+    color: #184331;
+}
+.fit-popup-identity {
+    padding: 13px 13px 14px;
+    border-bottom: 1px solid #ecf2ee;
+    margin-bottom: 7px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.fit-popup-identity strong {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+}
+.fit-popup-identity small {
+    font-size: 11px;
+    color: #7d9184;
+    overflow-wrap: anywhere;
+}
+.fit-account-popup > a,
+.fit-account-popup form button {
+    width: 100%;
+    display: block;
+    padding: 11px 12px;
+    border: 0;
+    border-radius: 9px;
+    background: transparent;
+    text-align: left;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 650;
+    color: #22543c;
+    cursor: pointer;
+    text-decoration: none;
+}
+.fit-account-popup > a:hover,
+.fit-account-popup form button:hover {
+    background: #ecf7ef;
+}
+.fit-account-popup form {
+    margin: 3px 0 0;
+    border-top: 1px solid #eaf1ec;
+    padding-top: 6px;
+}
+.fit-account-popup form button {
+    color: #b34646;
+}
+.fit-admin-profile-link {
+    text-decoration: none;
+    color: inherit;
+}
+.fit-admin-profile-link:hover {
+    background: #ffffff12;
+}
+.fit-admin-avatar {
+    display: grid;
+    text-decoration: none;
+}
+.fit-account-back {
+    color: #087f5b;
+    font-weight: 700;
+    font-size: 12px;
+    text-decoration: none;
+}
+.fit-profile-page {
+    font-family: "Be Vietnam Pro", Arial, sans-serif;
+    background: linear-gradient(120deg, #f4faf5, #f9fbf9);
+    min-height: 75vh;
+    padding: 40px 20px 85px;
+    color: #183b2b;
+}
+.fit-profile-container {
+    max-width: 1150px;
+    margin: auto;
+}
+.fit-profile-breadcrumb {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    font-size: 12px;
+    color: #7c9585;
+    margin-bottom: 35px;
+}
+.fit-profile-breadcrumb a {
+    color: #0a8158;
+    text-decoration: none;
+}
+.fit-profile-heading {
+    display: flex;
+    justify-content: space-between;
+    gap: 25px;
+    align-items: center;
+    margin-bottom: 32px;
+}
+.fit-profile-kicker {
+    color: #0b915e;
+    font-weight: 800;
+    letter-spacing: 2px;
+    font-size: 10px;
+}
+.fit-profile-heading h1 {
+    font-size: clamp(28px, 4vw, 36px);
+    margin: 12px 0 7px;
+    font-family: inherit;
+    line-height: 1.25;
+    color: #163c2c;
+}
+.fit-profile-heading p {
+    color: #83978a;
+    font-size: 12px;
+}
+.fit-profile-active {
+    white-space: nowrap;
+    border-radius: 20px;
+    padding: 10px 14px;
+    background: #e1f4e8;
+    color: #0a8554;
+    font-weight: 750;
+    font-size: 11px;
+}
+.fit-profile-layout {
+    display: grid;
+    grid-template-columns: 310px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+.fit-profile-side,
+.fit-profile-card {
+    background: #fff;
+    border: 1px solid #e6efe8;
+    border-radius: 21px;
+    box-shadow: 0 10px 36px #1f644012;
+    padding: 28px;
+}
+.fit-profile-side {
+    text-align: center;
+}
+.fit-profile-large-avatar {
+    height: 90px;
+    width: 90px;
+    border: 5px solid #e5f5ea;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    background: #0c815a;
+    display: grid;
+    place-items: center;
+    font-size: 35px;
+    font-weight: 850;
+    color: #fff;
+}
+.fit-profile-side h2 {
+    font-size: 20px;
+    color: #183e2e;
+    overflow-wrap: anywhere;
+}
+.fit-profile-side p {
+    font-size: 12px;
+    color: #7a9182;
+    margin: 7px 0 11px;
+    overflow-wrap: anywhere;
+}
+.fit-profile-pill {
+    display: inline-block;
+    color: #128451;
+    background: #e7f7ec;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 750;
+    padding: 8px 12px;
+}
+.fit-profile-links {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    text-align: left;
+    border-top: 1px solid #edf1ed;
+    margin-top: 25px;
+    padding-top: 17px;
+}
+.fit-profile-links a {
+    padding: 13px 14px;
+    color: #456a53;
+    font-size: 12px;
+    font-weight: 650;
+    border-radius: 10px;
+    text-decoration: none;
+}
+.fit-profile-links a:hover,
+.fit-profile-links a.fit-profile-selected {
+    background: #e8f7ed;
+    color: #087f5b;
+}
+.fit-profile-card-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #e8eee9;
+}
+.fit-profile-card-title h2 {
+    font-size: 20px;
+    font-family: inherit;
+    color: #193d2d;
+}
+.fit-profile-card-title p {
+    font-size: 11px;
+    color: #8ba094;
+    margin-top: 7px;
+    line-height: 1.7;
+}
+.fit-profile-card-title > span {
+    color: #0a8655;
+    font-size: 10px;
+    background: #e8f7ed;
+    padding: 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+.fit-profile-data {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    padding: 25px 0;
+}
+.fit-profile-data-item {
+    padding: 16px 18px;
+    border: 1px solid #e6f0e9;
+    background: #fbfdfb;
+    border-radius: 12px;
+    min-width: 0;
+}
+.fit-profile-data-item span {
+    display: block;
+    font-size: 11px;
+    color: #82998a;
+    margin-bottom: 10px;
+}
+.fit-profile-data-item strong {
+    font-size: 13px;
+    overflow-wrap: anywhere;
+    color: #183d2c;
+}
+.fit-profile-action-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    flex-wrap: wrap;
+}
+.fit-profile-main-button,
+.fit-profile-secondary-button {
+    padding: 13px 18px;
+    font-size: 12px;
+    font-weight: 750;
+    border-radius: 10px;
+    text-decoration: none;
+}
+.fit-profile-main-button {
+    background: #087f5b;
+    color: #fff;
+}
+.fit-profile-secondary-button {
+    background: #e5f6eb;
+    color: #087f5b;
+}
+.fit-profile-security-note {
+    font-size: 11px;
+    color: #74917e;
+    margin-top: 22px;
+    line-height: 1.8;
+}
+.fit-profile-footer {
+    text-align: center;
+    background: #173c2c;
+    color: #b9d2c1;
+    font-size: 11px;
+    padding: 24px 10px;
+}
+@media (max-width: 1000px) {
+    .fit-profile-layout {
+        grid-template-columns: 260px minmax(0, 1fr);
+    }
+    .fit-profile-side,
+    .fit-profile-card {
+        padding: 22px;
+    }
+}
+@media (max-width: 720px) {
+    .fit-profile-layout {
+        grid-template-columns: 1fr;
+    }
+    .fit-profile-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .fit-profile-data {
+        grid-template-columns: 1fr;
+    }
+    .fit-profile-page {
+        padding: 24px 14px 55px;
+    }
+    .fit-account-toggle {
+        max-width: 155px;
+    }
+    .fit-account-name {
+        max-width: 75px;
+    }
+    .fit-account-popup {
+        min-width: 245px;
+    }
+    .fit-profile-side,
+    .fit-profile-card {
+        padding: 22px;
+    }
+}
+@media (max-width: 440px) {
+    .fit-account-name {
+        display: none;
+    }
+    .fit-account-toggle {
+        padding: 5px;
+    }
+    .fit-profile-card-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+    .fit-profile-active {
+        display: none;
+    }
+    .fit-profile-side h2 {
+        font-size: 18px;
+    }
+}

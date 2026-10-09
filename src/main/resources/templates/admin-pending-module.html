@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title th:text="${moduleTitle} + ' | FITFOOD Admin'">
+            Tính năng | FITFOOD Admin
+        </title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+            rel="stylesheet"
+            />
+        <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
+        <style>
+            .pending-page {
+                max-width: 1060px;
+                margin: 0 auto;
+            }
+            .pending-kicker {
+                color: #098162;
+                font-size: 11px;
+                font-weight: 800;
+                letter-spacing: 2px;
+            }
+            .pending-title {
+                font-size: clamp(26px, 3vw, 34px);
+                color: #0a3d30;
+                margin: 11px 0 8px;
+            }
+            .pending-subtitle {
+                color: #779186;
+                line-height: 1.8;
+                margin: 0 0 24px;
+                font-size: 13px;
+            }
+            .pending-hero {
+                border: 1px solid #dcece3;
+                border-radius: 19px;
+                padding: 32px;
+                background: linear-gradient(122deg, #fff, #f4fcf7);
+                box-shadow: 0 6px 20px #08352206;
+            }
+            .pending-status {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                color: #8b5e17;
+                background: #fff3d8;
+                padding: 8px 13px;
+                border-radius: 999px;
+                font-size: 11px;
+                font-weight: 700;
+            }
+            .pending-status::before {
+                content: "●";
+                font-size: 10px;
+            }
+            .pending-hero h2 {
+                color: #0b3d2f;
+                font-size: 24px;
+                margin: 22px 0 8px;
+            }
+            .pending-hero p {
+                line-height: 1.85;
+                font-size: 13px;
+                color: #688479;
+                max-width: 720px;
+            }
+            .pending-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-top: 23px;
+            }
+            .pending-actions a {
+                text-decoration: none;
+                background: #078262;
+                border-radius: 11px;
+                padding: 12px 18px;
+                color: white;
+                font-size: 12px;
+                font-weight: 700;
+            }
+            .pending-actions a.pending-outline {
+                background: white;
+                color: #126f54;
+                border: 1px solid #c6e4d4;
+            }
+            .pending-grid {
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 15px;
+                margin-top: 20px;
+            }
+            .pending-card {
+                background: #fff;
+                border: 1px solid #e3efe7;
+                border-radius: 15px;
+                padding: 20px;
+                min-height: 145px;
+            }
+            .pending-num {
+                width: 32px;
+                height: 32px;
+                border-radius: 10px;
+                background: #e7f7ed;
+                color: #087c59;
+                display: grid;
+                place-items: center;
+                font-weight: 800;
+                margin-bottom: 15px;
+            }
+            .pending-card p {
+                color: #23493b;
+                font-size: 13px;
+                font-weight: 600;
+                line-height: 1.7;
+                margin: 0;
+            }
+            .pending-meta {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 15px;
+                margin-top: 20px;
+            }
+            .pending-meta > div {
+                background: white;
+                border: 1px solid #e3efe7;
+                border-radius: 14px;
+                padding: 17px 20px;
+                min-width: 0;
+            }
+            .pending-meta small {
+                display: block;
+                font-size: 10px;
+                color: #81998c;
+                margin-bottom: 7px;
+            }
+            .pending-meta strong {
+                font-size: 12px;
+                color: #1b5845;
+                overflow-wrap: anywhere;
+            }
+            @media (max-width: 780px) {
+                .pending-grid,
+                .pending-meta {
+                    grid-template-columns: 1fr;
+                }
+                .pending-hero {
+                    padding: 22px;
+                }
+            }
+        </style>
+    </head>
+    <body class="admin-body">
+        <div class="adm-layout">
+            <aside
+                class="adm-sidebar"
+                th:replace="~{fragments/admin-sidebar :: sidebar(${module})}"
+                ></aside>
+            <div class="adm-main">
+                <header class="adm-top">
+                    <div class="admin-breadcrumb">
+                        FITFOOD <span>/</span> <b th:text="${moduleTitle}">Chức năng</b>
+                    </div>
+                    <a
+                        th:href="@{/admin}"
+                        style="color: #087e5e; font-size: 12px; font-weight: 700"
+                        >← Tổng quan</a
+                    >
+                </header>
+                <main class="adm-content pending-page">
+                    <span class="pending-kicker">FITFOOD / QUẢN LÝ CỬA HÀNG</span>
+                    <h1 class="pending-title" th:text="'Quản lý ' + ${moduleTitle}">
+                        Chức năng quản lý
+                    </h1>
+                    <p class="pending-subtitle">
+                        Menu đã kết nối đường dẫn và kiểm tra quyền SQL cho tài khoản ADMIN.
+                    </p>
+                    <section class="pending-hero">
+                        <span class="pending-status">CHƯA TRIỂN KHAI CHỨC NĂNG</span>
+                        <h2>Chức năng đang phát triển</h2>
+                        <p>
+                            Trang này là giao diện chuẩn bị cho chức năng quản trị tiếp theo.
+                            Các nút thêm, sửa, xóa và dữ liệu nghiệp vụ chưa được lập trình;
+                            chưa có thay đổi nào được ghi vào database.
+                        </p>
+                        <div class="pending-actions">
+                            <a th:href="@{/admin}">← Quay về Tổng quan</a>
+                            <a class="pending-outline" th:href="@{/admin/permissions}"
+                               >Xem quyền đã cấp</a
+                            >
+                        </div>
+                    </section>
+                    <div class="pending-grid">
+                        <div class="pending-card">
+                            <span class="pending-num">01</span>
+                            <p th:text="${moduleStep1}">Bước 1</p>
+                        </div>
+                        <div class="pending-card">
+                            <span class="pending-num">02</span>
+                            <p th:text="${moduleStep2}">Bước 2</p>
+                        </div>
+                        <div class="pending-card">
+                            <span class="pending-num">03</span>
+                            <p th:text="${moduleStep3}">Bước 3</p>
+                        </div>
+                    </div>
+                    <div class="pending-meta">
+                        <div>
+                            <small>QUYỀN SQL YÊU CẦU</small
+                            ><strong th:text="${modulePermission}">QUAN_LY</strong>
+                        </div>
+                        <div>
+                            <small>BẢNG DỮ LIỆU THAM CHIẾU TRONG SQL THIẾT KẾ</small
+                            ><strong th:text="${moduleTables}">Danh sách bảng</strong>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </body>
+</html>
