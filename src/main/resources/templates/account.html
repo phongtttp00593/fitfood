@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tài khoản của tôi | FITFOOD</title>
+    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
+    <link rel="stylesheet" th:href="@{/css/fitfood-auth.css}" />
+    <link rel="stylesheet" th:href="@{/css/fitfood-account.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="nav-inner">
+        <a th:href="@{/}" class="site-brand"
+          ><img th:src="@{/images/leaf.svg}" alt="" /><span>FITFOOD</span></a
+        >
+        <nav class="nav-menu">
+          <a th:href="@{/}">Trang chủ</a><a th:href="@{/menu}">Thực đơn</a
+          ><a th:href="@{/cart}">Giỏ hàng</a>
+        </nav>
+        <div class="nav-right">
+          <a class="fit-account-back" th:href="@{/}">← Về trang chủ</a>
+          <form class="auth-nav-logout" method="post" th:action="@{/dang-xuat}">
+            <input
+              type="hidden"
+              th:name="${_csrf.parameterName}"
+              th:value="${_csrf.token}"
+            />
+            <button type="submit">Đăng xuất</button>
+          </form>
+        </div>
+      </div>
+    </header>
+    <main class="fit-profile-page" th:if="${accountInfo != null}">
+      <div class="fit-profile-container">
+        <div class="fit-profile-breadcrumb">
+          <a th:href="@{/}">Trang chủ</a><span>›</span
+          ><strong>Tài khoản của tôi</strong>
+        </div>
+        <div class="fit-profile-heading">
+          <div>
+            <span class="fit-profile-kicker">FITFOOD MEMBER</span>
+            <h1>Thông tin tài khoản</h1>
+            <p>Thông tin cá nhân được lưu trong hệ thống FITFOOD.</p>
+          </div>
+          <span class="fit-profile-active">● Đang hoạt động</span>
+        </div>
+        <div class="fit-profile-layout">
+          <aside class="fit-profile-side">
+            <div
+              class="fit-profile-large-avatar"
+              th:text="${accountInfo.initials}"
+            >
+              P
+            </div>
+            <h2 th:text="${accountInfo.fullName}">Họ tên</h2>
+            <p th:text="${accountInfo.email}">email@example.com</p>
+            <div class="fit-profile-pill" th:text="${accountInfo.role}">
+              Khách hàng
+            </div>
+            <nav class="fit-profile-links">
+              <a th:href="@{/tai-khoan}" class="fit-profile-selected"
+                >👤 Thông tin của tôi</a
+              >
+              <a th:href="@{/menu}">🥗 Khám phá thực đơn</a>
+              <a th:if="${isAdmin}" th:href="@{/admin}">⚙ Trang quản trị</a>
+              <a th:href="@{/quen-mat-khau}">🔐 Đặt lại mật khẩu qua email</a>
+            </nav>
+          </aside>
+          <section class="fit-profile-card">
+            <div class="fit-profile-card-title">
+              <div>
+                <h2>Hồ sơ cá nhân</h2>
+                <p>Thông tin được lấy trực tiếp từ tài khoản đã đăng nhập.</p>
+              </div>
+              <span>✓ Đã đăng nhập</span>
+            </div>
+            <div class="fit-profile-data">
+              <div class="fit-profile-data-item">
+                <span>Họ và tên</span
+                ><strong th:text="${accountInfo.fullName}">Họ tên</strong>
+              </div>
+              <div class="fit-profile-data-item">
+                <span>Địa chỉ email</span
+                ><strong th:text="${accountInfo.email}"
+                  >email@example.com</strong
+                >
+              </div>
+              <div class="fit-profile-data-item">
+                <span>Loại tài khoản</span
+                ><strong th:text="${accountInfo.role}">Khách hàng</strong>
+              </div>
+              <div class="fit-profile-data-item">
+                <span>Ngày tham gia</span
+                ><strong th:text="${accountInfo.joinedDate}">09/10/2026</strong>
+              </div>
+            </div>
+            <div class="fit-profile-action-row">
+              <a class="fit-profile-main-button" th:href="@{/menu}"
+                >Xem thực đơn →</a
+              >
+              <a
+                th:if="${isAdmin}"
+                class="fit-profile-secondary-button"
+                th:href="@{/admin}"
+                >Đến trang Admin →</a
+              >
+            </div>
+            <div class="fit-profile-security-note">
+              🔒 FITFOOD không hiển thị mật khẩu để bảo vệ tài khoản của bạn.
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+    <footer class="fit-profile-footer">
+      © 2026 FITFOOD — Ăn ngon, sống khỏe 💚
+    </footer>
+  </body>
+</html>
