@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Menu chung Admin: mục đã hoạt động và mục đang phát triển đều có trang đích hợp lệ. -->
+<aside class="adm-sidebar" th:fragment="sidebar(active)">
+    <style>
+        /* Danh sach dai: chi cuon menu, khong che nut Trang chu/Tai khoan. */
+        .adm-sidebar .adm-nav { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; align-content: start; scrollbar-width: thin; scrollbar-color: #477964 transparent; }
+        .adm-sidebar .adm-nav > a { flex-shrink: 0; }
+        .adm-sidebar .adm-nav-divider { height: 1px; background: rgba(255,255,255,.12); margin: 5px 8px; }
+        .adm-sidebar .adm-nav > a span { min-width: 0; }
+        @media (max-width: 900px) {
+            .adm-sidebar .adm-nav { flex: none; overflow-x: auto; overflow-y: hidden; align-content: initial; }
+            .adm-sidebar .adm-nav-divider { flex: 0 0 1px; height: auto; margin: 5px 5px; }
+        }
+    </style>
+
+    <a th:href="@{/admin}" class="adm-brand">
+        <span class="admin-logo"><img th:src="@{/images/leaf.svg}" alt=""></span>
+        <span><b>FITFOOD</b><small>ADMIN PANEL</small></span>
+    </a>
+    <div class="adm-nav-cap">QUẢN LÝ CỬA HÀNG</div>
+    <nav class="adm-nav" aria-label="Điều hướng quản trị">
+        <a th:href="@{/admin}" th:classappend="${active == 'dashboard'} ? 'adm-nav-on' : ''">
+            <svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <span>Tổng quan</span>
+        </a>
+        <a th:href="@{/admin/categories}" th:classappend="${active == 'categories'} ? 'adm-nav-on' : ''">
+            <svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+            <span>Danh mục</span>
+        </a>
+        <a th:href="@{/admin/products}" th:classappend="${active == 'products'} ? 'adm-nav-on' : ''">
+            <svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M20 3C8 3 3 8 3 16a5 5 0 0 0 5 5c8 0 13-5 12-18ZM3 21 17 7"/></svg>
+            <span>Sản phẩm <small style="opacity:.65;font-size:10px">(mẫu)</small></span>
+        </a>
+        <div class="adm-nav-divider" aria-hidden="true"></div>
+        <a th:href="@{/admin/orders}" th:classappend="${active == 'orders'} ? 'adm-nav-on' : ''" title="Đơn hàng – đang phát triển">
+            <svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 9h8M8 13h8M8 17h5"/></svg>
+            <span>Đơn hàng</span>
+        </a>
+        <a th:href="@{/admin/promotions}" th:classappend="${active == 'promotions'} ? 'adm-nav-on' : ''" title="Khuyến mãi – đang phát triển">
+            <svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 12v7a1 1 0 0 1-1 1h-7L3 11V4a1 1 0 0 1 1-1h7l9 9Z"/><circle cx="8" cy="8" r="1"/></svg>
+            <span>Khuyến mãi</span>
+        </a>
+        <a th:href="@{/admin/customers}" th:classappend="${active == 'customers'} ? 'adm-nav-on' : ''" title="Khách hàng – đang phát triển">
+            <svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3"/><path d="M2 20v-1a7 7 0 0 1 14 0v1M16 5a3 3 0 0 1 0 6M19 20v-1a6 6 0 0 0-2-5"/></svg>
+            <span>Khách hàng</span>
+        </a>
+        <a th:href="@{/admin/deliveries}" th:classappend="${active == 'deliveries'} ? 'adm-nav-on' : ''" title="Giao hàng – đang phát triển">
+            <svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h11v12H3zM14 10h4l3 4v4h-7"/><circle cx="7.5" cy="18" r="2"/><circle cx="17.5" cy="18" r="2"/></svg>
+            <span>Giao hàng</span>
+        </a>
+        <a th:href="@{/admin/invoices}" th:classappend="${active == 'invoices'} ? 'adm-nav-on' : ''" title="Hóa đơn – đang phát triển">
+            <svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg>
+            <span>Hóa đơn</span>
+        </a>
+        <a th:href="@{/admin/support}" th:classappend="${active == 'support'} ? 'adm-nav-on' : ''" title="Hỗ trợ khách hàng – đang phát triển">
+            <svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 13v-2a8 8 0 0 1 16 0v2M4 13H3v5h4v-5H4ZM20 13h1v5h-4v-5h3ZM17 20a5 5 0 0 1-5 2"/></svg>
+            <span>Hỗ trợ khách hàng</span>
+        </a>
+        <a th:href="@{/admin/reports}" th:classappend="${active == 'reports'} ? 'adm-nav-on' : ''" title="Thống kê & báo cáo – đang phát triển">
+            <svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18M6 17v-5M12 17V7M18 17V3"/></svg>
+            <span>Thống kê & báo cáo</span>
+        </a>
+        <div class="adm-nav-divider" aria-hidden="true"></div>
+        <a th:href="@{/tai-khoan}">
+            <svg class="ic" width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 22c0-5 3-8 8-8s8 3 8 8"/></svg>
+            <span>Tài khoản</span>
+        </a>
+    </nav>
+    <div class="adm-nav-bottom">
+        <a th:href="@{/}">← Về trang chủ</a>
+        <a class="admin-identity fit-admin-profile-link" th:href="@{/tai-khoan}">
+            <span th:text="${accountInfo != null ? accountInfo.initials : 'A'}">A</span>
+            <div><b th:text="${accountInfo != null ? accountInfo.fullName : 'Admin'}">Admin</b><small>Quản trị viên</small></div>
+            <span>›</span>
+        </a>
+    </div>
+</aside>
+</body>
+</html>
