@@ -1,3 +1,4 @@
+
 package com.fitfood.controller;
 
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -71,23 +72,18 @@ public class AdminPendingModuleController {
             "HoTroKhachHang");
     }
 
-    // ================= THONG KE VA BAO CAO =================
-
-    @PreAuthorize("@permissionService.allowed(authentication, 'XEM_BAO_CAO')")
-    @GetMapping("/admin/reports")
-    public String reports(Model model) {
-        return show(model, "reports", "Thống kê & báo cáo", "XEM_BAO_CAO",
-            "Tổng hợp doanh thu",
-            "Phân tích đơn hàng và sản phẩm",
-            "Báo cáo theo mốc thời gian",
-            "DonHang, ThanhToan");
-    }
+    /*
+     * Chuc nang Thong ke & Bao cao da duoc chuyen sang
+     * StatisticsController, xu ly tai /admin/reports.
+     * Khong khai bao mapping /admin/reports tai day de tranh trung URL.
+     */
 
     // ================= HAM DUNG CHUNG =================
 
     private String show(Model model, String module, String title,
                         String permission, String step1, String step2,
                         String step3, String tables) {
+
         model.addAttribute("module", module);
         model.addAttribute("moduleTitle", title);
         model.addAttribute("modulePermission", permission);
