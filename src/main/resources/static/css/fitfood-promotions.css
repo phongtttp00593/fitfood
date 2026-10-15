@@ -1,0 +1,193 @@
+
+/* =========================================
+   FITFOOD - QUẢN LÝ KHUYẾN MÃI
+   CSS dùng chung cho:
+   - admin-promotions.html
+   - admin-promotion-form.html
+   ========================================= */
+
+
+/* =========================================
+   1. TRANG DANH SÁCH KHUYẾN MÃI
+   ========================================= */
+
+/* Ngày bắt đầu và ngày kết thúc */
+.promo-date {
+    white-space: nowrap;
+}
+
+/* Trạng thái: Sắp diễn ra */
+.promo-upcoming {
+    color: #9a6b10;
+    background: #fff3d4;
+}
+
+/* Trạng thái: Đang diễn ra */
+.promo-running {
+    color: #147748;
+    background: #e3f5ea;
+}
+
+/* Trạng thái: Đã kết thúc */
+.promo-ended {
+    color: #6b7280;
+    background: #edf0f2;
+}
+
+/* Trạng thái: Đã tắt */
+.promo-disabled {
+    color: #b42318;
+    background: #fee8e7;
+}
+
+/* Hiển thị mức giảm giá */
+.promo-amount {
+    font-weight: 800;
+    color: #087c54;
+    white-space: nowrap;
+}
+
+/* Bảng danh sách */
+.promo-table {
+    min-width: 1080px;
+}
+
+/* Căn giữa nội dung theo chiều dọc */
+.promo-table td {
+    vertical-align: middle;
+}
+
+/* Cột tên chương trình */
+.promo-name {
+    min-width: 160px;
+}
+
+/* Nhóm nút thao tác */
+.promo-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    white-space: normal;
+    min-width: 165px;
+}
+
+/* Form của nút bật/tắt và xóa */
+.promo-actions form {
+    margin: 0;
+}
+
+/* Đồng bộ các nút thao tác */
+.promo-actions .cat-action {
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+
+/* =========================================
+   2. FORM THÊM / SỬA KHUYẾN MÃI
+   ========================================= */
+
+/* Bố cục form gồm hai cột */
+.promo-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 24px;
+}
+
+/* Các ô nhập liệu */
+.promo-form-grid .cat-field {
+    min-width: 0;
+}
+
+/* Input và Select */
+.promo-form-grid .cat-field input,
+.promo-form-grid .cat-field select {
+    width: 100%;
+}
+
+/* Trường chiếm toàn bộ hai cột */
+.promo-full {
+    grid-column: 1 / -1;
+}
+
+/* Khung thông báo lên lịch khuyến mãi */
+.promo-notice {
+    margin: 0 0 22px;
+    padding: 15px 18px;
+
+    background: #eff8f2;
+    border: 1px solid #d4eadb;
+    border-radius: 12px;
+
+    color: #246044;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+/* Khoảng cách bên trong form */
+.promo-editor {
+    padding: 25px;
+}
+
+/* Nhãn của các trường */
+.promo-editor .cat-field label {
+    display: block;
+}
+
+/* Dấu sao bắt buộc */
+.promo-required {
+    color: #dc3545;
+}
+
+/* Nhóm nút Hủy và Lưu */
+.promo-form-actions {
+    margin-top: 25px;
+
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Nút lưu */
+.promo-form-actions .cat-primary-btn {
+    cursor: pointer;
+    font-family: inherit;
+}
+
+
+/* =========================================
+   3. RESPONSIVE
+   ========================================= */
+
+/* Tablet và điện thoại */
+@media (max-width: 700px) {
+
+    /* Form chuyển thành một cột */
+    .promo-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Trường full vẫn chiếm một cột */
+    .promo-full {
+        grid-column: 1;
+    }
+
+    /* Giảm padding form */
+    .promo-editor {
+        padding: 16px;
+    }
+
+    /* Nút lưu và hủy */
+    .promo-form-actions {
+        flex-wrap: wrap;
+    }
+
+    /* Bảng có thể cuộn ngang */
+    .promo-table {
+        min-width: 1080px;
+    }
+}
