@@ -2,461 +2,427 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Thống kê & Báo cáo | FITFOOD</title>
+        <title>Thống kê & Báo cáo | FITFOOD</title>
 
-    <!-- CSS giao diện chung -->
-    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
-    <link rel="stylesheet" th:href="@{/css/fitfood-auth.css}">
+        <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
+        <link rel="stylesheet" th:href="@{/css/fitfood-auth.css}">
+        <link rel="stylesheet" th:href="@{/css/fitfood-reports.css}">
 
-    <!-- Font chữ -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin="anonymous">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect"
+              href="https://fonts.gstatic.com"
+              crossorigin="anonymous">
 
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+              rel="stylesheet">
 
-    <!-- CSS riêng của trang báo cáo -->
-    <link rel="stylesheet" th:href="@{/css/fitfood-reports.css}">
+        <style>
+            
+            .report-chart-content {
+                width: 100%;
+                overflow-x: auto;
+                padding: 20px 0;
+            }
 
-    <!-- CSS bổ sung cho dữ liệu biểu đồ -->
-    <style>
-        .report-chart-content {
-            width: 100%;
-            overflow-x: auto;
-            padding: 20px 0;
-        }
+            .report-chart-bars {
+                display: flex;
+                align-items: flex-end;
+                gap: 20px;
+                min-height: 260px;
+                min-width: max-content;
+                padding: 10px 12px;
+            }
 
-        .report-chart-bars {
-            display: flex;
-            align-items: flex-end;
-            gap: 20px;
-            min-height: 260px;
-            min-width: max-content;
-            padding: 10px 12px;
-        }
+            .report-chart-column {
+                width: 95px;
+                flex-shrink: 0;
+                text-align: center;
+            }
 
-        .report-chart-column {
-            width: 95px;
-            flex-shrink: 0;
-            text-align: center;
-        }
+            .report-chart-revenue {
+                font-size: 12px;
+                font-weight: 600;
+                margin-bottom: 10px;
+                overflow-wrap: anywhere;
+            }
 
-        .report-chart-revenue {
-            font-size: 12px;
-            font-weight: 600;
-            margin-bottom: 10px;
-            overflow-wrap: anywhere;
-        }
+            .report-chart-bar-area {
+                height: 180px;
+                display: flex;
+                align-items: flex-end;
+                justify-content: center;
+            }
 
-        .report-chart-bar-area {
-            height: 180px;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-        }
+            .report-chart-bar {
+                width: 38px;
+                background: #28a745;
+                border-radius: 6px 6px 0 0;
+                transition: height .3s ease;
+            }
 
-        .report-chart-bar {
-            width: 38px;
-            background: #28a745;
-            border-radius: 6px 6px 0 0;
-            transition: height .3s ease;
-        }
+            .report-chart-date {
+                margin-top: 10px;
+                font-size: 12px;
+            }
 
-        .report-chart-date {
-            margin-top: 10px;
-            font-size: 12px;
-        }
+            .report-data-empty {
+                padding: 28px 16px;
+                text-align: center;
+                color: #777;
+            }
 
-        .report-data-empty {
-            padding: 28px 16px;
-            text-align: center;
-            color: #777;
-        }
+            .report-data-empty .chart-empty-icon {
+                font-size: 32px;
+                margin-bottom: 10px;
+            }
+        </style>
+    </head>
 
-        .report-data-empty .chart-empty-icon {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-    </style>
-</head>
+    <body class="admin-body">
 
-<body class="admin-body">
+        <div class="adm-layout">
 
-    <!-- Khung quản trị chung -->
-    <div class="adm-layout">
+            <!-- Menu bên trái giữ nguyên -->
+            <aside class="adm-sidebar"
+                   th:replace="~{fragments/admin-sidebar :: sidebar('reports')}">
+            </aside>
 
-        <!-- Thanh menu bên trái -->
-        <aside class="adm-sidebar"
-               th:replace="~{fragments/admin-sidebar :: sidebar('reports')}">
-        </aside>
+            <div class="adm-main">
 
-        <!-- Nội dung bên phải -->
-        <div class="adm-main">
 
-            <main class="report-page">
-                <div class="report-container">
+                <!-- THANH TRÊN CÙNG -->
+                <header class="reports-topbar">
 
-                    <!-- Tiêu đề -->
-                    <header class="report-header">
-                        <div>
-                            <h1>Thống kê & Báo cáo</h1>
-                            <p>Theo dõi tình hình kinh doanh của FITFOOD</p>
-                        </div>
-                    </header>
+                    <div class="reports-topbar-left">
+                        <span class="reports-brand">
+                            FITFOOD
+                        </span>
 
-                    <!-- Thông báo lỗi -->
-                    <div class="report-alert"
-                         th:if="${filterError != null}"
-                         th:text="${filterError}">
+                        <span class="reports-divider">/</span>
+
+                        <span class="reports-page-title">
+                            Thống kê &amp; Báo cáo
+                        </span>
                     </div>
 
-                    <!-- Bộ lọc thời gian -->
-                    <section class="report-filter">
-                        <div class="section-heading">
-                            <h2>Lọc dữ liệu</h2>
-                            <p>Chọn khoảng thời gian muốn thống kê</p>
-                        </div>
+                    <div class="reports-topbar-right">
+                        <span class="reports-admin-name">
+                            Quản trị viên
+                        </span>
 
-                        <form th:action="@{/admin/reports}"
-                              method="get"
-                              class="filter-form"
-                              id="reportFilterForm">
-
-                            <div class="filter-field">
-                                <label for="period">Loại thống kê</label>
-
-                                <select id="period"
-                                        name="period"
-                                        onchange="changePeriod()">
-
-                                    <option value="day"
-                                            th:selected="${selectedPeriod == 'day'}">
-                                        Theo ngày
-                                    </option>
-
-                                    <option value="month"
-                                            th:selected="${selectedPeriod == 'month'}">
-                                        Theo tháng
-                                    </option>
-
-                                    <option value="year"
-                                            th:selected="${selectedPeriod == 'year'}">
-                                        Theo năm
-                                    </option>
-
-                                    <option value="range"
-                                            th:selected="${selectedPeriod == 'range'}">
-                                        Khoảng ngày
-                                    </option>
-                                </select>
-                            </div>
-
-                            <!-- Lọc theo ngày -->
-                            <div class="filter-field period-field" id="dayField">
-                                <label for="date">Chọn ngày</label>
-                                <input type="date"
-                                       id="date"
-                                       name="date"
-                                       th:value="${selectedDate}">
-                            </div>
-
-                            <!-- Lọc theo tháng -->
-                            <div class="filter-field period-field" id="monthField">
-                                <label for="month">Chọn tháng</label>
-                                <input type="month"
-                                       id="month"
-                                       name="month"
-                                       th:value="${selectedMonth}">
-                            </div>
-
-                            <!-- Lọc theo năm -->
-                            <div class="filter-field period-field" id="yearField">
-                                <label for="year">Chọn năm</label>
-                                <input type="number"
-                                       id="year"
-                                       name="year"
-                                       min="2000"
-                                       max="2100"
-                                       th:value="${selectedYear}">
-                            </div>
-
-                            <!-- Lọc từ ngày -->
-                            <div class="filter-field period-field" id="startDateField">
-                                <label for="startDate">Từ ngày</label>
-                                <input type="date"
-                                       id="startDate"
-                                       name="startDate"
-                                       th:value="${startDate}">
-                            </div>
-
-                            <!-- Lọc đến ngày -->
-                            <div class="filter-field period-field" id="endDateField">
-                                <label for="endDate">Đến ngày</label>
-                                <input type="date"
-                                       id="endDate"
-                                       name="endDate"
-                                       th:value="${endDate}">
-                            </div>
-
-                            <div class="filter-actions">
-                                <button type="submit" class="btn-filter">
-                                    Lọc dữ liệu
-                                </button>
-
-                                <a th:href="@{/admin/reports}" class="btn-reset">
-                                    Làm mới
-                                </a>
-                            </div>
+                        <form th:action="@{/dang-xuat}" method="post" style="margin: 0;">
+                            <button type="submit" class="reports-logout">
+                                Đăng xuất
+                            </button>
                         </form>
-                    </section>
+                    </div>
 
-                    <!-- Các thẻ thống kê -->
-                    <section class="report-stats">
+                </header>
 
-                        <article class="stat-card revenue-card">
-                            <div class="stat-icon">₫</div>
-                            <div class="stat-content">
-                                <p>Doanh thu</p>
-                                <h3>
-                                    <span th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')}">0</span>
-                                    <small>đ</small>
-                                </h3>
+
+                <!-- NỘI DUNG THỐNG KÊ -->
+                <main class="report-page">
+                    <div class="report-container">
+
+
+                        <header class="report-header">
+                            <div>
+                                <h1>Thống kê &amp; Báo cáo</h1>
+                                <p>Theo dõi tình hình kinh doanh của FITFOOD</p>
                             </div>
-                        </article>
+                        </header>
 
-                        <article class="stat-card orders-card">
-                            <div class="stat-icon">▤</div>
-                            <div class="stat-content">
-                                <p>Tổng đơn hàng</p>
-                                <h3 th:text="${totalOrders}">0</h3>
-                            </div>
-                        </article>
-
-                        <article class="stat-card products-card">
-                            <div class="stat-icon">▣</div>
-                            <div class="stat-content">
-                                <p>Sản phẩm đã bán</p>
-                                <h3 th:text="${totalProductsSold}">0</h3>
-                            </div>
-                        </article>
-
-                        <article class="stat-card customers-card">
-                            <div class="stat-icon">♙</div>
-                            <div class="stat-content">
-                                <p>Khách hàng</p>
-                                <h3 th:text="${totalCustomers}">0</h3>
-                            </div>
-                        </article>
-
-                    </section>
-
-                    <!-- Biểu đồ doanh thu -->
-                    <section class="report-panel">
-                        <div class="section-heading">
-                            <h2>Biểu đồ doanh thu</h2>
-                            <p>Doanh thu trong khoảng thời gian đã chọn</p>
+                        <div class="report-alert"
+                             th:if="${filterError != null}"
+                             th:text="${filterError}">
                         </div>
 
-                        <!-- Hiện khi chưa có đơn hàng trong thời gian lọc -->
-                        <div class="report-data-empty"
-                             th:if="${#lists.isEmpty(revenueByDay)}">
+                        <!-- BỘ LỌC -->
+                        <section class="report-filter">
+                            <div class="section-heading">
+                                <h2>Lọc dữ liệu</h2>
+                                <p>Chọn khoảng thời gian muốn thống kê</p>
+                            </div>
 
-                            <div class="chart-empty-icon">▥</div>
+                            <form th:action="@{/admin/reports}"
+                                  method="get"
+                                  class="filter-form"
+                                  id="reportFilterForm">
 
-                            <h3>Chưa có dữ liệu biểu đồ</h3>
-
-                            <p>
-                                Chưa có đơn hàng trong khoảng thời gian đã chọn.
-                            </p>
-                        </div>
-
-                        <!-- Hiện biểu đồ khi có dữ liệu -->
-                        <div class="report-chart-content"
-                             th:unless="${#lists.isEmpty(revenueByDay)}">
-
-                            <div class="report-chart-bars">
-
-                                <div class="report-chart-column"
-                                     th:each="item : ${revenueByDay}">
-
-                                    <div class="report-chart-revenue"
-                                         th:text="${#numbers.formatDecimal(
-                                             item.revenue, 0, 'COMMA', 0, 'POINT') + ' đ'}">
-                                        0 đ
-                                    </div>
-
-                                    <div class="report-chart-bar-area">
-
-                                        <div class="report-chart-bar"
-                                             th:style="|height: ${item.barHeight}px;|">
-                                        </div>
-
-                                    </div>
-
-                                    <div class="report-chart-date"
-                                         th:text="${item.reportDate}">
-                                        14/10/2026
-                                    </div>
-
+                                <div class="filter-field">
+                                    <label for="period">Loại thống kê</label>
+                                    <select id="period" name="period"
+                                            onchange="changePeriod()">
+                                        <option value="day"
+                                                th:selected="${selectedPeriod == 'day'}">
+                                            Theo ngày
+                                        </option>
+                                        <option value="month"
+                                                th:selected="${selectedPeriod == 'month'}">
+                                            Theo tháng
+                                        </option>
+                                        <option value="year"
+                                                th:selected="${selectedPeriod == 'year'}">
+                                            Theo năm
+                                        </option>
+                                        <option value="range"
+                                                th:selected="${selectedPeriod == 'range'}">
+                                            Khoảng ngày
+                                        </option>
+                                    </select>
                                 </div>
 
+                                <div class="filter-field period-field" id="dayField">
+                                    <label for="date">Chọn ngày</label>
+                                    <input type="date" id="date" name="date"
+                                           th:value="${selectedDate}">
+                                </div>
+
+                                <div class="filter-field period-field" id="monthField">
+                                    <label for="month">Chọn tháng</label>
+                                    <input type="month" id="month" name="month"
+                                           th:value="${selectedMonth}">
+                                </div>
+
+                                <div class="filter-field period-field" id="yearField">
+                                    <label for="year">Chọn năm</label>
+                                    <input type="number" id="year" name="year"
+                                           min="2000" max="2100"
+                                           th:value="${selectedYear}">
+                                </div>
+
+                                <div class="filter-field period-field" id="startDateField">
+                                    <label for="startDate">Từ ngày</label>
+                                    <input type="date" id="startDate"
+                                           name="startDate"
+                                           th:value="${startDate}">
+                                </div>
+
+                                <div class="filter-field period-field" id="endDateField">
+                                    <label for="endDate">Đến ngày</label>
+                                    <input type="date" id="endDate"
+                                           name="endDate"
+                                           th:value="${endDate}">
+                                </div>
+
+                                <div class="filter-actions">
+                                    <button type="submit" class="btn-filter">
+                                        Lọc dữ liệu
+                                    </button>
+
+                                    <a th:href="@{/admin/reports}" class="btn-reset">
+                                        Làm mới
+                                    </a>
+                                </div>
+                            </form>
+                        </section>
+
+                        <!-- THẺ THỐNG KÊ -->
+                        <section class="report-stats">
+
+                            <article class="stat-card revenue-card">
+                                <div class="stat-icon">₫</div>
+                                <div class="stat-content">
+                                    <p>Doanh thu</p>
+                                    <h3>
+                                        <span th:text="${#numbers.formatDecimal(totalRevenue, 0, 'COMMA', 0, 'POINT')}">0</span>
+                                        <small>đ</small>
+                                    </h3>
+                                </div>
+                            </article>
+
+                            <article class="stat-card orders-card">
+                                <div class="stat-icon">▤</div>
+                                <div class="stat-content">
+                                    <p>Tổng đơn hàng</p>
+                                    <h3 th:text="${totalOrders}">0</h3>
+                                </div>
+                            </article>
+
+                            <article class="stat-card products-card">
+                                <div class="stat-icon">▣</div>
+                                <div class="stat-content">
+                                    <p>Sản phẩm đã bán</p>
+                                    <h3 th:text="${totalProductsSold}">0</h3>
+                                </div>
+                            </article>
+
+                            <article class="stat-card customers-card">
+                                <div class="stat-icon">♙</div>
+                                <div class="stat-content">
+                                    <p>Khách hàng</p>
+                                    <h3 th:text="${totalCustomers}">0</h3>
+                                </div>
+                            </article>
+
+                        </section>
+
+                        <!-- BIỂU ĐỒ DOANH THU -->
+                        <section class="report-panel">
+                            <div class="section-heading">
+                                <h2>Biểu đồ doanh thu</h2>
+                                <p>Doanh thu trong khoảng thời gian đã chọn</p>
                             </div>
-                        </div>
-                    </section>
 
-                    <!-- Trạng thái đơn hàng -->
-                    <section class="report-panel">
-                        <div class="section-heading">
-                            <h2>Trạng thái đơn hàng</h2>
-                            <p>Tổng quan trạng thái xử lý đơn hàng</p>
-                        </div>
-
-                        <div class="status-grid">
-
-                            <div class="status-item">
-                                <span class="status-dot status-pending"></span>
-                                <span>Chờ xử lý</span>
-                                <strong th:text="${waitingOrders}">0</strong>
+                            <div class="report-data-empty"
+                                 th:if="${#lists.isEmpty(revenueByDay)}">
+                                <div class="chart-empty-icon">▥</div>
+                                <h3>Chưa có dữ liệu biểu đồ</h3>
+                                <p>Chưa có đơn hàng trong khoảng thời gian đã chọn.</p>
                             </div>
 
-                            <div class="status-item">
-                                <span class="status-dot status-processing"></span>
-                                <span>Đang xử lý</span>
-                                <strong th:text="${processingOrders}">0</strong>
+                            <div class="report-chart-content"
+                                 th:unless="${#lists.isEmpty(revenueByDay)}">
+                                <div class="report-chart-bars">
+                                    <div class="report-chart-column"
+                                         th:each="item : ${revenueByDay}">
+
+                                        <div class="report-chart-revenue"
+                                             th:text="${#numbers.formatDecimal(item.revenue, 0, 'COMMA', 0, 'POINT') + ' đ'}">
+                                            0 đ
+                                        </div>
+
+                                        <div class="report-chart-bar-area">
+                                            <div class="report-chart-bar"
+                                                 th:style="|height: ${item.barHeight}px;|">
+                                            </div>
+                                        </div>
+
+                                        <div class="report-chart-date"
+                                             th:text="${item.reportDate}">
+                                            14/10/2026
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- TRẠNG THÁI ĐƠN HÀNG -->
+                        <section class="report-panel">
+                            <div class="section-heading">
+                                <h2>Trạng thái đơn hàng</h2>
+                                <p>Tổng quan trạng thái xử lý đơn hàng</p>
                             </div>
 
-                            <div class="status-item">
-                                <span class="status-dot status-completed"></span>
-                                <span>Hoàn thành</span>
-                                <strong th:text="${completedOrders}">0</strong>
+                            <div class="status-grid">
+                                <div class="status-item">
+                                    <span class="status-dot status-pending"></span>
+                                    <span>Chờ xử lý</span>
+                                    <strong th:text="${waitingOrders}">0</strong>
+                                </div>
+
+                                <div class="status-item">
+                                    <span class="status-dot status-processing"></span>
+                                    <span>Đang xử lý</span>
+                                    <strong th:text="${processingOrders}">0</strong>
+                                </div>
+
+                                <div class="status-item">
+                                    <span class="status-dot status-completed"></span>
+                                    <span>Hoàn thành</span>
+                                    <strong th:text="${completedOrders}">0</strong>
+                                </div>
+
+                                <div class="status-item">
+                                    <span class="status-dot status-cancelled"></span>
+                                    <span>Đã hủy</span>
+                                    <strong th:text="${cancelledOrders}">0</strong>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- ĐƠN HÀNG GẦN ĐÂY -->
+                        <section class="report-panel">
+                            <div class="section-heading">
+                                <h2>Đơn hàng gần đây</h2>
+                                <p>Các đơn hàng thuộc khoảng thời gian đang lọc</p>
                             </div>
 
-                            <div class="status-item">
-                                <span class="status-dot status-cancelled"></span>
-                                <span>Đã hủy</span>
-                                <strong th:text="${cancelledOrders}">0</strong>
+                            <div class="table-responsive">
+                                <table class="report-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Mã đơn hàng</th>
+                                            <th>Khách hàng</th>
+                                            <th>Ngày đặt</th>
+                                            <th>Tổng tiền</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr th:if="${#lists.isEmpty(recentOrders)}">
+                                            <td colspan="5" class="empty-table">
+                                                Chưa có dữ liệu đơn hàng để hiển thị.
+                                            </td>
+                                        </tr>
+
+                                        <tr th:each="order : ${recentOrders}">
+                                            <td th:text="${order.orderId}">1</td>
+
+                                            <td th:text="${order.customerName != null ? order.customerName : 'Khách hàng'}">
+                                                Khách hàng
+                                            </td>
+
+                                            <td th:text="${#dates.format(order.placedAt, 'dd/MM/yyyy HH:mm')}">
+                                                14/10/2026 10:00
+                                            </td>
+
+                                            <td th:text="${#numbers.formatDecimal(order.total, 0, 'COMMA', 0, 'POINT') + ' đ'}">
+                                                100.000 đ
+                                            </td>
+
+                                            <td th:text="${order.status}">Hoàn thành</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
+                        </section>
 
-                        </div>
-                    </section>
+                        <footer class="report-footer">
+                            FITFOOD · Hệ thống quản lý và báo cáo
+                        </footer>
 
-                    <!-- Đơn hàng gần đây -->
-                    <section class="report-panel">
-                        <div class="section-heading">
-                            <h2>Đơn hàng gần đây</h2>
-                            <p>Các đơn hàng thuộc khoảng thời gian đang lọc</p>
-                        </div>
+                    </div>
+                </main>
 
-                        <div class="table-responsive">
-                            <table class="report-table">
-
-                                <thead>
-                                    <tr>
-                                        <th>Mã đơn hàng</th>
-                                        <th>Khách hàng</th>
-                                        <th>Ngày đặt</th>
-                                        <th>Tổng tiền</th>
-                                        <th>Trạng thái</th>
-                                    </tr>
-                                </thead>
-
-                                <tbody>
-
-                                    <!-- Chỉ hiện khi không có đơn hàng -->
-                                    <tr th:if="${#lists.isEmpty(recentOrders)}">
-                                        <td colspan="5" class="empty-table">
-                                            Chưa có dữ liệu đơn hàng để hiển thị.
-                                        </td>
-                                    </tr>
-
-                                    <!-- Hiển thị từng đơn hàng từ database -->
-                                    <tr th:each="order : ${recentOrders}">
-
-                                        <td th:text="${order.orderId}">
-                                            1
-                                        </td>
-
-                                        <td th:text="${order.customerName != null
-                                                ? order.customerName : 'Khách hàng'}">
-                                            Khách hàng
-                                        </td>
-
-                                        <td th:text="${#dates.format(
-                                                order.placedAt,
-                                                'dd/MM/yyyy HH:mm')}">
-                                            14/10/2026 10:00
-                                        </td>
-
-                                        <td th:text="${#numbers.formatDecimal(
-                                                order.total,
-                                                0, 'COMMA', 0, 'POINT') + ' đ'}">
-                                            100.000 đ
-                                        </td>
-
-                                        <td th:text="${order.status}">
-                                            Hoàn thành
-                                        </td>
-
-                                    </tr>
-
-                                </tbody>
-                            </table>
-                        </div>
-                    </section>
-
-                    <!-- Chân trang -->
-                    <footer class="report-footer">
-                        FITFOOD · Hệ thống quản lý và báo cáo
-                    </footer>
-
-                </div>
-            </main>
-
+            </div>
         </div>
-        <!-- Kết thúc adm-main -->
 
-    </div>
-    <!-- Kết thúc adm-layout -->
+        <script>
+            function changePeriod() {
+                const period = document.getElementById("period").value;
 
-    <!-- Xử lý bộ lọc thời gian -->
-    <script>
-        function changePeriod() {
-            const period = document.getElementById("period").value;
+                const fields = [
+                    "dayField",
+                    "monthField",
+                    "yearField",
+                    "startDateField",
+                    "endDateField"
+                ];
 
-            const fields = [
-                "dayField",
-                "monthField",
-                "yearField",
-                "startDateField",
-                "endDateField"
-            ];
+                fields.forEach(function (fieldId) {
+                    document.getElementById(fieldId).style.display = "none";
+                });
 
-            fields.forEach(function (fieldId) {
-                document.getElementById(fieldId).style.display = "none";
-            });
-
-            if (period === "day") {
-                document.getElementById("dayField").style.display = "flex";
-            } else if (period === "month") {
-                document.getElementById("monthField").style.display = "flex";
-            } else if (period === "year") {
-                document.getElementById("yearField").style.display = "flex";
-            } else if (period === "range") {
-                document.getElementById("startDateField").style.display = "flex";
-                document.getElementById("endDateField").style.display = "flex";
+                if (period === "day") {
+                    document.getElementById("dayField").style.display = "flex";
+                } else if (period === "month") {
+                    document.getElementById("monthField").style.display = "flex";
+                } else if (period === "year") {
+                    document.getElementById("yearField").style.display = "flex";
+                } else if (period === "range") {
+                    document.getElementById("startDateField").style.display = "flex";
+                    document.getElementById("endDateField").style.display = "flex";
+                }
             }
-        }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            changePeriod();
-        });
-    </script>
+            document.addEventListener("DOMContentLoaded", changePeriod);
+        </script>
 
-</body>
+    </body>
 </html>
