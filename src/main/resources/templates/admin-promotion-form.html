@@ -13,63 +13,7 @@
 
     <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
     <link rel="stylesheet" th:href="@{/css/fitfood-categories.css}">
-
-    <style>
-        .promo-form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 18px 24px;
-        }
-
-        .promo-form-grid .cat-field {
-            min-width: 0;
-        }
-
-        .promo-form-grid .cat-field input,
-        .promo-form-grid .cat-field select {
-            width: 100%;
-        }
-
-        .promo-full {
-            grid-column: 1 / -1;
-        }
-
-        .promo-notice {
-            margin: 0 0 22px;
-            padding: 15px 18px;
-            background: #eff8f2;
-            border: 1px solid #d4eadb;
-            border-radius: 12px;
-            color: #246044;
-            font-size: 12px;
-            line-height: 1.8;
-        }
-
-        .promo-editor {
-            padding: 25px;
-        }
-
-        .promo-editor .cat-field label {
-            display: block;
-        }
-
-        .promo-form-actions {
-            margin-top: 25px;
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-
-        .promo-required {
-            color: #dc3545;
-        }
-
-        @media (max-width: 700px) {
-            .promo-form-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/fitfood-promotions.css}">
 </head>
 
 <body class="admin-body">
