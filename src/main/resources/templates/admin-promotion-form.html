@@ -1,0 +1,353 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm / Sửa khuyến mãi | FITFOOD Admin</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
+    <link rel="stylesheet" th:href="@{/css/fitfood-categories.css}">
+    <link rel="stylesheet" th:href="@{/css/fitfood-promotions.css}">
+</head>
+
+<body class="admin-body">
+
+<div class="adm-layout">
+
+    <!-- Sidebar chung -->
+    <aside class="adm-sidebar"
+           th:replace="~{fragments/admin-sidebar :: sidebar('promotions')}">
+    </aside>
+
+    <div class="adm-main">
+
+        <!-- Header -->
+        <header class="adm-top cat-top">
+
+            <div class="admin-breadcrumb">
+                FITFOOD <span>/</span>
+
+                <a th:href="@{/admin/promotions}">
+                    Khuyến mãi
+                </a>
+
+                <span>/</span>
+
+                <b th:text="${isEdit ? 'Chỉnh sửa' : 'Thêm mới'}">
+                    Thêm mới
+                </b>
+            </div>
+
+            <a class="cat-outline-btn"
+               th:href="@{/admin/promotions}">
+                ← Danh sách
+            </a>
+
+        </header>
+
+        <main class="adm-content cat-content">
+
+            <!-- Tiêu đề -->
+            <div class="cat-heading">
+                <div>
+                    <span class="cat-overline">
+                        QUẢN LÝ KHUYẾN MÃI
+                    </span>
+
+                    <h1 th:text="${isEdit ? 'Chỉnh sửa khuyến mãi' : 'Thêm khuyến mãi mới'}">
+                        Thêm khuyến mãi mới
+                    </h1>
+
+                    <p>
+                        Thiết lập mã ưu đãi, mức giảm và
+                        thời gian áp dụng cho khách hàng.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Thông báo lỗi -->
+            <div class="cat-alert cat-alert-error"
+                 th:if="${error}"
+                 th:text="${error}">
+            </div>
+
+            <!-- Form -->
+            <section class="cat-card cat-form-card">
+
+                <div class="cat-card-header">
+                    <div>
+                        <h2>Thông tin khuyến mãi</h2>
+                        <p>
+                            Các trường có dấu * là bắt buộc.
+                        </p>
+                    </div>
+                </div>
+
+                <form class="cat-editor promo-editor"
+                      th:action="@{/admin/promotions/save}"
+                      th:object="${promotionForm}"
+                      method="post">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <input type="hidden"
+                           th:field="*{id}">
+
+                    <div class="promo-notice">
+                        📅 <strong>Lên lịch khuyến mãi:</strong>
+                        Bạn có thể tạo chương trình ngay hôm nay
+                        và chọn ngày bắt đầu trong tương lai.
+                        Khi đến thời gian đã đặt, khuyến mãi
+                        tự có hiệu lực nếu đang bật.
+                    </div>
+
+                    <div class="promo-form-grid">
+
+                        <!-- Mã -->
+                        <div class="cat-field">
+                            <label for="promoCode">
+                                Mã khuyến mãi
+                                <em class="promo-required">*</em>
+                            </label>
+
+                            <input id="promoCode"
+                                   type="text"
+                                   th:field="*{code}"
+                                   maxlength="50"
+                                   placeholder="Ví dụ: FITFOOD20"
+                                   required>
+
+                            <small class="cat-hint">
+                                Mã phải là duy nhất, tối đa 50 ký tự.
+                            </small>
+
+                            <span class="cat-error-text"
+                                  th:if="${#fields.hasErrors('code')}"
+                                  th:errors="*{code}">
+                            </span>
+                        </div>
+
+                        <!-- Tên -->
+                        <div class="cat-field">
+                            <label for="promoName">
+                                Tên chương trình
+                                <em class="promo-required">*</em>
+                            </label>
+
+                            <input id="promoName"
+                                   type="text"
+                                   th:field="*{name}"
+                                   maxlength="150"
+                                   placeholder="Ví dụ: Ưu đãi tháng 10"
+                                   required>
+
+                            <span class="cat-error-text"
+                                  th:if="${#fields.hasErrors('name')}"
+                                  th:errors="*{name}">
+                            </span>
+                        </div>
+
+                        <!-- Phần trăm -->
+                        <div class="cat-field">
+                            <label for="promoPercent">
+                                Giảm theo phần trăm (%)
+                            </label>
+
+                            <input id="promoPercent"
+                                   type="number"
+                                   th:field="*{percentDiscount}"
+                                   min="0"
+                                   max="100"
+                                   step="0.01"
+                                   placeholder="Ví dụ: 20">
+
+                            <small class="cat-hint">
+                                Để trống nếu giảm theo số tiền.
+                            </small>
+
+                            <span class="cat-error-text"
+                                  th:if="${#fields.hasErrors('percentDiscount')}"
+                                  th:errors="*{percentDiscount}">
+                            </span>
+                        </div>
+
+                        <!-- Số tiền -->
+                        <div class="cat-field">
+                            <label for="promoAmount">
+                                Giảm theo số tiền (VNĐ)
+                            </label>
+
+                            <input id="promoAmount"
+                                   type="number"
+                                   th:field="*{amountDiscount}"
+                                   min="0"
+                                   step="0.01"
+                                   placeholder="Ví dụ: 50000">
+
+                            <small class="cat-hint">
+                                Chỉ nhập một trong hai hình thức giảm.
+                            </small>
+
+                            <span class="cat-error-text"
+                                  th:if="${#fields.hasErrors('amountDiscount')}"
+                                  th:errors="*{amountDiscount}">
+                            </span>
+                        </div>
+
+                        <!-- Bắt đầu -->
+                        <div class="cat-field">
+                            <label for="promoStarts">
+                                Ngày bắt đầu
+                                <em class="promo-required">*</em>
+                            </label>
+
+                            <input id="promoStarts"
+                                   type="datetime-local"
+                                   th:field="*{startsAt}"
+                                   required>
+
+                            <small class="cat-hint">
+                                Có thể đặt trong tương lai.
+                                Trước thời gian này, trạng thái
+                                là "Sắp diễn ra".
+                            </small>
+
+                            <span class="cat-error-text"
+                                  th:if="${#fields.hasErrors('startsAt')}"
+                                  th:errors="*{startsAt}">
+                            </span>
+                        </div>
+
+                        <!-- Kết thúc -->
+                        <div class="cat-field">
+                            <label for="promoEnds">
+                                Ngày kết thúc
+                                <em class="promo-required">*</em>
+                            </label>
+
+                            <input id="promoEnds"
+                                   type="datetime-local"
+                                   th:field="*{endsAt}"
+                                   required>
+
+                            <small class="cat-hint">
+                                Phải sau ngày bắt đầu.
+                                Hết thời gian sẽ chuyển sang
+                                "Đã kết thúc".
+                            </small>
+
+                            <span class="cat-error-text"
+                                  th:if="${#fields.hasErrors('endsAt')}"
+                                  th:errors="*{endsAt}">
+                            </span>
+                        </div>
+
+                        <!-- Đơn tối thiểu -->
+                        <div class="cat-field">
+                            <label for="promoMinimum">
+                                Giá trị đơn tối thiểu (VNĐ)
+                                <em class="promo-required">*</em>
+                            </label>
+
+                            <input id="promoMinimum"
+                                   type="number"
+                                   th:field="*{minimumOrder}"
+                                   min="0"
+                                   step="0.01"
+                                   required>
+
+                            <small class="cat-hint">
+                                Nhập 0 nếu không yêu cầu
+                                giá trị đơn tối thiểu.
+                            </small>
+
+                            <span class="cat-error-text"
+                                  th:if="${#fields.hasErrors('minimumOrder')}"
+                                  th:errors="*{minimumOrder}">
+                            </span>
+                        </div>
+
+                        <!-- Giảm tối đa -->
+                        <div class="cat-field">
+                            <label for="promoMaximum">
+                                Số tiền giảm tối đa (VNĐ)
+                            </label>
+
+                            <input id="promoMaximum"
+                                   type="number"
+                                   th:field="*{maximumDiscount}"
+                                   min="0"
+                                   step="0.01"
+                                   placeholder="Ví dụ: 100000">
+
+                            <small class="cat-hint">
+                                Có thể để trống nếu không giới hạn.
+                            </small>
+
+                            <span class="cat-error-text"
+                                  th:if="${#fields.hasErrors('maximumDiscount')}"
+                                  th:errors="*{maximumDiscount}">
+                            </span>
+                        </div>
+
+                        <!-- Trạng thái -->
+                        <div class="cat-field promo-full">
+                            <label for="promoActive">
+                                Trạng thái chương trình
+                            </label>
+
+                            <select id="promoActive"
+                                    th:field="*{active}">
+
+                                <option value="true">
+                                    Bật khuyến mãi
+                                </option>
+
+                                <option value="false">
+                                    Tạm ẩn khuyến mãi
+                                </option>
+                            </select>
+
+                            <small class="cat-hint">
+                                Bật không có nghĩa là áp dụng ngay.
+                                Hệ thống vẫn kiểm tra ngày bắt đầu
+                                và ngày kết thúc.
+                            </small>
+                        </div>
+
+                    </div>
+
+                    <!-- Nút lưu -->
+                    <div class="cat-form-actions promo-form-actions">
+
+                        <a class="cat-outline-btn"
+                           th:href="@{/admin/promotions}">
+                            Hủy
+                        </a>
+
+                        <button class="cat-primary-btn"
+                                type="submit"
+                                th:text="${isEdit ? '✓ Lưu thay đổi' : '＋ Lưu khuyến mãi'}">
+                            Lưu khuyến mãi
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </section>
+
+        </main>
+    </div>
+</div>
+
+</body>
+</html>
