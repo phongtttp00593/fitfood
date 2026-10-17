@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý giao hàng | FITFOOD Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
+    <link rel="stylesheet" th:href="@{/css/fitfood-categories.css}" />
+    <style>
+      .delivery-update { display: grid; gap: 7px; min-width: 220px; }
+      .cat-table td input, .delivery-update select, .delivery-create input, .delivery-create select {
+        min-width: 0; border: 1px solid #d6e8dc; border-radius: 9px; padding: 9px; font: inherit;
+      }
+      .delivery-update button, .delivery-create button {
+        border: 0; border-radius: 9px; padding: 10px 12px; background: #078058; color: #fff; font: inherit; font-weight: 700; cursor: pointer;
+      }
+      .delivery-create { display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)) auto; gap: 10px; align-items: end; padding: 18px 0; }
+      .delivery-create label { display: grid; gap: 6px; color: #64816e; font-size: 12px; font-weight: 700; }
+      .delivery-empty { padding: 32px; color: #819287; text-align: center; }
+      .delivery-account { color: #819287; font-size: 11px; }
+      @media (max-width: 900px) { .delivery-create { grid-template-columns: repeat(2, minmax(130px, 1fr)); } }
+      @media (max-width: 600px) { .delivery-create { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body class="admin-body">
+    <div class="adm-layout">
+      <aside class="adm-sidebar" th:replace="~{fragments/admin-sidebar :: sidebar('deliveries')}"></aside>
+
+      <div class="adm-main">
+        <header class="adm-top cat-top">
+          <div class="admin-breadcrumb">FITFOOD <span>/</span> <b>Quản lý giao hàng</b></div>
+          <div class="cat-header-tools">
+            <span class="cat-admin-label">Quản trị viên</span>
+            <form method="post" th:action="@{/dang-xuat}">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <button type="submit" class="cat-outline-btn">Đăng xuất</button>
+            </form>
+          </div>
+        </header>
+
+        <main class="adm-content cat-content">
+          <div class="cat-heading">
+            <div>
+              <span class="cat-overline">FITFOOD / GIAO HÀNG</span>
+              <h1>Quản lý giao hàng</h1>
+              <p>Tạo phiếu giao cho đơn hàng và theo dõi thông tin giao nhận.</p>
+            </div>
+          </div>
+
+          <div class="cat-alert cat-alert-ok" th:if="${success}" th:text="${success}" role="status"></div>
+          <div class="cat-alert cat-alert-error" th:if="${error}" th:text="${error}" role="alert"></div>
+
+          <section class="cat-card">
+            <div class="cat-card-header">
+              <div>
+                <h2>Tạo phiếu giao hàng</h2>
+                <p>Chỉ các đơn chưa hủy và chưa có phiếu giao mới xuất hiện ở đây.</p>
+              </div>
+            </div>
+            <form class="delivery-create" method="post" th:action="@{/admin/deliveries}">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <label for="deliveryOrder">Đơn hàng
+                <select id="deliveryOrder" name="orderId" required>
+                  <option value="">Chọn đơn hàng</option>
+                  <option th:each="order : ${ordersWithoutDelivery}" th:value="${order.id}"
+                          th:text="'#' + ${order.id} + ' - ' + ${order.customerName} + ' (' + ${order.email} + ')'">
+                    #1 - Khách hàng
+                  </option>
+                </select>
+              </label>
+              <label for="receiverName">Tên người nhận
+                <input id="receiverName" name="receiverName" maxlength="100" required />
+              </label>
+              <label for="receiverPhone">Số điện thoại
+                <input id="receiverPhone" name="receiverPhone" maxlength="20" required />
+              </label>
+              <label for="deliveryAddress">Địa chỉ giao hàng
+                <input id="deliveryAddress" name="deliveryAddress" maxlength="255" required />
+              </label>
+              <button type="submit" th:disabled="${#lists.isEmpty(ordersWithoutDelivery)}">Tạo phiếu</button>
+            </form>
+          </section>
+
+          <section class="cat-card" style="margin-top: 20px">
+            <div class="cat-card-header">
+              <div>
+                <h2>Danh sách giao hàng</h2>
+                <p th:text="'Tìm thấy ' + ${#lists.size(deliveries)} + ' phiếu giao.'">Danh sách phiếu giao.</p>
+              </div>
+            </div>
+            <form class="cat-filters" method="get" th:action="@{/admin/deliveries}">
+              <label class="cat-search-label" for="deliveryKeyword">Tìm kiếm</label>
+              <input id="deliveryKeyword" type="search" name="keyword" th:value="${keyword}"
+                     placeholder="Mã đơn, tên, email, số điện thoại, địa chỉ…" />
+              <label class="cat-search-label" for="deliveryFilter">Trạng thái</label>
+              <select id="deliveryFilter" name="filter">
+                <option value="all" th:selected="${filter == 'all'}">Tất cả trạng thái</option>
+                <option th:each="status : ${deliveryStatuses}" th:value="${status}" th:text="${status}"
+                        th:selected="${filter == status}">Chờ giao</option>
+              </select>
+              <button type="submit" class="cat-filter-btn">Tìm kiếm</button>
+              <a class="cat-clear" th:href="@{/admin/deliveries}">Xóa lọc</a>
+            </form>
+
+            <div class="cat-table-wrap" th:if="${!#lists.isEmpty(deliveries)}">
+              <table class="cat-table">
+                <thead>
+                  <tr>
+                    <th>MÃ ĐƠN</th>
+                    <th>KHÁCH ĐẶT</th>
+                    <th>NGƯỜI NHẬN / ĐỊA CHỈ</th>
+                    <th>GIÁ TRỊ</th>
+                    <th>THỜI GIAN</th>
+                    <th>CẬP NHẬT GIAO HÀNG</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="delivery : ${deliveries}">
+                    <td class="cat-id" th:text="'#' + ${delivery.orderId}">#1</td>
+                    <td>
+                      <strong th:text="${delivery.accountName}">Tên khách</strong><br />
+                      <small class="delivery-account" th:text="${delivery.email}">email@example.com</small>
+                    </td>
+                    <td>
+                      <input th:attr="form=${'delivery-form-' + delivery.id}" name="receiverName"
+                             maxlength="100" required th:value="${delivery.receiverName}"
+                             aria-label="Tên người nhận" />
+                      <input th:attr="form=${'delivery-form-' + delivery.id}" name="receiverPhone"
+                             maxlength="20" required th:value="${delivery.receiverPhone}"
+                             aria-label="Số điện thoại người nhận" />
+                      <input th:attr="form=${'delivery-form-' + delivery.id}" name="deliveryAddress"
+                             maxlength="255" required th:value="${delivery.deliveryAddress}"
+                             aria-label="Địa chỉ giao hàng" />
+                    </td>
+                    <td th:text="${#numbers.formatDecimal(delivery.orderTotal, 0, 'POINT', 0, 'COMMA')} + ' đ'">0 đ</td>
+                    <td>
+                      <span th:text="${delivery.status}">Chờ giao</span><br />
+                      <small class="delivery-account" th:if="${delivery.sentAt != null}"
+                             th:text="'Gửi: ' + ${#temporals.format(delivery.sentAt, 'dd/MM/yyyy HH:mm')}">Gửi</small><br
+                        th:if="${delivery.sentAt != null}" />
+                      <small class="delivery-account" th:if="${delivery.deliveredAt != null}"
+                             th:text="'Giao: ' + ${#temporals.format(delivery.deliveredAt, 'dd/MM/yyyy HH:mm')}">Giao</small>
+                    </td>
+                    <td>
+                      <form class="delivery-update" method="post" th:id="'delivery-form-' + ${delivery.id}"
+                            th:action="@{/admin/deliveries/{id}/update(id=${delivery.id})}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <select name="status" aria-label="Trạng thái giao hàng">
+                          <option th:each="status : ${deliveryStatuses}" th:value="${status}" th:text="${status}"
+                                  th:selected="${delivery.status == status}">Chờ giao</option>
+                        </select>
+                        <button type="submit">Lưu</button>
+                      </form>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="delivery-empty" th:if="${#lists.isEmpty(deliveries)}">
+              Chưa có phiếu giao phù hợp. Tạo phiếu giao từ đơn hàng ở phía trên.
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
