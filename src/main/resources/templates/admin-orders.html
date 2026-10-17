@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý đơn hàng | FITFOOD Admin</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
+    <link rel="stylesheet" th:href="@{/css/fitfood-categories.css}" />
+    <style>
+      .order-status-form { display: flex; align-items: center; gap: 8px; min-width: 250px; }
+      .order-status-form select { min-width: 145px; border: 1px solid #d6e8dc; border-radius: 9px; padding: 9px; font: inherit; }
+      .order-status-form button { border: 0; border-radius: 9px; padding: 10px 12px; background: #078058; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+      .order-empty { padding: 32px; color: #819287; text-align: center; }
+      @media (max-width: 700px) { .cat-heading { align-items: flex-start; } .cat-filters { flex-wrap: wrap; } }
+    </style>
+  </head>
+  <body class="admin-body">
+    <div class="adm-layout">
+      <aside class="adm-sidebar" th:replace="~{fragments/admin-sidebar :: sidebar('orders')}"></aside>
+
+      <div class="adm-main">
+        <header class="adm-top cat-top">
+          <div class="admin-breadcrumb">FITFOOD <span>/</span> <b>Quản lý đơn hàng</b></div>
+          <div class="cat-header-tools">
+            <span class="cat-admin-label">Quản trị viên</span>
+            <form method="post" th:action="@{/dang-xuat}">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+              <button type="submit" class="cat-outline-btn">Đăng xuất</button>
+            </form>
+          </div>
+        </header>
+
+        <main class="adm-content cat-content">
+          <div class="cat-heading">
+            <div>
+              <span class="cat-overline">FITFOOD / ĐƠN HÀNG</span>
+              <h1>Quản lý đơn hàng</h1>
+              <p>Xem đơn hàng từ SQL Server và cập nhật trạng thái xử lý.</p>
+            </div>
+          </div>
+
+          <div class="cat-alert cat-alert-ok" th:if="${success}" th:text="${success}" role="status"></div>
+          <div class="cat-alert cat-alert-error" th:if="${error}" th:text="${error}" role="alert"></div>
+
+          <section class="cat-card">
+            <div class="cat-card-header">
+              <div>
+                <h2>Danh sách đơn hàng</h2>
+                <p th:text="'Tìm thấy ' + ${#lists.size(orders)} + ' đơn hàng.'">Danh sách đơn hàng.</p>
+              </div>
+            </div>
+            <form class="cat-filters" method="get" th:action="@{/admin/orders}">
+              <label class="cat-search-label" for="orderKeyword">Tìm kiếm</label>
+              <input id="orderKeyword" type="search" name="keyword" th:value="${keyword}"
+                     placeholder="Mã đơn, tên hoặc email khách hàng…" />
+              <label class="cat-search-label" for="orderFilter">Trạng thái</label>
+              <select id="orderFilter" name="filter">
+                <option value="all" th:selected="${filter == 'all'}">Tất cả trạng thái</option>
+                <option th:each="status : ${orderStatuses}" th:value="${status}" th:text="${status}"
+                        th:selected="${filter == status}">Chờ xác nhận</option>
+              </select>
+              <button type="submit" class="cat-filter-btn">Tìm kiếm</button>
+              <a class="cat-clear" th:href="@{/admin/orders}">Xóa lọc</a>
+            </form>
+
+            <div class="cat-table-wrap" th:if="${!#lists.isEmpty(orders)}">
+              <table class="cat-table">
+                <thead>
+                  <tr>
+                    <th>MÃ ĐƠN</th>
+                    <th>KHÁCH HÀNG</th>
+                    <th>NGÀY ĐẶT</th>
+                    <th>SẢN PHẨM</th>
+                    <th>TỔNG TIỀN</th>
+                    <th>TRẠNG THÁI</th>
+                    <th>CẬP NHẬT</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="order : ${orders}">
+                    <td class="cat-id" th:text="'#' + ${order.id}">#1</td>
+                    <td>
+                      <strong th:text="${order.customerName}">Tên khách hàng</strong>
+                      <br />
+                      <small th:text="${order.email}">email@example.com</small>
+                    </td>
+                    <td th:text="${order.placedAt != null ? #temporals.format(order.placedAt, 'dd/MM/yyyy HH:mm') : '—'}">14/10/2026</td>
+                    <td th:text="${order.itemCount}">0</td>
+                    <td th:text="${#numbers.formatDecimal(order.total, 0, 'POINT', 0, 'COMMA')} + ' đ'">0 đ</td>
+                    <td><span class="cat-pill" th:text="${order.status}">Chờ xác nhận</span></td>
+                    <td>
+                      <form class="order-status-form" method="post"
+                            th:action="@{/admin/orders/{id}/status(id=${order.id})}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <input type="hidden" name="keyword" th:value="${keyword}" />
+                        <input type="hidden" name="filter" th:value="${filter}" />
+                        <label class="sr-only" th:for="'status-' + ${order.id}">Trạng thái đơn hàng</label>
+                        <select name="status" th:id="'status-' + ${order.id}">
+                          <option th:each="status : ${orderStatuses}" th:value="${status}" th:text="${status}"
+                                  th:selected="${order.status == status}">Chờ xác nhận</option>
+                        </select>
+                        <button type="submit">Lưu</button>
+                      </form>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="order-empty" th:if="${#lists.isEmpty(orders)}">Không tìm thấy đơn hàng phù hợp.</div>
+          </section>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
