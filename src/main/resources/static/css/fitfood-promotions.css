@@ -1,9 +1,6 @@
 
 /* =========================================
    FITFOOD - QUẢN LÝ KHUYẾN MÃI
-   CSS dùng chung cho:
-   - admin-promotions.html
-   - admin-promotion-form.html
    ========================================= */
 
 
@@ -11,58 +8,48 @@
    1. TRANG DANH SÁCH KHUYẾN MÃI
    ========================================= */
 
-/* Ngày bắt đầu và ngày kết thúc */
 .promo-date {
     white-space: nowrap;
 }
 
-/* Trạng thái: Sắp diễn ra */
 .promo-upcoming {
     color: #9a6b10;
     background: #fff3d4;
 }
 
-/* Trạng thái: Đang diễn ra */
 .promo-running {
     color: #147748;
     background: #e3f5ea;
 }
 
-/* Trạng thái: Đã kết thúc */
 .promo-ended {
     color: #6b7280;
     background: #edf0f2;
 }
 
-/* Trạng thái: Đã tắt */
 .promo-disabled {
     color: #b42318;
     background: #fee8e7;
 }
 
-/* Hiển thị mức giảm giá */
 .promo-amount {
     font-weight: 800;
     color: #087c54;
     white-space: nowrap;
 }
 
-/* Bảng danh sách */
 .promo-table {
     min-width: 1080px;
 }
 
-/* Căn giữa nội dung theo chiều dọc */
 .promo-table td {
     vertical-align: middle;
 }
 
-/* Cột tên chương trình */
 .promo-name {
     min-width: 160px;
 }
 
-/* Nhóm nút thao tác */
 .promo-actions {
     display: flex;
     align-items: center;
@@ -72,12 +59,10 @@
     min-width: 165px;
 }
 
-/* Form của nút bật/tắt và xóa */
 .promo-actions form {
     margin: 0;
 }
 
-/* Đồng bộ các nút thao tác */
 .promo-actions .cat-action {
     cursor: pointer;
     font-family: inherit;
@@ -90,30 +75,25 @@
    2. FORM THÊM / SỬA KHUYẾN MÃI
    ========================================= */
 
-/* Bố cục form gồm hai cột */
 .promo-form-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 18px 24px;
 }
 
-/* Các ô nhập liệu */
 .promo-form-grid .cat-field {
     min-width: 0;
 }
 
-/* Input và Select */
 .promo-form-grid .cat-field input,
 .promo-form-grid .cat-field select {
     width: 100%;
 }
 
-/* Trường chiếm toàn bộ hai cột */
 .promo-full {
     grid-column: 1 / -1;
 }
 
-/* Khung thông báo lên lịch khuyến mãi */
 .promo-notice {
     margin: 0 0 22px;
     padding: 15px 18px;
@@ -127,22 +107,18 @@
     line-height: 1.8;
 }
 
-/* Khoảng cách bên trong form */
 .promo-editor {
     padding: 25px;
 }
 
-/* Nhãn của các trường */
 .promo-editor .cat-field label {
     display: block;
 }
 
-/* Dấu sao bắt buộc */
 .promo-required {
     color: #dc3545;
 }
 
-/* Nhóm nút Hủy và Lưu */
 .promo-form-actions {
     margin-top: 25px;
 
@@ -152,7 +128,6 @@
     gap: 12px;
 }
 
-/* Nút lưu */
 .promo-form-actions .cat-primary-btn {
     cursor: pointer;
     font-family: inherit;
@@ -160,10 +135,203 @@
 
 
 /* =========================================
-   3. RESPONSIVE
+   3. POPUP XÁC NHẬN XÓA
    ========================================= */
 
-/* Tablet và điện thoại */
+/* Khóa cuộn trang */
+body.promo-modal-open {
+    overflow: hidden;
+}
+
+/* Nền tối, làm mờ */
+.promo-delete-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 16px;
+
+    background: rgba(18, 32, 27, 0.52);
+
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+}
+
+/* Popup hiển thị */
+.promo-delete-overlay.show {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+/* Hộp thoại trắng */
+.promo-delete-box {
+    width: 100%;
+    max-width: 322px;
+
+    padding: 25px 22px 20px;
+
+    background: #ffffff;
+    border-radius: 13px;
+
+    box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.16);
+
+    text-align: center;
+    font-family: 'Be Vietnam Pro', sans-serif;
+
+    transform: translateY(12px) scale(0.97);
+
+    transition: transform 0.2s ease;
+}
+
+.promo-delete-overlay.show .promo-delete-box {
+    transform: translateY(0) scale(1);
+}
+
+/* Icon thùng rác */
+.promo-delete-icon {
+    width: 45px;
+    height: 45px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 17px;
+
+    color: #d73c43;
+    background: #fff2f2;
+
+    border: 1px solid #ffe2e2;
+    border-radius: 50%;
+}
+
+/* Tiêu đề */
+.promo-delete-box h2 {
+    margin: 0 0 13px;
+
+    color: #26372f;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.5;
+}
+
+/* Nội dung */
+.promo-delete-description {
+    margin: 0;
+
+    color: #747b77;
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.8;
+}
+
+.promo-delete-description strong {
+    color: #35423b;
+    font-weight: 800;
+    overflow-wrap: anywhere;
+}
+
+/* Cảnh báo */
+.promo-delete-warning {
+    margin: 3px 0 22px;
+
+    color: #747b77;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+/* Nhóm hai nút */
+.promo-delete-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+/* Style chung của nút */
+.promo-delete-actions button {
+    min-height: 36px;
+    padding: 9px 8px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+
+    border-radius: 7px;
+
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+/* Nút Hủy */
+.promo-delete-cancel {
+    color: #53635a;
+    background: #f7f8f6;
+    border: 1px solid #e4e8e4;
+}
+
+.promo-delete-cancel:hover {
+    background: #e9ede9;
+}
+
+/* Nút Xóa */
+.promo-delete-confirm {
+    color: #ffffff;
+    background: #df3838;
+    border: 1px solid #df3838;
+}
+
+.promo-delete-confirm:hover {
+    background: #c92727;
+    border-color: #c92727;
+}
+
+.promo-delete-confirm svg {
+    flex-shrink: 0;
+}
+
+.promo-delete-confirm:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* Hiệu ứng nhấn */
+.promo-delete-actions button:active {
+    transform: scale(0.97);
+}
+
+/* Focus */
+.promo-delete-actions button:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 2px;
+}
+
+
+/* =========================================
+   4. RESPONSIVE
+   ========================================= */
+
 @media (max-width: 700px) {
 
     /* Form chuyển thành một cột */
@@ -171,23 +339,44 @@
         grid-template-columns: 1fr;
     }
 
-    /* Trường full vẫn chiếm một cột */
     .promo-full {
         grid-column: 1;
     }
 
-    /* Giảm padding form */
     .promo-editor {
         padding: 16px;
     }
 
-    /* Nút lưu và hủy */
     .promo-form-actions {
         flex-wrap: wrap;
     }
 
-    /* Bảng có thể cuộn ngang */
+    /* Bảng cuộn ngang qua cat-table-wrap */
     .promo-table {
         min-width: 1080px;
+    }
+}
+
+@media (max-width: 380px) {
+
+    .promo-delete-box {
+        padding: 23px 16px 18px;
+    }
+
+    .promo-delete-actions {
+        gap: 8px;
+    }
+
+    .promo-delete-actions button {
+        font-size: 9px;
+    }
+}
+
+/* Giảm chuyển động */
+@media (prefers-reduced-motion: reduce) {
+
+    .promo-delete-overlay,
+    .promo-delete-box {
+        transition: none;
     }
 }
