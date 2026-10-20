@@ -245,6 +245,32 @@ public class DeliveryController {
     }
 
     /**
+     * POST /admin/deliveries/{id}/delete
+     * Xóa 1 phiếu giao hàng. Đơn hàng gốc KHÔNG bị xóa - sau khi xóa phiếu, đơn đó sẽ
+     * xuất hiện lại trong danh sách "Tạo phiếu giao hàng" để tạo phiếu mới nếu cần.
+     *
+     * Chỉ cho xóa phiếu "Chờ giao" hoặc "Giao thất bại". Phiếu đang
+     * giao / đã giao phải giữ lại làm lịch sử giao nhận.
+     */
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable long id, RedirectAttributes redirect) {
+        // Điều kiện trạng thái nằm ngay trong câu DELETE (giống cách create() dùng NOT EXISTS):
+        // kiểm tra và xóa trong 1 lệnh, không có khoảng hở để request khác đổi trạng thái
+        // phiếu sang "Đang giao" giữa lúc kiểm tra và lúc xóa.
+        int deleted = jdbc.update("""
+            DELETE FROM dbo.fitfood_deliveries
+            WHERE id = ? AND status IN (N'Chờ giao', N'Giao thất bại')
+            """, id);
+        if (deleted == 0) {
+            redirect.addFlashAttribute(FLASH_ERROR,
+                    "Không thể xóa: phiếu giao không tồn tại hoặc đang giao / đã giao.");
+        } else {
+            redirect.addFlashAttribute(FLASH_SUCCESS, "Đã xóa phiếu giao hàng.");
+        }
+        return REDIRECT_DELIVERIES;
+    }
+
+    /**
      * DTO cho 1 dòng trong bảng "Danh sách giao hàng" (template admin-deliveries.html).
      * Gộp dữ liệu từ 3 bảng: fitfood_deliveries, fitfood_orders (total), fitfood_users
      * (accountName/email của người ĐẶT đơn - khác với receiverName là người NHẬN hàng,

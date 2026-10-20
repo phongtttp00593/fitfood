@@ -22,6 +22,8 @@
       }
       .delivery-create { display: grid; grid-template-columns: repeat(4, minmax(130px, 1fr)) auto; gap: 10px; align-items: end; padding: 18px 0; }
       .delivery-create label { display: grid; gap: 6px; color: #64816e; font-size: 12px; font-weight: 700; }
+      .delivery-delete { margin-top: 7px; }
+      .delivery-delete button { width: 100%; }
       .delivery-empty { padding: 32px; color: #819287; text-align: center; }
       .delivery-account { color: #819287; font-size: 11px; }
       @media (max-width: 900px) { .delivery-create { grid-template-columns: repeat(2, minmax(130px, 1fr)); } }
@@ -156,6 +158,14 @@
                                   th:selected="${delivery.status == status}">Chờ giao</option>
                         </select>
                         <button type="submit">Lưu</button>
+                      </form>
+                      <!-- Chỉ hiện nút Xóa với phiếu "Chờ giao" / "Giao thất bại" (server vẫn kiểm tra lại) -->
+                      <form class="delivery-delete" method="post"
+                            th:if="${delivery.status == 'Chờ giao' or delivery.status == 'Giao thất bại'}"
+                            th:action="@{/admin/deliveries/{id}/delete(id=${delivery.id})}"
+                            onsubmit="return confirm('Xóa phiếu giao hàng này? Thao tác không thể hoàn tác.');">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" class="cat-action cat-danger">Xóa phiếu</button>
                       </form>
                     </td>
                   </tr>
