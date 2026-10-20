@@ -14,18 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 public class AdminPendingModuleController {
 
-    // ================= QUAN LY KHACH HANG =================
-
-    @PreAuthorize("@permissionService.allowed(authentication, 'QUAN_LY_KHACH_HANG')")
-    @GetMapping("/customers")
-    public String customers(Model model) {
-        return show(model, "customers", "Khách hàng", "QUAN_LY_KHACH_HANG",
-            "Danh sách khách hàng",
-            "Xem, tìm và cập nhật hồ sơ",
-            "Kiểm soát trạng thái tài khoản",
-            "NguoiDung, ThongTinKhachHang");
-    }
-
     // ================= QUAN LY HOA DON =================
 
     @PreAuthorize("@permissionService.allowed(authentication, 'HOA_DON')")
@@ -59,6 +47,8 @@ public class AdminPendingModuleController {
      * DeliveryController, xu ly tai /admin/deliveries.
      * Chuc nang Quan ly khuyen mai da duoc chuyen sang
      * AdminPromotionController, xu ly tai /admin/promotions.
+     * Chuc nang Quan ly khach hang da duoc chuyen sang
+     * KhachHangController, xu ly tai /admin/customers.
      * Khong khai bao cac mapping nay tai day de tranh trung URL.
      */
 
