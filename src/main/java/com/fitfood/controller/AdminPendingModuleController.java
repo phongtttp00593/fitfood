@@ -26,13 +26,6 @@ public class AdminPendingModuleController {
             "Danh sách mã giảm giá", "Thêm, sửa, ngừng kích hoạt mã", "Kiểm tra thời hạn và điều kiện giảm", "KhuyenMai");
     }
 
-    @PreAuthorize("@permissionService.allowed(authentication, 'QUAN_LY_KHACH_HANG')")
-    @GetMapping("/admin/customers")
-    public String customers(Model model) {
-        return show(model, "customers", "Khách hàng", "QUAN_LY_KHACH_HANG",
-            "Danh sách khách hàng", "Xem, tìm và cập nhật hồ sơ", "Kiểm soát trạng thái tài khoản", "NguoiDung, ThongTinKhachHang");
-    }
-
     @PreAuthorize("@permissionService.allowed(authentication, 'QUAN_LY_GIAO_HANG')")
     @GetMapping("/admin/deliveries")
     public String deliveries(Model model) {
