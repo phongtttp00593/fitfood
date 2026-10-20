@@ -6,9 +6,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,6 +41,15 @@ public class OrderController {
             "Chờ xác nhận", "Đang xử lý", "Đang giao", "Hoàn thành", "Đã hủy");
     // Set để kiểm tra "status có hợp lệ không" nhanh hơn List (O(1) thay vì O(n))
     private static final Set<String> VALID_STATUSES = Set.copyOf(ORDER_STATUSES);
+    // Chỉ đơn ở các trạng thái này mới được xóa (xem method delete()).
+    private static final Set<String> DELETABLE_STATUSES = Set.of("Chờ xác nhận", "Đã hủy");
+
+    // Gom các chuỗi lặp lại nhiều lần thành hằng số (giống DeliveryController).
+    private static final String FLASH_ERROR = "error";
+    private static final String FLASH_SUCCESS = "success";
+    private static final String PARAM_KEYWORD = "keyword";
+    private static final String PARAM_FILTER = "filter";
+    private static final String REDIRECT_ORDERS = "redirect:/admin/orders";
 
     // JdbcTemplate: lớp tiện ích của Spring để chạy SQL thuần (SELECT/UPDATE...)
     // mà không cần tự quản lý Connection, PreparedStatement, đóng/mở kết nối.
@@ -123,8 +135,8 @@ public class OrderController {
 
         // Đưa dữ liệu vào Model để template Thymeleaf (admin-orders.html) đọc và render ra HTML.
         model.addAttribute("orders", orders);
-        model.addAttribute("keyword", normalizedKeyword);
-        model.addAttribute("filter", normalizedFilter);
+        model.addAttribute(PARAM_KEYWORD, normalizedKeyword);
+        model.addAttribute(PARAM_FILTER, normalizedFilter);
         model.addAttribute("orderStatuses", ORDER_STATUSES);
         return "admin-orders"; // tên file template (templates/admin-orders.html)
     }
@@ -145,24 +157,113 @@ public class OrderController {
         if (!VALID_STATUSES.contains(status)) {
             // addFlashAttribute: lưu thông báo tạm, chỉ hiển thị được ở request redirect
             // TIẾP THEO (sau khi chuyển trang), rồi tự xoá - tránh thông báo bị lặp lại khi F5.
-            redirect.addFlashAttribute("error", "Trạng thái đơn hàng không hợp lệ.");
+            redirect.addFlashAttribute(FLASH_ERROR, "Trạng thái đơn hàng không hợp lệ.");
         } else {
             // UPDATE đơn giản theo id. jdbc.update() trả về số dòng bị ảnh hưởng.
             int updated = jdbc.update(
                     "UPDATE dbo.fitfood_orders SET status = ? WHERE id = ?", status, id);
             if (updated == 0) {
                 // updated == 0 nghĩa là không có đơn hàng nào khớp id này (đã bị xoá / sai id).
-                redirect.addFlashAttribute("error", "Không tìm thấy đơn hàng cần cập nhật.");
+                redirect.addFlashAttribute(FLASH_ERROR, "Không tìm thấy đơn hàng cần cập nhật.");
             } else {
-                redirect.addFlashAttribute("success", "Đã cập nhật trạng thái đơn hàng.");
+                redirect.addFlashAttribute(FLASH_SUCCESS, "Đã cập nhật trạng thái đơn hàng.");
             }
         }
         // addAttribute (khác addFlashAttribute): gắn vào QUERY STRING của URL redirect,
         // ví dụ redirect:/admin/orders?keyword=...&filter=... để trang danh sách sau khi
         // load lại vẫn đang ở đúng bộ lọc/tìm kiếm trước khi bấm "Lưu".
-        redirect.addAttribute("keyword", keyword);
-        redirect.addAttribute("filter", filter);
-        return "redirect:/admin/orders";
+        redirect.addAttribute(PARAM_KEYWORD, keyword);
+        redirect.addAttribute(PARAM_FILTER, filter);
+        return REDIRECT_ORDERS;
+    }
+
+    /**
+     * POST /admin/orders/{id}/delete
+     * Xóa hẳn 1 đơn hàng khỏi database, kèm các dòng con phụ thuộc vào nó.
+     *
+     * Chỉ cho xóa khi đơn "chưa phát sinh nghiệp vụ thật":
+     *   - trạng thái là "Chờ xác nhận" hoặc "Đã hủy" (DELETABLE_STATUSES)
+     *   - chưa xuất hóa đơn (fitfood_invoices)
+     *   - chưa có khoản thanh toán nào "Đã thanh toán" (fitfood_payments)
+     *   - phiếu giao (nếu có) chưa ở trạng thái "Đang giao" / "Đã giao"
+     * Các đơn còn lại phải giữ lại để không làm sai báo cáo doanh thu / lịch sử giao hàng.
+     *
+     * @Transactional: toàn bộ các câu DELETE bên dưới chạy trong CÙNG 1 transaction -
+     * nếu 1 câu lỗi thì tất cả được rollback, không bao giờ xảy ra cảnh xóa được
+     * order_items mà đơn hàng vẫn còn (dữ liệu "mồ côi").
+     */
+    @PostMapping("/{id}/delete")
+    @Transactional
+    public String delete(@PathVariable long id,
+                         @RequestParam(defaultValue = "") String keyword,
+                         @RequestParam(defaultValue = "all") String filter,
+                         RedirectAttributes redirect) {
+        // Đọc trạng thái đơn + đếm các dữ liệu liên quan trong 1 câu SQL.
+        // WITH (UPDLOCK, HOLDLOCK): khóa dòng đơn hàng tới hết transaction, để trong lúc
+        // đang kiểm tra/xóa thì request khác (ví dụ đổi trạng thái sang "Đang giao")
+        // không chen vào làm điều kiện kiểm tra bị sai.
+        List<OrderDeleteCheck> checks = jdbc.query("""
+            SELECT o.status,
+                   (SELECT COUNT(*) FROM dbo.fitfood_invoices AS i
+                    WHERE i.order_id = o.id) AS invoice_count,
+                   (SELECT COUNT(*) FROM dbo.fitfood_payments AS p
+                    WHERE p.order_id = o.id AND p.status = N'Đã thanh toán') AS paid_count,
+                   (SELECT COUNT(*) FROM dbo.fitfood_deliveries AS d
+                    WHERE d.order_id = o.id AND d.status IN (N'Đang giao', N'Đã giao')) AS shipping_count
+            FROM dbo.fitfood_orders AS o WITH (UPDLOCK, HOLDLOCK)
+            WHERE o.id = ?
+            """, (rs, rowNum) -> new OrderDeleteCheck(
+                rs.getString("status"),
+                rs.getInt("invoice_count"),
+                rs.getInt("paid_count"),
+                rs.getInt("shipping_count")), id);
+
+        // Giữ lại bộ lọc/từ khóa khi quay về danh sách (giống updateStatus).
+        redirect.addAttribute(PARAM_KEYWORD, keyword);
+        redirect.addAttribute(PARAM_FILTER, filter);
+
+        // Lần lượt kiểm tra từng điều kiện; gặp điều kiện sai đầu tiên thì báo lỗi và dừng.
+        String error = null;
+        if (checks.isEmpty()) {
+            error = "Không tìm thấy đơn hàng cần xóa.";
+        } else if (!DELETABLE_STATUSES.contains(checks.get(0).status())) {
+            error = "Chỉ được xóa đơn hàng ở trạng thái \"Chờ xác nhận\" hoặc \"Đã hủy\".";
+        } else if (checks.get(0).invoiceCount() > 0) {
+            error = "Không thể xóa: đơn hàng đã được xuất hóa đơn.";
+        } else if (checks.get(0).paidCount() > 0) {
+            error = "Không thể xóa: đơn hàng đã được thanh toán.";
+        } else if (checks.get(0).shippingCount() > 0) {
+            error = "Không thể xóa: phiếu giao của đơn hàng đang giao hoặc đã giao.";
+        }
+        if (error != null) {
+            redirect.addFlashAttribute(FLASH_ERROR, error);
+            return REDIRECT_ORDERS;
+        }
+
+        try {
+            // Xóa bảng con trước, bảng cha (fitfood_orders) sau cùng - vì các khóa ngoại
+            // FK_ff_delivery_order, FK_ff_payment_order, FK_ff_orderitem_order không có
+            // ON DELETE CASCADE, xóa đơn trước sẽ bị SQL Server chặn.
+            jdbc.update("DELETE FROM dbo.fitfood_deliveries WHERE order_id = ?", id);
+            jdbc.update("DELETE FROM dbo.fitfood_payments WHERE order_id = ?", id);
+            jdbc.update("DELETE FROM dbo.fitfood_order_items WHERE order_id = ?", id);
+            jdbc.update("DELETE FROM dbo.fitfood_orders WHERE id = ?", id);
+            redirect.addFlashAttribute(FLASH_SUCCESS, "Đã xóa đơn hàng #" + id + ".");
+        } catch (DataIntegrityViolationException ex) {
+            // Còn bảng khác (thêm sau này) tham chiếu tới đơn hàng -> SQL Server chặn xóa.
+            // Vì exception đã bị bắt ở đây, Spring sẽ KHÔNG tự rollback, nên phải đánh dấu
+            // rollback thủ công để hoàn tác các câu DELETE bảng con đã chạy ở trên.
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            redirect.addFlashAttribute(FLASH_ERROR,
+                    "Không thể xóa: đơn hàng đang được dữ liệu khác sử dụng.");
+        }
+        return REDIRECT_ORDERS;
+    }
+
+    /**
+     * Kết quả kiểm tra trước khi xóa đơn hàng (dùng riêng trong method delete()).
+     */
+    private record OrderDeleteCheck(String status, int invoiceCount, int paidCount, int shippingCount) {
     }
 
     /**
