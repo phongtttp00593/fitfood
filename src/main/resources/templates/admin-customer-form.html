@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cập nhật khách hàng | FITFOOD Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
+  <style>
+    .customer-edit{max-width:850px;margin:0 auto}.customer-edit h1{color:#0a3d30;margin:10px 0}.customer-edit>p{color:#71877c;margin-bottom:22px}.edit-card{background:#fff;border:1px solid #e3eee7;border-radius:15px;padding:24px}.edit-account{padding:14px 16px;background:#f5f9f6;border-radius:9px;color:#567064;font-size:13px;margin-bottom:20px}.edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}.edit-field{display:grid;gap:7px;color:#52685d;font-weight:600;font-size:12px}.edit-field.full{grid-column:1/-1}.edit-field input,.edit-field select,.edit-field textarea{width:100%;box-sizing:border-box;border:1px solid #dce7df;border-radius:8px;padding:11px 12px;font:400 14px inherit;color:#263c30}.edit-field textarea{min-height:88px;resize:vertical}.field-error{color:#b43d2d;font-size:11px;font-weight:500}.edit-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}.edit-btn{border:0;border-radius:8px;padding:12px 18px;background:#078262;color:white;font:600 13px inherit;text-decoration:none;cursor:pointer}.edit-btn.secondary{background:#eff7f2;color:#17634f}@media(max-width:650px){.edit-grid{grid-template-columns:1fr}.edit-field.full{grid-column:auto}.edit-card{padding:16px}}
+  </style>
+</head>
+<body class="admin-body">
+<div class="adm-layout">
+  <aside class="adm-sidebar" th:replace="~{fragments/admin-sidebar :: sidebar('customers')}"></aside>
+  <div class="adm-main">
+    <header class="adm-top"><div class="admin-breadcrumb">FITFOOD <span>/</span> <a th:href="@{/admin/customers}">Khách hàng</a> <span>/</span> <b>Cập nhật hồ sơ</b></div></header>
+    <main class="adm-content customer-edit">
+      <span class="admin-eyebrow">HỒ SƠ KHÁCH HÀNG</span>
+      <h1>Cập nhật thông tin khách hàng</h1>
+      <p>Chỉnh sửa thông tin cá nhân. Email dùng để đăng nhập được giữ nguyên.</p>
+      <section class="edit-card">
+        <div class="edit-account"><strong>Tài khoản:</strong> <span th:text="${customer.account.email}">email@example.com</span> · <strong>Mã khách:</strong> <span th:text="'KH' + ${customer.account.id}">KH1</span></div>
+        <form method="post" th:action="@{/admin/customers/{id}/edit(id=${customer.account.id})}" th:object="${customerForm}">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <div class="edit-grid">
+            <label class="edit-field full" for="hoTen">Họ và tên *<input id="hoTen" type="text" th:field="*{hoTen}" maxlength="100" required /><span class="field-error" th:if="${#fields.hasErrors('hoTen')}" th:errors="*{hoTen}">Lỗi</span></label>
+            <label class="edit-field" for="soDienThoai">Số điện thoại<input id="soDienThoai" type="tel" th:field="*{soDienThoai}" maxlength="20" /><span class="field-error" th:if="${#fields.hasErrors('soDienThoai')}" th:errors="*{soDienThoai}">Lỗi</span></label>
+            <label class="edit-field" for="ngaySinh">Ngày sinh<input id="ngaySinh" type="date" th:field="*{ngaySinh}" /><span class="field-error" th:if="${#fields.hasErrors('ngaySinh')}" th:errors="*{ngaySinh}">Lỗi</span></label>
+            <label class="edit-field" for="gioiTinh">Giới tính<select id="gioiTinh" th:field="*{gioiTinh}"><option value="">Chưa cập nhật</option><option value="Nam">Nam</option><option value="Nữ">Nữ</option><option value="Khác">Khác</option></select><span class="field-error" th:if="${#fields.hasErrors('gioiTinh')}" th:errors="*{gioiTinh}">Lỗi</span></label>
+            <label class="edit-field full" for="diaChi">Địa chỉ<textarea id="diaChi" th:field="*{diaChi}" maxlength="255"></textarea><span class="field-error" th:if="${#fields.hasErrors('diaChi')}" th:errors="*{diaChi}">Lỗi</span></label>
+          </div>
+          <div class="edit-actions"><a class="edit-btn secondary" th:href="@{/admin/customers}">Hủy</a><button class="edit-btn" type="submit">Lưu thay đổi</button></div>
+        </form>
+      </section>
+    </main>
+  </div>
+</div>
+</body>
+</html>

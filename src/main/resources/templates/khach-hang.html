@@ -1,0 +1,288 @@
+
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quản lý khách hàng | FITFOOD Admin</title>
+
+    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
+    <link rel="stylesheet" th:href="@{/css/fitfood-auth.css}">
+    <link rel="stylesheet" th:href="@{/css/fitfood-account.css}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        .customer-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+        }
+
+        .customer-search {
+            width: 100%;
+            max-width: 360px;
+            padding: 12px 15px;
+            border: 1px solid #dce5df;
+            border-radius: 9px;
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .customer-search:focus {
+            border-color: #438363;
+        }
+
+        .customer-count {
+            color: #65766b;
+            font-size: 14px;
+        }
+
+        .customer-panel {
+            background: #fff;
+            border: 1px solid #e8eee9;
+            border-radius: 14px;
+            padding: 22px;
+        }
+
+        .customer-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .customer-table {
+            width: 100%;
+            min-width: 760px;
+            border-collapse: collapse;
+        }
+
+        .customer-table th {
+            padding: 15px 12px;
+            text-align: left;
+            font-size: 12px;
+            color: #63756a;
+            background: #f5f8f6;
+            border-bottom: 1px solid #e5ece7;
+            white-space: nowrap;
+        }
+
+        .customer-table td {
+            padding: 16px 12px;
+            font-size: 13px;
+            color: #34473b;
+            border-bottom: 1px solid #edf1ee;
+            vertical-align: middle;
+        }
+
+        .customer-table tbody tr:hover {
+            background: #f8fbf9;
+        }
+
+        .customer-name {
+            font-weight: 600;
+            color: #263c2f;
+        }
+
+        .customer-empty {
+            padding: 35px !important;
+            text-align: center;
+            color: #7b8980 !important;
+        }
+
+        .customer-code {
+            color: #438363;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .customer-panel {
+                padding: 12px;
+            }
+
+            .customer-toolbar {
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+
+<body class="admin-body">
+
+<div class="adm-layout">
+
+    <aside class="adm-sidebar"
+           th:replace="~{fragments/admin-sidebar :: sidebar('customers')}">
+    </aside>
+
+    <div class="adm-main">
+
+        <header class="adm-top">
+            <div class="admin-breadcrumb">
+                FITFOOD <span>/</span> <b>Quản lý khách hàng</b>
+            </div>
+
+            <div class="adm-top-actions">
+                <form method="post"
+                      th:action="@{/dang-xuat}"
+                      class="auth-admin-logout">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <button type="submit">Đăng xuất</button>
+                </form>
+
+                <a class="adm-user fit-admin-avatar"
+                   th:href="@{/tai-khoan}"
+                   title="Tài khoản của tôi"
+                   th:text="${accountInfo != null ? accountInfo.initials : 'A'}">
+                    A
+                </a>
+            </div>
+        </header>
+
+        <div class="adm-content">
+
+            <div class="adm-page-header">
+                <div>
+                    <span class="admin-eyebrow">
+                        CUSTOMER MANAGEMENT · QUẢN LÝ KHÁCH HÀNG
+                    </span>
+
+                    <h1>Quản lý khách hàng</h1>
+
+                    <p>Danh sách thông tin khách hàng của cửa hàng FITFOOD.</p>
+                </div>
+            </div>
+
+            <section class="white-panel orders-panel customer-panel">
+
+                <div class="panel-title">
+                    <div>
+                        <h3>Danh sách khách hàng</h3>
+                        <p>Thông tin được lấy từ cơ sở dữ liệu</p>
+                    </div>
+                </div>
+
+                <div class="customer-toolbar">
+                    <input type="text"
+                           id="customerSearch"
+                           class="customer-search"
+                           placeholder="Tìm tên, số điện thoại, địa chỉ...">
+
+                    <span class="customer-count">
+                        Số kết quả:
+                        <b id="customerCount"
+                           th:text="${#lists.size(danhSachKhachHang)}">0</b>
+                    </span>
+                </div>
+
+                <div class="customer-table-wrap">
+                    <table class="customer-table">
+                        <thead>
+                        <tr>
+                            <th>MÃ THÔNG TIN</th>
+                            <th>HỌ VÀ TÊN</th>
+                            <th>SỐ ĐIỆN THOẠI</th>
+                            <th>ĐỊA CHỈ</th>
+                            <th>NGÀY SINH</th>
+                            <th>GIỚI TÍNH</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="customerTableBody">
+
+                        <tr th:each="kh : ${danhSachKhachHang}">
+                            <td class="customer-code"
+                                th:text="${kh.maThongTin}">1</td>
+
+                            <td class="customer-name"
+                                th:text="${kh.hoTen != null ? kh.hoTen : 'Chưa cập nhật'}">
+                                Nguyễn Văn A
+                            </td>
+
+                            <td th:text="${kh.soDienThoai != null ? kh.soDienThoai : 'Chưa cập nhật'}">
+                                0123456789
+                            </td>
+
+                            <td th:text="${kh.diaChi != null ? kh.diaChi : 'Chưa cập nhật'}">
+                                Hải Phòng
+                            </td>
+
+                            <td th:text="${kh.ngaySinh != null ? #temporals.format(kh.ngaySinh, 'dd/MM/yyyy') : 'Chưa cập nhật'}">
+                                01/01/2000
+                            </td>
+
+                            <td th:text="${kh.gioiTinh != null ? kh.gioiTinh : 'Chưa cập nhật'}">
+                                Nam
+                            </td>
+                        </tr>
+
+                        <tr th:if="${#lists.isEmpty(danhSachKhachHang)}">
+                            <td colspan="6" class="customer-empty">
+                                Chưa có thông tin khách hàng trong hệ thống.
+                            </td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+                <p id="noSearchResult"
+                   style="display:none; text-align:center; padding:20px; color:#718078;">
+                    Không tìm thấy khách hàng phù hợp.
+                </p>
+
+            </section>
+
+            <p class="adm-footer">
+                © FITFOOD · Quản lý khách hàng
+            </p>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    let customerSearch = document.getElementById("customerSearch");
+    let customerRows = document.querySelectorAll(
+        "#customerTableBody tr"
+    );
+    let customerCount = document.getElementById("customerCount");
+    let noSearchResult = document.getElementById("noSearchResult");
+
+    customerSearch.addEventListener("input", function () {
+        let keyword = customerSearch.value.toLowerCase();
+        let count = 0;
+
+        customerRows.forEach(function (row) {
+            if (row.querySelectorAll("td").length <= 1) {
+                return;
+            }
+
+            let content = row.innerText.toLowerCase();
+            let matched = content.includes(keyword);
+
+            row.style.display = matched ? "" : "none";
+
+            if (matched) {
+                count++;
+            }
+        });
+
+        customerCount.innerText = count;
+        noSearchResult.style.display = count === 0 ? "block" : "none";
+    });
+</script>
+
+</body>
+</html>

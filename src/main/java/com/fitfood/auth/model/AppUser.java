@@ -2,6 +2,7 @@ package com.fitfood.auth.model;
 
 import jakarta.persistence.*;
 import java.time.Instant;
+import java.util.Date;
 
 @Entity
 @Table(name = "fitfood_users")
@@ -29,6 +30,7 @@ public class AppUser {
     private Instant createdAt = Instant.now();
 
     public Instant getCreatedAt(){ return createdAt; }
+    public Date getCreatedAtDate(){ return Date.from(createdAt); }
     public Long getId(){ return id; }
     public String getEmail(){ return email; }
     public void setEmail(String email){ this.email = email; }
