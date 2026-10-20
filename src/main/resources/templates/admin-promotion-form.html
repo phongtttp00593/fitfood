@@ -1,13 +1,16 @@
 
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Thêm / Sửa khuyến mãi | FITFOOD Admin</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
           rel="stylesheet">
 
@@ -20,17 +23,18 @@
 
 <div class="adm-layout">
 
-    <!-- Sidebar chung -->
+    <!-- SIDEBAR -->
     <aside class="adm-sidebar"
            th:replace="~{fragments/admin-sidebar :: sidebar('promotions')}">
     </aside>
 
     <div class="adm-main">
 
-        <!-- Header -->
+        <!-- HEADER -->
         <header class="adm-top cat-top">
 
             <div class="admin-breadcrumb">
+
                 FITFOOD <span>/</span>
 
                 <a th:href="@{/admin/promotions}">
@@ -42,6 +46,7 @@
                 <b th:text="${isEdit ? 'Chỉnh sửa' : 'Thêm mới'}">
                     Thêm mới
                 </b>
+
             </div>
 
             <a class="cat-outline-btn"
@@ -51,11 +56,14 @@
 
         </header>
 
+        <!-- NỘI DUNG -->
         <main class="adm-content cat-content">
 
-            <!-- Tiêu đề -->
+            <!-- TIÊU ĐỀ -->
             <div class="cat-heading">
+
                 <div>
+
                     <span class="cat-overline">
                         QUẢN LÝ KHUYẾN MÃI
                     </span>
@@ -68,25 +76,32 @@
                         Thiết lập mã ưu đãi, mức giảm và
                         thời gian áp dụng cho khách hàng.
                     </p>
+
                 </div>
+
             </div>
 
-            <!-- Thông báo lỗi -->
+            <!-- THÔNG BÁO LỖI -->
             <div class="cat-alert cat-alert-error"
                  th:if="${error}"
                  th:text="${error}">
             </div>
 
-            <!-- Form -->
+            <!-- FORM -->
             <section class="cat-card cat-form-card">
 
                 <div class="cat-card-header">
+
                     <div>
+
                         <h2>Thông tin khuyến mãi</h2>
+
                         <p>
                             Các trường có dấu * là bắt buộc.
                         </p>
+
                     </div>
+
                 </div>
 
                 <form class="cat-editor promo-editor"
@@ -94,25 +109,33 @@
                       th:object="${promotionForm}"
                       method="post">
 
+                    <!-- CSRF -->
                     <input type="hidden"
                            th:name="${_csrf.parameterName}"
                            th:value="${_csrf.token}">
 
+                    <!-- ID -->
                     <input type="hidden"
                            th:field="*{id}">
 
+                    <!-- THÔNG BÁO LÊN LỊCH -->
                     <div class="promo-notice">
+
                         📅 <strong>Lên lịch khuyến mãi:</strong>
+
                         Bạn có thể tạo chương trình ngay hôm nay
                         và chọn ngày bắt đầu trong tương lai.
+
                         Khi đến thời gian đã đặt, khuyến mãi
                         tự có hiệu lực nếu đang bật.
+
                     </div>
 
                     <div class="promo-form-grid">
 
-                        <!-- Mã -->
+                        <!-- MÃ KHUYẾN MÃI -->
                         <div class="cat-field">
+
                             <label for="promoCode">
                                 Mã khuyến mãi
                                 <em class="promo-required">*</em>
@@ -133,10 +156,12 @@
                                   th:if="${#fields.hasErrors('code')}"
                                   th:errors="*{code}">
                             </span>
+
                         </div>
 
-                        <!-- Tên -->
+                        <!-- TÊN CHƯƠNG TRÌNH -->
                         <div class="cat-field">
+
                             <label for="promoName">
                                 Tên chương trình
                                 <em class="promo-required">*</em>
@@ -153,10 +178,12 @@
                                   th:if="${#fields.hasErrors('name')}"
                                   th:errors="*{name}">
                             </span>
+
                         </div>
 
-                        <!-- Phần trăm -->
+                        <!-- GIẢM THEO PHẦN TRĂM -->
                         <div class="cat-field">
+
                             <label for="promoPercent">
                                 Giảm theo phần trăm (%)
                             </label>
@@ -177,10 +204,12 @@
                                   th:if="${#fields.hasErrors('percentDiscount')}"
                                   th:errors="*{percentDiscount}">
                             </span>
+
                         </div>
 
-                        <!-- Số tiền -->
+                        <!-- GIẢM THEO SỐ TIỀN -->
                         <div class="cat-field">
+
                             <label for="promoAmount">
                                 Giảm theo số tiền (VNĐ)
                             </label>
@@ -200,10 +229,12 @@
                                   th:if="${#fields.hasErrors('amountDiscount')}"
                                   th:errors="*{amountDiscount}">
                             </span>
+
                         </div>
 
-                        <!-- Bắt đầu -->
+                        <!-- NGÀY BẮT ĐẦU -->
                         <div class="cat-field">
+
                             <label for="promoStarts">
                                 Ngày bắt đầu
                                 <em class="promo-required">*</em>
@@ -224,10 +255,12 @@
                                   th:if="${#fields.hasErrors('startsAt')}"
                                   th:errors="*{startsAt}">
                             </span>
+
                         </div>
 
-                        <!-- Kết thúc -->
+                        <!-- NGÀY KẾT THÚC -->
                         <div class="cat-field">
+
                             <label for="promoEnds">
                                 Ngày kết thúc
                                 <em class="promo-required">*</em>
@@ -248,10 +281,12 @@
                                   th:if="${#fields.hasErrors('endsAt')}"
                                   th:errors="*{endsAt}">
                             </span>
+
                         </div>
 
-                        <!-- Đơn tối thiểu -->
+                        <!-- ĐƠN TỐI THIỂU -->
                         <div class="cat-field">
+
                             <label for="promoMinimum">
                                 Giá trị đơn tối thiểu (VNĐ)
                                 <em class="promo-required">*</em>
@@ -273,10 +308,12 @@
                                   th:if="${#fields.hasErrors('minimumOrder')}"
                                   th:errors="*{minimumOrder}">
                             </span>
+
                         </div>
 
-                        <!-- Giảm tối đa -->
+                        <!-- GIẢM TỐI ĐA -->
                         <div class="cat-field">
+
                             <label for="promoMaximum">
                                 Số tiền giảm tối đa (VNĐ)
                             </label>
@@ -296,10 +333,12 @@
                                   th:if="${#fields.hasErrors('maximumDiscount')}"
                                   th:errors="*{maximumDiscount}">
                             </span>
+
                         </div>
 
-                        <!-- Trạng thái -->
+                        <!-- TRẠNG THÁI -->
                         <div class="cat-field promo-full">
+
                             <label for="promoActive">
                                 Trạng thái chương trình
                             </label>
@@ -314,6 +353,7 @@
                                 <option value="false">
                                     Tạm ẩn khuyến mãi
                                 </option>
+
                             </select>
 
                             <small class="cat-hint">
@@ -321,11 +361,12 @@
                                 Hệ thống vẫn kiểm tra ngày bắt đầu
                                 và ngày kết thúc.
                             </small>
+
                         </div>
 
                     </div>
 
-                    <!-- Nút lưu -->
+                    <!-- NÚT LƯU -->
                     <div class="cat-form-actions promo-form-actions">
 
                         <a class="cat-outline-btn"
@@ -346,7 +387,9 @@
             </section>
 
         </main>
+
     </div>
+
 </div>
 
 </body>
