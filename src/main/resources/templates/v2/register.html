@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{v2/fragments/layout :: head('Đăng ký')}"></head>
+<body>
+<div th:replace="~{v2/fragments/layout :: header('login')}"></div>
+
+<main id="main">
+  <div class="auth-wrap">
+    <div class="container auth-container">
+      <div class="card pad stack auth-card">
+        <span class="auth-seal" aria-hidden="true"></span>
+        <p class="eyebrow">Thành viên mới</p>
+        <h1>Tạo tài khoản</h1>
+        <p class="muted small">Đăng ký để xem lại đơn đã đặt và đặt món nhanh hơn.</p>
+        <div class="msg error" th:if="${error}" th:text="${error}">Lỗi</div>
+        <form class="stack" th:action="@{/dang-ky}" method="post">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <div class="field"><label for="r-name">Họ và tên</label><input id="r-name" name="fullName" th:value="${fullName}" type="text" autocomplete="name" minlength="2" maxlength="120" required /></div>
+          <div class="field"><label for="r-email">Email</label><input id="r-email" name="email" th:value="${email}" type="email" autocomplete="email" maxlength="254" required /></div>
+          <div class="field"><label for="r-pass">Mật khẩu (8–64 ký tự)</label><input id="r-pass" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="64" required /></div>
+          <div class="field"><label for="r-pass2">Nhập lại mật khẩu</label><input id="r-pass2" name="confirmPassword" type="password" autocomplete="new-password" minlength="8" maxlength="64" required /></div>
+          <button class="btn block" type="submit">Tạo tài khoản</button>
+        </form>
+        <p class="small">Đã có tài khoản? <a th:href="@{/dang-nhap}">Đăng nhập</a></p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer th:replace="~{v2/fragments/layout :: footer}"></footer>
+<th:block th:replace="~{v2/fragments/layout :: scripts}"></th:block>
+</body>
+</html>

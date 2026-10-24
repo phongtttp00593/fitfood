@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{v2/fragments/layout :: head('Giỏ hàng')}"></head>
+<body>
+<div th:replace="~{v2/fragments/layout :: header('cart')}"></div>
+
+<main id="main">
+  <header class="page-hero compact-title">
+    <div class="container">
+      <p class="eyebrow">Đơn hàng của bạn</p>
+      <h1>Giỏ hàng</h1>
+      <ol class="checkout-steps" aria-label="Các bước đặt hàng">
+        <li class="on" aria-current="step"><b>1</b><span>Giỏ hàng</span></li>
+        <li><b>2</b><span>Thông tin nhận hàng</span></li>
+        <li><b>3</b><span>Thanh toán</span></li>
+      </ol>
+    </div>
+  </header>
+  <div class="container layout-2">
+    <div class="card pad cart-card" data-reveal="0" data-reveal-dir="left">
+      <h2 class="card-title">Món đã chọn</h2>
+      <div class="cart-line">
+        <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&amp;fit=crop&amp;w=300&amp;q=75" onerror="this.onerror=null;this.src='/images/chicken-salad.jpg'" alt="" />
+        <div>
+          <a class="name" th:href="@{/product}">Salad ức gà</a>
+          <div class="small muted">49.000đ / phần</div>
+          <div class="row" style="margin-top: 6px">
+            <div class="qty"><input type="number" min="1" max="99" value="1" aria-label="Số lượng Salad ức gà" inputmode="numeric" /></div>
+            <button class="btn ghost sm" type="button">Xoá</button>
+          </div>
+        </div>
+        <strong>49.000đ</strong>
+      </div>
+      <div class="cart-line">
+        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&amp;fit=crop&amp;w=300&amp;q=75" onerror="this.onerror=null;this.src='/images/chicken-bowl.jpg'" alt="" />
+        <div>
+          <a class="name" th:href="@{/product}">Cơm gà sốt tiêu đen</a>
+          <div class="small muted">59.000đ / phần</div>
+          <div class="row" style="margin-top: 6px">
+            <div class="qty"><input type="number" min="1" max="99" value="1" aria-label="Số lượng Cơm gà sốt tiêu đen" inputmode="numeric" /></div>
+            <button class="btn ghost sm" type="button">Xoá</button>
+          </div>
+        </div>
+        <strong>59.000đ</strong>
+      </div>
+      <div class="cart-line">
+        <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&amp;fit=crop&amp;w=300&amp;q=75" onerror="this.onerror=null;this.src='/images/green-bowl.jpg'" alt="" />
+        <div>
+          <a class="name" th:href="@{/product}">Nước ép detox</a>
+          <div class="small muted">29.000đ / phần</div>
+          <div class="row" style="margin-top: 6px">
+            <div class="qty"><input type="number" min="1" max="99" value="1" aria-label="Số lượng Nước ép detox" inputmode="numeric" /></div>
+            <button class="btn ghost sm" type="button">Xoá</button>
+          </div>
+        </div>
+        <strong>29.000đ</strong>
+      </div>
+    </div>
+    <aside class="card pad summary" aria-label="Tóm tắt" data-reveal="120" data-reveal-dir="right">
+      <h2 class="card-title">Tóm tắt</h2>
+      <div class="line"><span>Tạm tính</span><strong>137.000đ</strong></div>
+      <div class="line"><span>Phí vận chuyển</span><strong>15.000đ</strong></div>
+      <div class="line"><span>Tổng cộng</span><strong>152.000đ</strong></div>
+      <p class="small muted">Giỏ hàng đang hiển thị dữ liệu mẫu, chưa kết nối đặt hàng.</p>
+      <button class="btn block" type="button" data-add-to-cart data-msg="Chức năng đặt hàng đang được phát triển.">Tiến hành đặt hàng</button>
+      <a class="btn ghost block" th:href="@{/menu}">← Tiếp tục chọn món</a>
+    </aside>
+  </div>
+</main>
+
+<footer th:replace="~{v2/fragments/layout :: footer}"></footer>
+<th:block th:replace="~{v2/fragments/layout :: scripts}"></th:block>
+</body>
+</html>

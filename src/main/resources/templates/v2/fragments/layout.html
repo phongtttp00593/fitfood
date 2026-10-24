@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<!-- Khung chung giao diện mới: head / header / footer / scripts. Các trang v2 chỉ cần gọi lại. -->
+<head th:fragment="head(title)">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title th:text="${title} + ' · FITFOOD'">FITFOOD</title>
+    <link rel="stylesheet" th:href="@{/css/v2/fonts/fonts.css}" />
+    <link rel="stylesheet" th:href="@{/css/v2/styles.css}" />
+    <link rel="stylesheet" th:href="@{/css/v2/motion.css}" />
+    <link rel="stylesheet" th:href="@{/css/v2/extra.css}" />
+</head>
+<body>
+<th:block th:fragment="header(active)">
+    <div class="scroll-bar" id="scrollBar" aria-hidden="true"></div>
+    <a class="skip" href="#main">Bỏ qua, tới nội dung chính</a>
+    <div class="topline">
+        <div class="container">
+            <span class="tl-left">Ăn ngon, sống khỏe · Nấu mới mỗi ngày · Giao tận nơi</span>
+            <span class="tl-right"><span>Hotline: <a href="tel:0900000000">0900 000 000</a></span></span>
+        </div>
+    </div>
+    <header class="site-header" id="siteHeader">
+        <div class="container bar">
+            <a class="brand" th:href="@{/}" aria-label="FITFOOD — Trang chủ">
+                <span class="brand-mark">
+                    <svg viewBox="0 0 48 48" aria-hidden="true">
+                        <circle cx="24" cy="24" r="23" fill="#9b2c1f" />
+                        <circle cx="24" cy="24" r="20.5" fill="none" stroke="#dcc07e" stroke-width="1.1" />
+                        <g fill="none" stroke="#f3dfa6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M32 13C20 13 14 19 14 29a5 5 0 0 0 5 5c10 0 15-6 13-21Z" />
+                            <path d="M14 36 28 20" />
+                        </g>
+                    </svg>
+                </span>
+                <span>FITFOOD<small>Ăn ngon · Sống khỏe</small></span>
+            </a>
+
+            <nav id="main-nav" class="nav" aria-label="Menu chính">
+                <a th:href="@{/}" th:attr="aria-current=${active == 'home'} ? 'page'">Trang chủ</a>
+                <a th:href="@{/menu}" th:attr="aria-current=${active == 'menu'} ? 'page'">Thực đơn</a>
+                <a th:href="@{/cart}" th:attr="aria-current=${active == 'cart'} ? 'page'">Giỏ hàng</a>
+                <a th:if="${accountInfo != null}" th:href="@{/tai-khoan}" th:attr="aria-current=${active == 'account'} ? 'page'">Tài khoản</a>
+            </nav>
+
+            <div class="head-actions">
+                <a class="icon-btn" th:if="${accountInfo == null}" th:href="@{/dang-nhap}" title="Đăng nhập">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                    <span class="lbl">Đăng nhập</span>
+                </a>
+                <details class="acc-menu" th:if="${accountInfo != null}">
+                    <summary class="icon-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                        <span class="lbl" th:text="${accountInfo.fullName}">Họ tên</span>
+                    </summary>
+                    <div class="acc-pop">
+                        <div class="acc-id">
+                            <strong th:text="${accountInfo.fullName}">Họ tên</strong>
+                            <small th:text="${accountInfo.email}">email@example.com</small>
+                        </div>
+                        <a th:href="@{/tai-khoan}">Thông tin tài khoản</a>
+                        <a th:if="${isAdmin}" th:href="@{/admin}">Trang quản trị</a>
+                        <form th:action="@{/dang-xuat}" method="post">
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <button type="submit">Đăng xuất</button>
+                        </form>
+                    </div>
+                </details>
+                <a class="icon-btn" th:href="@{/cart}" title="Giỏ hàng">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="21" r="1" /><circle cx="20" cy="21" r="1" /><path d="M1 1h4l2.7 13.4a2 2 0 0 0 2 1.6h9.7a2 2 0 0 0 2-1.6L23 6H6" /></svg>
+                    <span class="lbl">Giỏ</span>
+                </a>
+                <button class="icon-btn menu-toggle" type="button" aria-controls="main-nav" aria-expanded="false" aria-label="Mở menu" id="menuToggle">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18" /></svg>
+                </button>
+            </div>
+        </div>
+    </header>
+</th:block>
+
+<footer class="site-footer" th:fragment="footer">
+    <div class="container">
+        <div class="f-top">
+            <p class="f-name">FITFOOD</p>
+            <p>Ăn ngon, sống khỏe — những bữa ăn lành mạnh nấu bằng sự tận tâm</p>
+        </div>
+        <div class="cols">
+            <div>
+                <h3>Về FITFOOD</h3>
+                <p>Đồ ăn healthy nấu mới mỗi ngày, từ nguyên liệu tươi và sạch, ghi rõ dinh dưỡng từng món.</p>
+            </div>
+            <div>
+                <h3>Liên hệ</h3>
+                <ul>
+                    <li>Địa chỉ: Hải Phòng, Việt Nam</li>
+                    <li>Email: <a href="mailto:support@fitfood.vn">support@fitfood.vn</a></li>
+                    <li>Hotline: <a href="tel:0900000000">0900 000 000</a></li>
+                    <li>Giờ mở cửa: 8:00 – 21:00 mỗi ngày</li>
+                </ul>
+            </div>
+            <div>
+                <h3>Mua hàng</h3>
+                <ul>
+                    <li><a th:href="@{/menu}">Thực đơn</a></li>
+                    <li><a th:href="@{/cart}">Giỏ hàng</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3>Tài khoản</h3>
+                <ul>
+                    <li><a th:href="@{/tai-khoan}">Tài khoản của tôi</a></li>
+                    <li th:if="${accountInfo == null}"><a th:href="@{/dang-nhap}">Đăng nhập</a></li>
+                    <li th:if="${accountInfo == null}"><a th:href="@{/dang-ky}">Đăng ký</a></li>
+                    <li><a th:href="@{/quen-mat-khau}">Quên mật khẩu</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="bottom"><span>© 2026 FITFOOD · Nội dung và giá chỉ mang tính minh họa</span></div>
+    </div>
+</footer>
+
+<th:block th:fragment="scripts">
+    <script th:src="@{/js/v2-motion.js}" defer></script>
+</th:block>
+</body>
+</html>

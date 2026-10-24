@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{v2/fragments/layout :: head('Salad ức gà')}"></head>
+<body>
+<div th:replace="~{v2/fragments/layout :: header('menu')}"></div>
+
+<main id="main">
+  <header class="page-hero compact">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Đường dẫn">
+        <a th:href="@{/}">Trang chủ</a> <i>›</i> <a th:href="@{/menu}">Thực đơn</a> <i>›</i> <span aria-current="page">Salad ức gà</span>
+      </nav>
+    </div>
+  </header>
+  <div class="container pd-wrap">
+    <div class="pd">
+      <div class="pd-media" data-reveal="0" data-reveal-dir="left"><div class="img photo framed"><img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&amp;fit=crop&amp;w=1000&amp;q=75" onerror="this.onerror=null;this.src='/images/chicken-salad.jpg'" alt="Salad ức gà" width="400" height="300" /></div></div>
+      <div class="pd-info stack" data-reveal="0" data-reveal-dir="right">
+        <div class="badges"><span class="badge">Salad</span><span class="badge vegan">Eat clean</span></div>
+        <h1>Salad ức gà</h1>
+        <p class="lead">Ức gà, xà lách, cà chua bi, sốt mè rang.</p>
+        <div class="pd-buy">
+          <div class="price pd-price">49.000đ <span class="muted small">/ phần</span></div>
+          <div class="row pd-actions">
+            <div class="qty">
+              <button type="button" aria-label="Bớt" data-qty-step="-1">−</button>
+              <input type="number" value="1" min="1" max="99" aria-label="Số lượng" inputmode="numeric" data-qty-input />
+              <button type="button" aria-label="Thêm" data-qty-step="1">+</button>
+            </div>
+            <button class="btn" type="button" data-add-to-cart>Thêm vào giỏ</button>
+            <a class="btn outline" th:href="@{/cart}">Mua ngay</a>
+          </div>
+        </div>
+        <ul class="pd-assure">
+          <li><b>Nấu trong ngày</b><span>Số suất có hạn mỗi ngày.</span></li>
+          <li><b>Khẩu phần cân bằng</b><span>Đủ đạm, tinh bột và chất xơ.</span></li>
+          <li><b>Giao tận nơi</b><span>Chọn ở bước đặt hàng.</span></li>
+        </ul>
+        <div class="pd-specs">
+          <h2 class="card-title">Thông tin món</h2>
+          <dl class="kv">
+            <dt>Thành phần</dt><dd>Ức gà, xà lách, cà chua bi, dưa leo, sốt mè rang</dd>
+            <dt>Năng lượng</dt><dd>380 kcal</dd>
+            <dt>Đạm</dt><dd>32 g</dd>
+            <dt>Tinh bột</dt><dd>24 g</dd>
+            <dt>Chất béo</dt><dd>15 g</dd>
+          </dl>
+        </div>
+      </div>
+    </div>
+  </div>
+  <section class="section alt related">
+    <div class="container">
+      <div class="title-center" data-reveal="0"><p class="eyebrow">Gợi ý thêm</p><h2>Có thể bạn cũng thích</h2><div class="lotus-divider" aria-hidden="true"><i></i></div></div>
+      <div class="grid grid-4">
+          <div data-reveal="0">
+            <article class="card p-card">
+              <a class="thumb" th:href="@{/product}" tabindex="-1" aria-hidden="true">
+                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&amp;fit=crop&amp;w=800&amp;q=75" onerror="this.onerror=null;this.src='/images/chicken-bowl.jpg'" alt="Cơm gà sốt tiêu đen" loading="lazy" width="400" height="300" />
+              </a>
+              <div class="body">
+                <div class="badges"><span class="badge">Cơm healthy</span><span class="badge">★ 4.9</span></div>
+                <h3><a th:href="@{/product}">Cơm gà sốt tiêu đen</a></h3>
+                <p class="desc">Ức gà áp chảo, gạo lứt, rau củ hấp.</p>
+                <div class="foot">
+                  <span class="price">59.000đ</span>
+                  <button class="btn sm" type="button" data-add-to-cart aria-label="Thêm Cơm gà sốt tiêu đen vào giỏ">Thêm vào giỏ</button>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div data-reveal="100">
+            <article class="card p-card">
+              <a class="thumb" th:href="@{/product}" tabindex="-1" aria-hidden="true">
+                <img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&amp;fit=crop&amp;w=800&amp;q=75" onerror="this.onerror=null;this.src='/images/salmon-bowl.jpg'" alt="Cá hồi áp chảo" loading="lazy" width="400" height="300" />
+              </a>
+              <div class="body">
+                <div class="badges"><span class="badge">Món cao cấp</span><span class="badge vegan">Mới</span><span class="badge">★ 4.9</span></div>
+                <h3><a th:href="@{/product}">Cá hồi áp chảo</a></h3>
+                <p class="desc">Cá hồi áp chảo, khoai lang, măng tây.</p>
+                <div class="foot">
+                  <span class="price">89.000đ</span>
+                  <button class="btn sm" type="button" data-add-to-cart aria-label="Thêm Cá hồi áp chảo vào giỏ">Thêm vào giỏ</button>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div data-reveal="200">
+            <article class="card p-card">
+              <a class="thumb" th:href="@{/product}" tabindex="-1" aria-hidden="true">
+                <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&amp;fit=crop&amp;w=800&amp;q=75" onerror="this.onerror=null;this.src='/images/beef-bowl.jpg'" alt="Cơm bò xào rau củ" loading="lazy" width="400" height="300" />
+              </a>
+              <div class="body">
+                <div class="badges"><span class="badge">Cơm healthy</span><span class="badge">★ 4.8</span></div>
+                <h3><a th:href="@{/product}">Cơm bò xào rau củ</a></h3>
+                <p class="desc">Thịt bò nạc xào rau củ, gạo lứt.</p>
+                <div class="foot">
+                  <span class="price">65.000đ</span>
+                  <button class="btn sm" type="button" data-add-to-cart aria-label="Thêm Cơm bò xào rau củ vào giỏ">Thêm vào giỏ</button>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div data-reveal="300">
+            <article class="card p-card">
+              <a class="thumb" th:href="@{/product}" tabindex="-1" aria-hidden="true">
+                <img src="https://images.unsplash.com/photo-1512621776951-a57141f2eefd?auto=format&amp;fit=crop&amp;w=800&amp;q=75" onerror="this.onerror=null;this.src='/images/green-bowl.jpg'" alt="Salad quinoa" loading="lazy" width="400" height="300" />
+              </a>
+              <div class="body">
+                <div class="badges"><span class="badge">Salad</span><span class="badge">★ 4.9</span></div>
+                <h3><a th:href="@{/product}">Salad quinoa</a></h3>
+                <p class="desc">Quinoa, bơ, đậu gà, rau xanh.</p>
+                <div class="foot">
+                  <span class="price">55.000đ</span>
+                  <button class="btn sm" type="button" data-add-to-cart aria-label="Thêm Salad quinoa vào giỏ">Thêm vào giỏ</button>
+                </div>
+              </div>
+            </article>
+          </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer th:replace="~{v2/fragments/layout :: footer}"></footer>
+<th:block th:replace="~{v2/fragments/layout :: scripts}"></th:block>
+</body>
+</html>

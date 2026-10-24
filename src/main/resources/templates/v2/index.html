@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{v2/fragments/layout :: head('Trang chủ')}"></head>
+<body>
+<div th:replace="~{v2/fragments/layout :: header('home')}"></div>
+
+<main id="main">
+  <div class="home">
+    <section class="h-hero">
+      <span class="leaf" style="left: 3%; top: 16%; --s: 38px; --t: 12s" aria-hidden="true"><svg viewBox="0 0 48 48" fill="currentColor"><path d="M40 6C20 6 8 16 8 32c0 4 3 8 8 8 16 0 26-12 24-34Z" /></svg></span>
+      <span class="leaf gold" style="left: 46%; top: 8%; --s: 24px; --t: 9s; --dl: -3s" aria-hidden="true"><svg viewBox="0 0 48 48" fill="currentColor"><path d="M40 6C20 6 8 16 8 32c0 4 3 8 8 8 16 0 26-12 24-34Z" /></svg></span>
+      <span class="leaf" style="right: 4%; bottom: 14%; --s: 30px; --t: 13s; --dl: -6s" aria-hidden="true"><svg viewBox="0 0 48 48" fill="currentColor"><path d="M40 6C20 6 8 16 8 32c0 4 3 8 8 8 16 0 26-12 24-34Z" /></svg></span>
+      <span class="leaf gold" style="left: 40%; bottom: 10%; --s: 20px; --t: 10s; --dl: -2s" aria-hidden="true"><svg viewBox="0 0 48 48" fill="currentColor"><path d="M40 6C20 6 8 16 8 32c0 4 3 8 8 8 16 0 26-12 24-34Z" /></svg></span>
+
+      <div class="container h-hero-wrap">
+        <div class="h-hero-text">
+          <p class="eyebrow">Ăn ngon · Sống khỏe · Mỗi ngày</p>
+          <h1>Thực phẩm lành mạnh <span class="nowrap"><em>cho một cuộc sống</em></span> <br />tốt đẹp hơn</h1>
+          <p class="lead">Những bữa ăn tươi ngon, giàu dinh dưỡng được chế biến từ nguyên liệu sạch, giúp bạn khỏe mạnh mỗi ngày.</p>
+          <div class="row h-cta">
+            <a class="btn btn-pulse" th:href="@{/menu}">Khám phá thực đơn</a>
+            <a class="btn outline" href="#about">Tìm hiểu FITFOOD</a>
+          </div>
+          <ul class="h-trust">
+            <li>Nguyên liệu tươi, nấu mới mỗi ngày</li>
+            <li>Khẩu phần cân bằng, ghi rõ dinh dưỡng</li>
+            <li>Giao tận nơi, thanh toán khi nhận</li>
+          </ul>
+        </div>
+        <div class="h-hero-art" data-tilt>
+          <figure class="photo arch framed h-hero-main">
+            <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&amp;fit=crop&amp;w=1000&amp;q=75" onerror="this.onerror=null;this.src='/images/hero-bowl.jpg'" alt="Salad rau xanh tươi ngon" width="1000" height="1500" fetchpriority="high" />
+          </figure>
+          <figure class="photo framed h-hero-sub">
+            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&amp;fit=crop&amp;w=700&amp;q=75" onerror="this.onerror=null;this.src='/images/chicken-bowl.jpg'" alt="Bát cơm rau củ healthy" width="700" height="525" />
+          </figure>
+          <div class="h-hero-seal" aria-hidden="true"><span>100% Healthy</span><b>cân bằng</b></div>
+        </div>
+      </div>
+      <span class="scroll-hint" aria-hidden="true"></span>
+    </section>
+
+    <div class="marquee" aria-hidden="true">
+      <div class="marquee-track">
+        <span>Cơm healthy</span>
+        <span>Salad tươi</span>
+        <span>Món cao cấp</span>
+        <span>Nấu mới mỗi ngày</span>
+        <span>Ít dầu mỡ</span>
+        <span>Rõ dinh dưỡng</span>
+        <span>Giao tận nơi</span>
+        <span>Eat clean</span>
+        <span>Cơm healthy</span>
+        <span>Salad tươi</span>
+        <span>Món cao cấp</span>
+        <span>Nấu mới mỗi ngày</span>
+        <span>Ít dầu mỡ</span>
+        <span>Rõ dinh dưỡng</span>
+        <span>Giao tận nơi</span>
+        <span>Eat clean</span>
+      </div>
+    </div>
+
+    <section class="section">
+      <div class="container h-stats">
+        <div class="h-stat" data-reveal="0"><b data-count="6" data-suffix="+">0</b><span>Món nấu mỗi ngày</span></div>
+        <div class="h-stat" data-reveal="120"><b data-count="4.8" data-decimals="1" data-suffix="★">0</b><span>Điểm đánh giá trung bình</span></div>
+        <div class="h-stat" data-reveal="240"><b data-count="100" data-suffix="%">0</b><span>Nguyên liệu tươi, sạch</span></div>
+        <div class="h-stat" data-reveal="360"><b data-count="365">0</b><span>Ngày nấu mới trong năm</span></div>
+      </div>
+    </section>
+
+    <section id="about" class="section pattern h-story">
+      <div class="container h-story-wrap">
+        <figure class="photo framed h-story-photo" data-reveal="0" data-reveal-dir="left">
+          <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&amp;fit=crop&amp;w=1000&amp;q=75" onerror="this.onerror=null;this.src='/images/welcome-green.jpg'" alt="Nguyên liệu tươi cho bữa ăn healthy" width="1000" height="750" loading="lazy" />
+        </figure>
+        <div class="h-story-text" data-reveal="0" data-reveal-dir="right">
+          <p class="eyebrow">Về FITFOOD</p>
+          <h2>Chăm sóc bản thân bắt đầu từ bữa ăn</h2>
+          <p>Một lựa chọn lành mạnh mỗi ngày chính là món quà cho sức khỏe lâu dài. Bếp FITFOOD nấu từ ức gà, cá hồi, gạo lứt, hạt và rau củ tươi — ít dầu mỡ, nêm vừa vị.</p>
+          <ul class="h-values">
+            <li data-reveal="150"><b>Nấu mới mỗi ngày</b><span>Số suất có hạn, hết là thôi.</span></li>
+            <li data-reveal="300"><b>Rõ dinh dưỡng</b><span>Ghi calo, đạm, tinh bột, chất béo ở từng món.</span></li>
+            <li data-reveal="450"><b>Khẩu phần cân bằng</b><span>Phù hợp lối sống năng động.</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="section h-featured">
+      <div class="container">
+        <div class="title-center" data-reveal="0">
+          <p class="eyebrow">Món được đặt nhiều</p>
+          <h2>Món ngon hôm nay</h2>
+          <div class="lotus-divider" aria-hidden="true"><i></i></div>
+          <p>Món nấu trong ngày, số suất có hạn.</p>
+        </div>
+        <div class="grid grid-4">
+          <div data-reveal="0">
+            <article class="card p-card">
+              <a class="thumb" th:href="@{/product}" tabindex="-1" aria-hidden="true">
+                <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&amp;fit=crop&amp;w=800&amp;q=75" alt="Cơm gà sốt tiêu đen" loading="lazy" width="400" height="300" />
+              </a>
+              <div class="body">
+                <div class="badges"><span class="badge">Cơm healthy</span><span class="badge">★ 4.9</span></div>
+                <h3><a th:href="@{/product}">Cơm gà sốt tiêu đen</a></h3>
+                <p class="desc">Ức gà áp chảo, gạo lứt, rau củ hấp.</p>
+                <div class="foot">
+                  <span class="price">59.000đ</span>
+                  <a class="btn sm" th:href="@{/product}">Xem món</a>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div data-reveal="120">
+            <article class="card p-card">
+              <a class="thumb" th:href="@{/product}" tabindex="-1" aria-hidden="true">
+                <img src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&amp;fit=crop&amp;w=800&amp;q=75" alt="Salad ức gà" loading="lazy" width="400" height="300" />
+              </a>
+              <div class="body">
+                <div class="badges"><span class="badge">Salad</span><span class="badge vegan">Phổ biến</span><span class="badge">★ 4.8</span></div>
+                <h3><a th:href="@{/product}">Salad ức gà</a></h3>
+                <p class="desc">Ức gà, xà lách, cà chua bi, sốt mè rang.</p>
+                <div class="foot">
+                  <span class="price">49.000đ</span>
+                  <a class="btn sm" th:href="@{/product}">Xem món</a>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div data-reveal="240">
+            <article class="card p-card">
+              <a class="thumb" th:href="@{/product}" tabindex="-1" aria-hidden="true">
+                <img src="https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&amp;fit=crop&amp;w=800&amp;q=75" alt="Cá hồi áp chảo" loading="lazy" width="400" height="300" />
+              </a>
+              <div class="body">
+                <div class="badges"><span class="badge">Món cao cấp</span><span class="badge vegan">Mới</span><span class="badge">★ 4.9</span></div>
+                <h3><a th:href="@{/product}">Cá hồi áp chảo</a></h3>
+                <p class="desc">Cá hồi áp chảo, khoai lang, măng tây.</p>
+                <div class="foot">
+                  <span class="price">89.000đ</span>
+                  <a class="btn sm" th:href="@{/product}">Xem món</a>
+                </div>
+              </div>
+            </article>
+          </div>
+          <div data-reveal="360">
+            <article class="card p-card">
+              <a class="thumb" th:href="@{/product}" tabindex="-1" aria-hidden="true">
+                <img src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?auto=format&amp;fit=crop&amp;w=800&amp;q=75" alt="Cơm bò xào rau củ" loading="lazy" width="400" height="300" />
+              </a>
+              <div class="body">
+                <div class="badges"><span class="badge">Cơm healthy</span><span class="badge">★ 4.8</span></div>
+                <h3><a th:href="@{/product}">Cơm bò xào rau củ</a></h3>
+                <p class="desc">Thịt bò nạc xào rau củ, gạo lứt.</p>
+                <div class="foot">
+                  <span class="price">65.000đ</span>
+                  <a class="btn sm" th:href="@{/product}">Xem món</a>
+                </div>
+              </div>
+            </article>
+          </div>
+        </div>
+        <p class="center" style="margin-top: 28px" data-reveal="0">
+          <a class="btn outline" th:href="@{/menu}">Xem toàn bộ thực đơn</a>
+        </p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="title-center" data-reveal="0">
+          <p class="eyebrow">Đơn giản, rõ ràng</p>
+          <h2>Đặt món thế nào?</h2>
+          <div class="lotus-divider" aria-hidden="true"><i></i></div>
+        </div>
+        <ol class="steps">
+          <li data-reveal="0"><strong>Chọn món</strong><br /><span class="muted">Cơm healthy, salad, món cao cấp.</span></li>
+          <li data-reveal="130"><strong>Thêm vào giỏ</strong><br /><span class="muted">Chọn số lượng phù hợp.</span></li>
+          <li data-reveal="260"><strong>Thanh toán</strong><br /><span class="muted">Tiền mặt khi nhận hoặc chuyển khoản.</span></li>
+          <li data-reveal="390"><strong>Nhận món</strong><br /><span class="muted">Giao tận nơi, nóng và tươi.</span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section pattern">
+      <div class="container grid grid-2 h-info">
+        <div class="card pad h-store" data-reveal="0" data-reveal-dir="left">
+          <p class="eyebrow">Ghé bếp</p>
+          <h2>Cửa hàng</h2>
+          <ul class="info-list">
+            <li><b>Địa chỉ</b><span>Hải Phòng, Việt Nam</span></li>
+            <li><b>Email</b><span>support@fitfood.vn</span></li>
+            <li><b>Giờ hoạt động</b><span>8:00 – 21:00 mỗi ngày</span></li>
+          </ul>
+        </div>
+        <div class="faq" data-reveal="0" data-reveal-dir="right">
+          <p class="eyebrow">Hỏi đáp</p>
+          <h2>Câu hỏi thường gặp</h2>
+          <details><summary>Món ăn có ghi rõ dinh dưỡng không?</summary><p>Mỗi món ghi lượng calo, đạm, tinh bột và chất béo ở trang chi tiết.</p></details>
+          <details><summary>Tôi bị dị ứng, đặt món thế nào?</summary><p>Xem phần thành phần ở từng món. Nếu cần hỗ trợ thêm, hãy liên hệ cửa hàng.</p></details>
+          <details><summary>Thanh toán bằng cách nào?</summary><p>Tiền mặt khi nhận hàng hoặc chuyển khoản.</p></details>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer th:replace="~{v2/fragments/layout :: footer}"></footer>
+<th:block th:replace="~{v2/fragments/layout :: scripts}"></th:block>
+</body>
+</html>
