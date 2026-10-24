@@ -1,0 +1,203 @@
+/* TỰ SINH bởi recolor.py: đổi mọi màu xanh lá còn sót trong CSS admin sang tông FITFOOD. Sửa tay ở admin-theme.css. */
+/* ---- fitfood-categories.css ---- */
+body.admin-body .cat-admin-label{color:#5a3725}
+body.admin-body .cat-outline-btn,body.admin-body .cat-primary-btn,body.admin-body .cat-filter-btn{border:1px solid #dccaa0}
+body.admin-body .cat-outline-btn{color:#9b2c1f}
+body.admin-body .cat-outline-btn:hover{background:#f6ecd6}
+body.admin-body .cat-primary-btn{background:#9b2c1f;border-color:#b8862b;box-shadow:0 8px 18px #3a221733}
+body.admin-body .cat-primary-btn:hover{background:#3a2217}
+body.admin-body .cat-overline{color:#9b2c1f}
+body.admin-body .cat-heading h1{color:#3a2217}
+body.admin-body .cat-alert-ok{background:#f6ecd6;color:#9b2c1f;border:1px solid #dccaa0}
+body.admin-body .cat-stat{border:1px solid #dccaa0;box-shadow:0 7px 20px #3a221708}
+body.admin-body .cat-stat strong{color:#3a2217}
+body.admin-body .cat-card{border:1px solid #dccaa0;box-shadow:0 10px 35px #3a22170a}
+body.admin-body .cat-card-header{border-bottom:1px solid #dccaa0}
+body.admin-body .cat-card-header h2{color:#3a2217}
+body.admin-body .cat-filters input,body.admin-body .cat-filters select,body.admin-body .cat-field input,body.admin-body .cat-field textarea,body.admin-body .cat-field select{border:1px solid #dccaa0;background:#fffaf0;color:#3a2217}
+body.admin-body .cat-filters input:focus,body.admin-body .cat-filters select:focus,body.admin-body .cat-field input:focus,body.admin-body .cat-field textarea:focus,body.admin-body .cat-field select:focus{border-color:#b8862b;box-shadow:0 0 0 3px #3a2217}
+body.admin-body .cat-filter-btn{background:#9b2c1f;border-color:#b8862b}
+body.admin-body .cat-clear{color:#5a3725}
+body.admin-body .cat-table th{background:#f6ecd6;border-bottom:1px solid #dccaa0}
+body.admin-body .cat-table td{border-bottom:1px solid #dccaa0;color:#5a3725}
+body.admin-body .cat-id{color:#9b2c1f !important}
+body.admin-body .cat-name strong{color:#3a2217}
+body.admin-body .cat-mini-icon{background:#f6ecd6}
+body.admin-body .cat-pill-on{color:#9b2c1f;background:#f7eed6}
+body.admin-body .cat-action{color:#5a3725;border:1px solid #dccaa0}
+body.admin-body .cat-action:hover{background:#f6ecd6}
+body.admin-body .cat-edit{color:#9b2c1f}
+body.admin-body .cat-empty h3{color:#3a2217}
+body.admin-body .cat-table-footer{border-top:1px solid #dccaa0}
+body.admin-body .cat-field label{color:#3a2217}
+body.admin-body .cat-form-actions{border-top:1px solid #dccaa0}
+body.admin-body .admin-breadcrumb a{color:#9b2c1f}
+/* ---- fitfood-promotions.css ---- */
+body.admin-body .promo-running{color:#9b2c1f;background:#f7eed6}
+body.admin-body .promo-amount{color:#9b2c1f}
+body.admin-body .promo-notice{background:#f6ecd6;border:1px solid #dccaa0;color:#9b2c1f}
+body.admin-body .promo-delete-overlay{background:rgba(58,34,23,0.52)}
+body.admin-body .promo-delete-box h2{color:#3a2217}
+body.admin-body .promo-delete-description strong{color:#3a2217}
+body.admin-body .promo-delete-cancel{background:#f6ecd6}
+body.admin-body .promo-delete-cancel:hover{background:#f7eed6}
+/* ---- fitfood-reports.css ---- */
+body.admin-body .reports-brand{color:#8a735c}
+body.admin-body .reports-brand:hover{color:#9b2c1f}
+body.admin-body .reports-logout{border:1px solid #dccaa0;color:#9b2c1f}
+body.admin-body .reports-logout:hover{background:#f6ecd6;border-color:#c9a960}
+body.admin-body .report-page .btn-filter{border:1px solid #b8862b;background:#9b2c1f}
+body.admin-body .report-page .btn-filter:hover{background:#9b2c1f}
+body.admin-body .report-page .stat-icon{background:#f7eed6;color:#9b2c1f}
+body.admin-body .report-page .chart-empty-icon{color:#9b2c1f}
+body.admin-body .report-page .status-completed{background:#9b2c1f}
+/* ---- fitfood-permissions.css ---- */
+body.admin-body .perm-header h1{color:#3a2217}
+body.admin-body .perm-header p{color:#5a3725}
+body.admin-body .perm-header .perm-kicker{color:#9b2c1f}
+body.admin-body .perm-count{background:#f7eed6;color:#9b2c1f}
+body.admin-body .perm-exit{background:#9b2c1f}
+body.admin-body .perm-panel{border:1px solid #dccaa0;box-shadow:0 8px 28px #3a221708}
+body.admin-body .perm-panel-title{border-bottom:1px solid #dccaa0}
+body.admin-body .perm-panel-title h2{color:#3a2217}
+body.admin-body .perm-table th{background:#f6ecd6;color:#5a3725}
+body.admin-body .perm-table td{border-top:1px solid #dccaa0;color:#3a2217}
+body.admin-body .perm-table code{color:#9b2c1f;background:#f6ecd6}
+body.admin-body .perm-live{background:#f7eed6;color:#9b2c1f}
+/* ---- fitfood-account.css ---- */
+body.admin-body .fit-account-toggle{color:#3a2217;border:1px solid #dccaa0;background:#f6ecd6}
+body.admin-body .fit-account-toggle:focus-visible{outline:3px solid #c9a960}
+body.admin-body .fit-account-avatar{background:#9b2c1f}
+body.admin-body .fit-account-popup{border:1px solid #dccaa0;box-shadow:0 22px 60px #3a221726;color:#3a2217}
+body.admin-body .fit-popup-identity{border-bottom:1px solid #dccaa0}
+body.admin-body .fit-account-popup > a,body.admin-body .fit-account-popup form button{color:#9b2c1f}
+body.admin-body .fit-account-popup > a:hover,body.admin-body .fit-account-popup form button:hover{background:#f6ecd6}
+body.admin-body .fit-account-popup form{border-top:1px solid #dccaa0}
+body.admin-body .fit-account-back{color:#9b2c1f}
+body.admin-body .fit-profile-page{background:linear-gradient(120deg, #f6ecd6, #fffaf0);color:#3a2217}
+body.admin-body .fit-profile-breadcrumb{color:#8a735c}
+body.admin-body .fit-profile-breadcrumb a{color:#9b2c1f}
+body.admin-body .fit-profile-kicker{color:#9b2c1f}
+body.admin-body .fit-profile-heading h1{color:#3a2217}
+body.admin-body .fit-profile-active{background:#f7eed6;color:#9b2c1f}
+body.admin-body .fit-profile-side,body.admin-body .fit-profile-card{border:1px solid #dccaa0;box-shadow:0 10px 36px #3a221712}
+body.admin-body .fit-profile-large-avatar{border:5px solid #dccaa0;background:#9b2c1f}
+body.admin-body .fit-profile-side h2{color:#3a2217}
+body.admin-body .fit-profile-pill{color:#9b2c1f;background:#f7eed6}
+body.admin-body .fit-profile-links{border-top:1px solid #dccaa0}
+body.admin-body .fit-profile-links a{color:#5a3725}
+body.admin-body .fit-profile-links a:hover,body.admin-body .fit-profile-links a.fit-profile-selected{background:#f7eed6;color:#9b2c1f}
+body.admin-body .fit-profile-card-title{border-bottom:1px solid #dccaa0}
+body.admin-body .fit-profile-card-title h2{color:#3a2217}
+body.admin-body .fit-profile-card-title > span{color:#9b2c1f;background:#f7eed6}
+body.admin-body .fit-profile-data-item{border:1px solid #dccaa0;background:#fffaf0}
+body.admin-body .fit-profile-data-item span{color:#8a735c}
+body.admin-body .fit-profile-data-item strong{color:#3a2217}
+body.admin-body .fit-profile-main-button{background:#9b2c1f}
+body.admin-body .fit-profile-secondary-button{background:#f7eed6;color:#9b2c1f}
+body.admin-body .fit-profile-security-note{color:#8a735c}
+body.admin-body .fit-profile-footer{background:#3a2217;color:#dcc07e}
+/* ---- fitfood-modern.css(admin) ---- */
+body.admin-body .admin-body{background:#f6ecd6}
+body.admin-body .adm-sidebar{background:linear-gradient(180deg, #3a2217, #3a2217);color:#dcc07e}
+body.admin-body .adm-brand small{color:#8a735c}
+body.admin-body .adm-nav-cap{color:#8a735c}
+body.admin-body .adm-nav > a{color:#dcc07e}
+body.admin-body .adm-nav > a:hover,body.admin-body .adm-nav > a.adm-nav-on{background:#9b2c1f}
+body.admin-body .adm-nav-bottom > a{color:#dcc07e}
+body.admin-body .admin-identity > span:first-child,body.admin-body .adm-user{background:#efdfb4;color:#3a2217}
+body.admin-body .admin-identity small{color:#dcc07e}
+body.admin-body .adm-top{border-bottom:1px solid #dccaa0}
+body.admin-body .admin-breadcrumb b{color:#3a2217}
+body.admin-body .admin-search{color:#8a735c;background:#f6ecd6;border:1px solid #dccaa0}
+body.admin-body .top-date{border:1px solid #dccaa0}
+body.admin-body .demo-tag{color:#9b2c1f;background:#f7eed6}
+body.admin-body .metric-card{border:1px solid #dccaa0}
+body.admin-body .metric-ic{background:#f7eed6;color:#9b2c1f}
+body.admin-body .metric-desc b,body.admin-body .positive{color:#9b2c1f;background:#f6ecd6}
+body.admin-body .white-panel{border:1px solid #dccaa0}
+body.admin-body .chart-total span{background:#f7eed6;color:#9b2c1f}
+body.admin-body .bar-chart-grid{background:repeating-linear-gradient(
+    to top,
+    transparent 0,
+    transparent 38px,
+    #f7eed6 39px,
+    #f7eed6 40px
+  )}
+body.admin-body .chart-fill{background:#efdfb4}
+body.admin-body .donut{background:conic-gradient(
+    #9b2c1f 0 60.9375%,
+    #5ab6ed 60.9375% 79.6875%,
+    #f1b84b 79.6875% 93.75%,
+    #ef8c83 93.75% 100%
+  )}
+body.admin-body .legend-list strong{color:#3a2217}
+body.admin-body .green-dot{background:#9b2c1f}
+body.admin-body .adm-table th{background:#f6ecd6}
+body.admin-body .adm-table td{border-bottom:1px solid #dccaa0}
+body.admin-body .row-id,body.admin-body .money-cell{color:#3a2217 !important}
+body.admin-body .customer-inline{color:#3a2217}
+body.admin-body .initials{background:#f7eed6;color:#9b2c1f}
+body.admin-body .pill-status.done{background:#f7eed6;color:#9b2c1f}
+body.admin-body .tiny-food,body.admin-body .inventory-line{border-top:1px solid #dccaa0}
+body.admin-body .inventory-line > span{background:#f6ecd6}
+body.admin-body .admin-food-cell b{color:#3a2217}
+body.admin-body .admin-food-cell small{color:#8a735c}
+body.admin-body .table-actions button{border:1px solid #dccaa0;background:#f6ecd6;color:#5a3725}
+body.admin-body .pager button{border:1px solid #dccaa0}
+/* ---- admin-customer-form.html ---- */
+body.admin-body .customer-edit h1{color:#3a2217}
+body.admin-body .edit-card{border:1px solid #dccaa0}
+body.admin-body .edit-account{background:#f6ecd6;color:#5a3725}
+body.admin-body .edit-field{color:#5a3725}
+body.admin-body .edit-field input,body.admin-body .edit-field select,body.admin-body .edit-field textarea{border:1px solid #dccaa0;color:#3a2217}
+body.admin-body .edit-btn{background:#9b2c1f}
+body.admin-body .edit-btn.secondary{background:#f6ecd6;color:#9b2c1f}
+/* ---- admin-customers.html ---- */
+body.admin-body .customers-heading h1{color:#3a2217}
+body.admin-body .customer-alert{background:#f6ecd6;color:#9b2c1f}
+body.admin-body .customer-stat,body.admin-body .customer-card{border:1px solid #dccaa0}
+body.admin-body .customer-stat strong{color:#9b2c1f}
+body.admin-body .customer-card h2{color:#3a2217}
+body.admin-body .customer-filters label{color:#5a3725}
+body.admin-body .customer-filters input,body.admin-body .customer-filters select{border:1px solid #dccaa0}
+body.admin-body .customer-btn{background:#9b2c1f}
+body.admin-body .customer-btn.secondary{background:#f6ecd6;color:#9b2c1f}
+body.admin-body .customer-table th{background:#f6ecd6}
+body.admin-body .customer-table td{border-bottom:1px solid #dccaa0;color:#3a2217}
+body.admin-body .customer-table tr:hover td{background:#fffaf0}
+body.admin-body .customer-name{color:#3a2217}
+body.admin-body .customer-status.on{background:#f7eed6;color:#9b2c1f}
+/* ---- admin-deliveries.html ---- */
+body.admin-body .cat-table td input,body.admin-body .delivery-update select,body.admin-body .delivery-create input,body.admin-body .delivery-create select{border:1px solid #dccaa0}
+body.admin-body .delivery-update button,body.admin-body .delivery-create button{background:#9b2c1f}
+body.admin-body .delivery-create label{color:#5a3725}
+/* ---- admin-orders.html ---- */
+body.admin-body .order-status-form select{border:1px solid #dccaa0}
+body.admin-body .order-status-form button{background:#9b2c1f}
+/* ---- admin-pending-module.html ---- */
+body.admin-body .pending-kicker{color:#9b2c1f}
+body.admin-body .pending-title{color:#3a2217}
+body.admin-body .pending-subtitle{color:#8a735c}
+body.admin-body .pending-hero{border:1px solid #dccaa0;background:linear-gradient(122deg, #fff, #f6ecd6);box-shadow:0 6px 20px #3a221706}
+body.admin-body .pending-hero h2{color:#3a2217}
+body.admin-body .pending-hero p{color:#5a3725}
+body.admin-body .pending-actions a{background:#9b2c1f}
+body.admin-body .pending-actions a.pending-outline{color:#9b2c1f;border:1px solid #dccaa0}
+body.admin-body .pending-card{border:1px solid #dccaa0}
+body.admin-body .pending-num{background:#f7eed6;color:#9b2c1f}
+body.admin-body .pending-card p{color:#3a2217}
+body.admin-body .pending-meta > div{border:1px solid #dccaa0}
+body.admin-body .pending-meta small{color:#8a735c}
+body.admin-body .pending-meta strong{color:#9b2c1f}
+/* ---- reports.html ---- */
+body.admin-body .report-chart-bar{background:#9b2c1f}
+/* ---- khach-hang.html ---- */
+body.admin-body .customer-search{border:1px solid #dccaa0}
+body.admin-body .customer-search:focus{border-color:#b8862b}
+body.admin-body .customer-panel{border:1px solid #dccaa0}
+body.admin-body .customer-table th{background:#f6ecd6;border-bottom:1px solid #dccaa0}
+body.admin-body .customer-table td{color:#3a2217;border-bottom:1px solid #dccaa0}
+body.admin-body .customer-table tbody tr:hover{background:#fffaf0}
+body.admin-body .customer-name{color:#3a2217}
+body.admin-body .customer-code{color:#5a3725}

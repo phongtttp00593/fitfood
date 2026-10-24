@@ -20,7 +20,8 @@
       .order-empty { padding: 32px; color: #819287; text-align: center; }
       @media (max-width: 700px) { .cat-heading { align-items: flex-start; } .cat-filters { flex-wrap: wrap; } }
     </style>
-  </head>
+  <link rel="stylesheet" th:href="@{/css/admin-theme.css}" />
+</head>
   <body class="admin-body">
     <div class="adm-layout">
       <aside class="adm-sidebar" th:replace="~{fragments/admin-sidebar :: sidebar('orders')}"></aside>

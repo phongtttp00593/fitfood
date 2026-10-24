@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{v2/fragments/layout :: head('Không có quyền')}"></head>
+<body>
+<div th:replace="~{v2/fragments/layout :: header('login')}"></div>
+
+<main id="main">
+  <div class="auth-wrap">
+    <div class="container auth-container">
+      <div class="card pad stack auth-card">
+        <span class="auth-seal" aria-hidden="true"></span>
+        <p class="eyebrow">403 · Truy cập bị từ chối</p>
+        <h1>Không có quyền</h1>
+        <p class="muted">Tài khoản của bạn không có quyền truy cập trang quản trị FITFOOD.</p>
+        <a class="btn block" th:href="@{/}">← Về trang chủ</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer th:replace="~{v2/fragments/layout :: footer}"></footer>
+<th:block th:replace="~{v2/fragments/layout :: scripts}"></th:block>
+</body>
+</html>

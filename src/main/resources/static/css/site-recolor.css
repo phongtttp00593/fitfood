@@ -1,0 +1,98 @@
+/* TỰ SINH bởi recolor_site.py: đổi mọi màu xanh lá trong CSS trang khách (Thymeleaf cũ) sang tông FITFOOD. Sửa tay ở admin-theme.css. */
+/* ---- fitfood-modern.css(site) ---- */
+body:not(.admin-body) button:focus-visible,body:not(.admin-body) a:focus-visible,body:not(.admin-body) input:focus-visible{outline:2px solid #b8862b}
+body:not(.admin-body) .site-header{border-bottom:1px solid #dccaa0}
+body:not(.admin-body) .nav-menu a{color:#5a3725}
+body:not(.admin-body) .nav-search{border:1px solid #dccaa0;background:#f6ecd6}
+body:not(.admin-body) .nav-search kbd{border:1px solid #dccaa0}
+body:not(.admin-body) .login-pill:hover,body:not(.admin-body) .btn-primary:hover{background:#9b2c1f}
+body:not(.admin-body) .btn-primary{box-shadow:0 8px 23px rgba(58,34,23,0.17)}
+body:not(.admin-body) .hero-section{background:radial-gradient(ellipse 550px 440px at 70% 41%, #f7eed6 0, transparent 70%),
+    linear-gradient(120deg, #fffaf0, #f6ecd6 85%)}
+body:not(.admin-body) .hero-grain{background-image:radial-gradient(#efdfb4 1px, transparent 1px)}
+body:not(.admin-body) .eyebrow span{color:#8a735c}
+body:not(.admin-body) .hero-copy h1 em{color:#9b2c1f}
+body:not(.admin-body) .hero-link{color:#5a3725}
+body:not(.admin-body) .hero-link span{box-shadow:0 4px 15px #3a221715}
+body:not(.admin-body) .small-avatars span{color:#3a2217}
+body:not(.admin-body) .small-avatars span:nth-child(2){background:#efdfb4}
+body:not(.admin-body) .blur-blob{background:#efdfb4}
+body:not(.admin-body) .hero-dish{box-shadow:0 32px 65px rgba(58,34,23,0.2)}
+body:not(.admin-body) .float-note{color:#9b2c1f}
+body:not(.admin-body) .leaf-one{color:#8a735c}
+body:not(.admin-body) .hero-benefits{border:1px solid #dccaa0;box-shadow:0 12px 36px rgba(58,34,23,0.055)}
+body:not(.admin-body) .hero-benefits svg{background:#f7eed6}
+body:not(.admin-body) .category-strip > a:hover{background:#f6ecd6}
+body:not(.admin-body) .food-photo{background:#f6ecd6}
+body:not(.admin-body) .wish{color:#5a3725}
+body:not(.admin-body) .green-promo{background:linear-gradient(115deg, #9b2c1f, #9b2c1f)}
+body:not(.admin-body) .green-promo .section-kicker{color:#dcc07e}
+body:not(.admin-body) .green-promo p{color:#dcc07e}
+body:not(.admin-body) .green-promo > img{box-shadow:0 20px 40px #3a221755}
+body:not(.admin-body) .site-footer{background:#3a2217;color:#dcc07e}
+body:not(.admin-body) .footer-about p,body:not(.admin-body) .footer-inner > div > p{color:#8a735c}
+body:not(.admin-body) .footer-inner a:not(.site-brand){color:#8a735c}
+body:not(.admin-body) .footer-tag{color:#8a735c}
+body:not(.admin-body) .footer-copy{color:#8a735c}
+body:not(.admin-body) .filters a{background:#f6ecd6;border:1px solid #dccaa0;color:#5a3725}
+body:not(.admin-body) .big-photo{background:#f6ecd6}
+body:not(.admin-body) .thumbs img{border:2px solid #dccaa0}
+body:not(.admin-body) .review-line b{color:#3a2217}
+body:not(.admin-body) .nutrition-chips span{color:#5a3725}
+body:not(.admin-body) .detail-divider{background:#f7eed6}
+body:not(.admin-body) .quantity button{color:#5a3725}
+body:not(.admin-body) .detail-hint{color:#5a3725}
+body:not(.admin-body) .demo-alert{background:#f6ecd6;border:1px solid #dccaa0;color:#5a3725}
+body:not(.admin-body) .checkout-steps b{background:#f6ecd6}
+body:not(.admin-body) .login-shell{box-shadow:0 30px 80px #3a22170d}
+body:not(.admin-body) .form-field{border:1px solid #dccaa0}
+body:not(.admin-body) .form-field input{color:#3a2217}
+body:not(.admin-body) .social-login button{border:1px solid #dccaa0}
+body:not(.admin-body) .login-photo-side{background:linear-gradient(145deg, #3a2217, #9b2c1f)}
+body:not(.admin-body) .login-glow{background:linear-gradient(0deg, #3a2217d9, transparent 70%)}
+body:not(.admin-body) .login-quote span{color:#dcc07e}
+body:not(.admin-body) .login-quote h2 em{color:#dcc07e}
+body:not(.admin-body) .login-quote p{color:#dcc07e}
+/* ---- fitfood-auth.css ---- */
+body:not(.admin-body) .auth-form .label-field{color:#3a2217}
+body:not(.admin-body) .auth-form .form-field{border:1px solid #dccaa0}
+body:not(.admin-body) .auth-form .form-field input{color:#3a2217}
+body:not(.admin-body) .auth-form .form-field:focus-within{outline:2px solid #c9a960;border-color:#b8862b}
+body:not(.admin-body) .auth-alert.success{background:#f7eed6;color:#9b2c1f;border:1px solid #dccaa0}
+body:not(.admin-body) .auth-alert a,body:not(.admin-body) .login-opts a,body:not(.admin-body) .join-label a{color:#9b2c1f}
+body:not(.admin-body) .auth-nav-logout button,body:not(.admin-body) .auth-header-admin,body:not(.admin-body) .auth-admin-logout button{border:1px solid #c9a960;background:#f6ecd6;color:#9b2c1f}
+body:not(.admin-body) .auth-header-admin{background:#9b2c1f;border-color:#b8862b}
+body:not(.admin-body) .auth-admin-logout button{background:#9b2c1f}
+/* ---- fitfood-account.css ---- */
+body:not(.admin-body) .fit-account-toggle{color:#3a2217;border:1px solid #dccaa0;background:#f6ecd6}
+body:not(.admin-body) .fit-account-toggle:focus-visible{outline:3px solid #c9a960}
+body:not(.admin-body) .fit-account-avatar{background:#9b2c1f}
+body:not(.admin-body) .fit-account-popup{border:1px solid #dccaa0;box-shadow:0 22px 60px #3a221726;color:#3a2217}
+body:not(.admin-body) .fit-popup-identity{border-bottom:1px solid #dccaa0}
+body:not(.admin-body) .fit-account-popup > a,body:not(.admin-body) .fit-account-popup form button{color:#9b2c1f}
+body:not(.admin-body) .fit-account-popup > a:hover,body:not(.admin-body) .fit-account-popup form button:hover{background:#f6ecd6}
+body:not(.admin-body) .fit-account-popup form{border-top:1px solid #dccaa0}
+body:not(.admin-body) .fit-account-back{color:#9b2c1f}
+body:not(.admin-body) .fit-profile-page{background:linear-gradient(120deg, #f6ecd6, #fffaf0);color:#3a2217}
+body:not(.admin-body) .fit-profile-breadcrumb{color:#8a735c}
+body:not(.admin-body) .fit-profile-breadcrumb a{color:#9b2c1f}
+body:not(.admin-body) .fit-profile-kicker{color:#9b2c1f}
+body:not(.admin-body) .fit-profile-heading h1{color:#3a2217}
+body:not(.admin-body) .fit-profile-active{background:#f7eed6;color:#9b2c1f}
+body:not(.admin-body) .fit-profile-side,body:not(.admin-body) .fit-profile-card{border:1px solid #dccaa0;box-shadow:0 10px 36px #3a221712}
+body:not(.admin-body) .fit-profile-large-avatar{border:5px solid #dccaa0;background:#9b2c1f}
+body:not(.admin-body) .fit-profile-side h2{color:#3a2217}
+body:not(.admin-body) .fit-profile-pill{color:#9b2c1f;background:#f7eed6}
+body:not(.admin-body) .fit-profile-links{border-top:1px solid #dccaa0}
+body:not(.admin-body) .fit-profile-links a{color:#5a3725}
+body:not(.admin-body) .fit-profile-links a:hover,body:not(.admin-body) .fit-profile-links a.fit-profile-selected{background:#f7eed6;color:#9b2c1f}
+body:not(.admin-body) .fit-profile-card-title{border-bottom:1px solid #dccaa0}
+body:not(.admin-body) .fit-profile-card-title h2{color:#3a2217}
+body:not(.admin-body) .fit-profile-card-title > span{color:#9b2c1f;background:#f7eed6}
+body:not(.admin-body) .fit-profile-data-item{border:1px solid #dccaa0;background:#fffaf0}
+body:not(.admin-body) .fit-profile-data-item span{color:#8a735c}
+body:not(.admin-body) .fit-profile-data-item strong{color:#3a2217}
+body:not(.admin-body) .fit-profile-main-button{background:#9b2c1f}
+body:not(.admin-body) .fit-profile-secondary-button{background:#f7eed6;color:#9b2c1f}
+body:not(.admin-body) .fit-profile-security-note{color:#8a735c}
+body:not(.admin-body) .fit-profile-footer{background:#3a2217;color:#dcc07e}

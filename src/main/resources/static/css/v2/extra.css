@@ -1,0 +1,18 @@
+/* Phần bổ sung riêng cho bản Thymeleaf (bản Vue không có) */
+
+/* Menu tài khoản: dùng thẻ <details> */
+.acc-menu { position: relative; }
+.acc-menu > summary { list-style: none; }
+.acc-menu > summary::-webkit-details-marker { display: none; }
+.acc-pop { position: absolute; right: 0; top: calc(100% + 10px); min-width: 230px; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 14px; box-shadow: var(--shadow-lg); padding: 10px; z-index: 60; animation: fade-down .25s ease; }
+.acc-pop .acc-id { display: flex; flex-direction: column; padding: 8px 10px 10px; border-bottom: 1px dashed var(--line-strong); margin-bottom: 6px; }
+.acc-pop .acc-id small { color: var(--muted); }
+.acc-pop a, .acc-pop button { display: block; width: 100%; text-align: left; padding: 9px 10px; border-radius: 8px; border: 0; background: none; font: inherit; color: var(--lacquer); text-decoration: none; cursor: pointer; }
+.acc-pop a:hover, .acc-pop button:hover { background: var(--gold-50); color: var(--red); }
+.acc-pop form { margin: 0; }
+.nav.open { display: flex; }
+.nav a[aria-current="page"] { color: var(--red); }
+
+[hidden] { display: none !important; }
+.v2-toast { position: fixed; left: 50%; bottom: 28px; z-index: 200; translate: -50% 30px; opacity: 0; pointer-events: none; background: var(--lacquer-900); color: #fff3dc; border: 1px solid var(--gold-300); padding: 12px 20px; border-radius: 999px; box-shadow: var(--shadow-lg); transition: opacity .3s, translate .3s; max-width: calc(100vw - 32px); }
+.v2-toast.show { opacity: 1; translate: -50% 0; }
