@@ -29,7 +29,8 @@
       @media (max-width: 900px) { .delivery-create { grid-template-columns: repeat(2, minmax(130px, 1fr)); } }
       @media (max-width: 600px) { .delivery-create { grid-template-columns: 1fr; } }
     </style>
-  </head>
+  <link rel="stylesheet" th:href="@{/css/admin-theme.css}" />
+</head>
   <body class="admin-body">
     <div class="adm-layout">
       <aside class="adm-sidebar" th:replace="~{fragments/admin-sidebar :: sidebar('deliveries')}"></aside>
