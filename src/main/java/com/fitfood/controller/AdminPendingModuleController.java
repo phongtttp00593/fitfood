@@ -14,17 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 public class AdminPendingModuleController {
 
-    // ================= QUAN LY HOA DON =================
-
-    @PreAuthorize("@permissionService.allowed(authentication, 'HOA_DON')")
-    @GetMapping("/invoices")
-    public String invoices(Model model) {
-        return show(model, "invoices", "Hóa đơn", "HOA_DON",
-            "Danh sách hóa đơn",
-            "Xem và lập hóa đơn",
-            "Chi tiết sản phẩm, giá và tổng tiền",
-            "HoaDon, ChiTietHoaDon");
-    }
 
     // ================= HO TRO KHACH HANG =================
 
