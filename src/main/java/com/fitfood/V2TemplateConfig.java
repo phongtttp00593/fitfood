@@ -23,7 +23,7 @@ public class V2TemplateConfig {
         resolver.setTemplateMode(TemplateMode.HTML);
         resolver.setCharacterEncoding("UTF-8");
         resolver.setCheckExistence(true);
-        resolver.setCacheable(false);
+        resolver.setCacheable(true);
         resolver.setOrder(1);
         return resolver;
     }
