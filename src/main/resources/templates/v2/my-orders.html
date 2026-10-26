@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{v2/fragments/layout :: head('Đơn hàng của tôi')}"></head>
+<body>
+<div th:replace="~{v2/fragments/layout :: header('account')}"></div>
+
+<main id="main">
+  <header class="page-hero compact-title">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Đường dẫn"><a th:href="@{/}">Trang chủ</a> <i>›</i> <a th:href="@{/tai-khoan}">Tài khoản</a> <i>›</i> <span aria-current="page">Đơn hàng của tôi</span></nav>
+      <p class="eyebrow">FITFOOD member</p>
+      <h1>Đơn hàng của tôi</h1>
+    </div>
+  </header>
+
+  <div class="container" style="padding-bottom: 48px">
+    <style>
+      .mo-flash { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-weight: 600; }
+      .mo-flash.ok { background: #eaf3e6; color: #2f6b2f; }
+      .mo-flash.err { background: #fbeae7; color: #9b2c1f; }
+      .mo-card { margin-bottom: 16px; }
+      .mo-head { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+      .mo-meta { color: #7a6a58; font-size: 14px; margin: 6px 0; }
+      .mo-badge { padding: 4px 12px; border-radius: 20px; background: #f4ead2; color: #7a5a1c; font-weight: 700; font-size: 13px; }
+      .mo-badge.done { background: #eaf3e6; color: #2f6b2f; }
+      .mo-badge.cancel { background: #fbeae7; color: #9b2c1f; }
+      .mo-steps { display: flex; gap: 8px; margin: 14px 0; }
+      .mo-step { flex: 1; text-align: center; font-size: 13px; color: #a8998a; }
+      .mo-step::before { content: ""; display: block; height: 6px; border-radius: 4px; background: #eadfcc; margin-bottom: 6px; }
+      .mo-step.on { color: #9b2c1f; font-weight: 700; }
+      .mo-step.on::before { background: #9b2c1f; }
+    </style>
+
+    <div class="mo-flash ok" th:if="${success}" th:text="${success}"></div>
+    <div class="mo-flash err" th:if="${error}" th:text="${error}"></div>
+
+    <div class="card pad" th:if="${#lists.isEmpty(orders)}">
+      <p>Bạn chưa có đơn hàng nào.</p>
+      <a class="btn" th:href="@{/menu}">Xem thực đơn →</a>
+    </div>
+
+    <div class="card pad stack mo-card" th:each="o : ${orders}">
+      <div class="mo-head">
+        <h2 class="card-title" th:text="'Đơn #' + ${o.id}">Đơn #1</h2>
+        <span class="mo-badge" th:classappend="${o.step == 0} ? 'cancel' : (${o.step == 4} ? 'done')" th:text="${o.status}">Chờ xác nhận</span>
+      </div>
+      <div class="mo-meta">
+        <span th:if="${o.placedAt != null}" th:text="${#temporals.format(o.placedAt, 'dd/MM/yyyy HH:mm')}"></span>
+        · <span th:text="${o.itemCount} + ' món'"></span>
+        · <strong th:text="${#numbers.formatDecimal(o.total, 0, 'POINT', 0, 'COMMA')} + 'đ'"></strong>
+      </div>
+      <div class="mo-steps" th:unless="${o.step == 0}">
+        <div class="mo-step" th:classappend="${o.step >= 1} ? 'on'">Chờ xác nhận</div>
+        <div class="mo-step" th:classappend="${o.step >= 2} ? 'on'">Đang xử lý</div>
+        <div class="mo-step" th:classappend="${o.step >= 3} ? 'on'">Đang giao</div>
+        <div class="mo-step" th:classappend="${o.step >= 4} ? 'on'">Hoàn thành</div>
+      </div>
+      <div class="mo-meta" th:if="${o.deliveryStatus != null and o.step != 0}">
+        Giao hàng: <strong th:text="${o.deliveryStatus}">Chờ giao</strong>
+        <span th:if="${o.sentAt != null}" th:text="' · Gửi ' + ${#temporals.format(o.sentAt, 'dd/MM/yyyy HH:mm')}"></span>
+        <span th:if="${o.deliveredAt != null}" th:text="' · Nhận ' + ${#temporals.format(o.deliveredAt, 'dd/MM/yyyy HH:mm')}"></span>
+      </div>
+      <form th:if="${o.cancellable}" method="post" style="margin:0"
+            th:action="@{/don-hang-cua-toi/{id}/huy(id=${o.id})}"
+            onsubmit="return confirm('Bạn chắc chắn muốn hủy đơn này?');">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button class="btn outline" type="submit">Hủy đơn hàng</button>
+      </form>
+    </div>
+  </div>
+</main>
+
+<footer th:replace="~{v2/fragments/layout :: footer}"></footer>
+<th:block th:replace="~{v2/fragments/layout :: scripts}"></th:block>
+</body>
+</html>
