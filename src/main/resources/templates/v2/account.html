@@ -22,8 +22,7 @@
         <dt>Ngày tham gia</dt><dd th:text="${accountInfo.joinedDate}">09/10/2026</dd>
       </dl>
       <div class="row">
-        <a class="btn" th:href="@{/don-hang-cua-toi}">Đơn hàng của tôi →</a>
-        <a class="btn outline" th:href="@{/menu}">Xem thực đơn →</a>
+        <a class="btn" th:href="@{/menu}">Xem thực đơn →</a>
         <a class="btn outline" th:if="${isAdmin}" th:href="@{/admin}">Trang quản trị →</a>
         <a class="btn ghost" th:href="@{/quen-mat-khau}">Đặt lại mật khẩu qua email</a>
         <form th:action="@{/dang-xuat}" method="post" style="margin:0">
