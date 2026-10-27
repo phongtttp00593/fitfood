@@ -1,0 +1,174 @@
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        padding: 24px;
+        font-family: "Be Vietnam Pro", Arial, sans-serif;
+        background: #f8f1e3;
+        color: #2b1e16;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 28px;
+        background: #fffcf5;
+        border: 1px solid #e6d8bc;
+        border-radius: 16px;
+        box-shadow: 0 12px 30px rgba(58, 34, 23, 0.10);
+    }
+
+    h1 {
+        margin: 0 0 8px;
+        color: #3a2217;
+        font-size: 27px;
+    }
+
+    .container > p {
+        margin: 0 0 22px;
+        color: #6e5d4f;
+        font-size: 14px;
+    }
+
+    label {
+        display: block;
+        margin: 18px 0 8px;
+        color: #3a2217;
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="file"],
+    select,
+    textarea {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #d6c29a;
+        border-radius: 9px;
+        background: #fffcf5;
+        color: #2b1e16;
+        font-family: inherit;
+        font-size: 14px;
+    }
+
+    textarea {
+        resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+        outline: none;
+        border-color: #b8862b;
+        box-shadow: 0 0 0 3px #f7eed6;
+    }
+
+    .active-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .active-row input {
+        width: 18px;
+        height: 18px;
+        accent-color: #9b2c1f;
+    }
+
+    .active-row label {
+        margin: 0;
+    }
+
+    #preview {
+        display: none;
+        max-width: 220px;
+        max-height: 220px;
+        margin-top: 12px;
+        border: 1px solid #e6d8bc;
+        border-radius: 10px;
+        object-fit: contain;
+    }
+
+    .actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 28px;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 42px;
+        padding: 11px 20px;
+        border: 1px solid transparent;
+        border-radius: 999px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .save {
+        background: #9b2c1f;
+        color: #fff8ec;
+    }
+
+    .save:hover {
+        background: #7a2016;
+    }
+
+    .cancel {
+        border-color: #d6c29a;
+        background: #f7eed6;
+        color: #3a2217;
+    }
+
+    .cancel:hover {
+        background: #efdfb4;
+    }
+
+    .message {
+        margin: 14px 0;
+        padding: 12px 14px;
+        border-radius: 9px;
+        font-size: 14px;
+    }
+
+    .error {
+        background: #f8e9e4;
+        color: #7a2016;
+    }
+
+    .success {
+        background: #e6efe9;
+        color: #2f6f5a;
+    }
+
+    @media (max-width: 600px) {
+        body {
+            padding: 12px;
+        }
+
+        .container {
+            padding: 18px;
+        }
+
+        .actions {
+            flex-direction: column;
+        }
+
+        .actions .btn {
+            width: 100%;
+        }
+    }

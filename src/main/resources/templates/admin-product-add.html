@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Thêm sản phẩm - FITFOOD</title>
+    <link rel="stylesheet" th:href="@{/css/admin-product-add.css}">
+</head>
+<body>
+
+<div class="container">
+    <h1>Thêm sản phẩm</h1>
+    <p>Điền thông tin sản phẩm mới bên dưới.</p>
+
+    <div class="message error"
+         th:if="${errorMessage != null}"
+         th:text="${errorMessage}"></div>
+
+    <div id="productAddSuccess"
+         class="message success"
+         th:if="${productAddSuccess != null}"
+         th:text="${productAddSuccess}"></div>
+
+    <form th:action="@{/admin/products/save}"
+          th:object="${productForm}"
+          method="post"
+          enctype="multipart/form-data">
+
+        <label for="name">Tên sản phẩm *</label>
+        <input id="name"
+               type="text"
+               th:field="*{name}"
+               maxlength="150"
+               required>
+
+        <label for="categoryId">Danh mục *</label>
+        <select id="categoryId" th:field="*{categoryId}" required>
+            <option value="">-- Chọn danh mục --</option>
+            <option th:each="category : ${categories}"
+                    th:value="${category.id}"
+                    th:text="${category.name}">
+            </option>
+        </select>
+
+        <label for="price">Giá sản phẩm (VNĐ) *</label>
+        <input id="price"
+               type="number"
+               th:field="*{price}"
+               min="0"
+               step="any"
+               required>
+
+        <label for="description">Mô tả</label>
+        <textarea id="description"
+                  th:field="*{description}"
+                  rows="4"></textarea>
+
+        <label for="imageFile">Ảnh sản phẩm</label>
+        <input id="imageFile"
+               type="file"
+               name="imageFile"
+               accept=".jpg,.jpeg,.png,.webp">
+
+        <img id="preview" alt="Ảnh xem trước">
+
+        <div class="active-row">
+            <input id="active" type="checkbox" th:field="*{active}">
+            <label for="active">Đang kinh doanh</label>
+        </div>
+
+        <div class="actions">
+            <a th:href="@{/admin/products}" class="btn cancel">
+                Quay lại
+            </a>
+
+            <button type="submit" class="btn save">
+                Lưu sản phẩm
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Xem trước ảnh trước khi lưu
+    const input = document.getElementById('imageFile');
+    const preview = document.getElementById('preview');
+
+    let previewUrl = null;
+
+    input.addEventListener('change', function () {
+        const file = this.files && this.files[0];
+
+        if (previewUrl) {
+            URL.revokeObjectURL(previewUrl);
+            previewUrl = null;
+        }
+
+        if (!file) {
+            preview.style.display = 'none';
+            preview.removeAttribute('src');
+            return;
+        }
+
+        const allowedTypes = [
+            'image/jpeg',
+            'image/png',
+            'image/webp'
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+            alert('Ảnh phải có định dạng JPG, PNG hoặc WEBP.');
+            this.value = '';
+            preview.style.display = 'none';
+            preview.removeAttribute('src');
+            return;
+        }
+
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Ảnh không được vượt quá 5 MB.');
+            this.value = '';
+            preview.style.display = 'none';
+            preview.removeAttribute('src');
+            return;
+        }
+
+        previewUrl = URL.createObjectURL(file);
+        preview.src = previewUrl;
+        preview.style.display = 'block';
+    });
+
+    // Chỉ báo cho trang danh sách sau khi server xác nhận lưu thành công.
+    const successMessage = document.getElementById('productAddSuccess');
+
+    if (successMessage && window.parent !== window) {
+        window.parent.postMessage(
+            { type: 'FITFOOD_PRODUCT_ADDED' },
+            window.location.origin
+        );
+    }
+</script>
+
+<script th:if="${productAdded}">
+    // Cờ này chỉ được gửi sau khi ProductAddController lưu thành công.
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage(
+            { type: 'FITFOOD_PRODUCT_ADDED' },
+            window.location.origin
+        );
+    }
+</script>
+
+</body>
+</html>
