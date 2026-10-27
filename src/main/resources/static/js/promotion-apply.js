@@ -1,52 +1,33 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Other/javascript.js to edit this template
- */
-
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    // LẤY CÁC THÀNH PHẦN GIAO DIỆN
-    const promoInput =
-        document.getElementById("promo-code");
+    const input = document.getElementById("promo-code");
+    const applyBtn = document.getElementById("apply-promo");
+    const removeBtn = document.getElementById("remove-promo");
 
-    const applyButton =
-        document.getElementById("apply-promo");
+    const message = document.getElementById("promo-message");
+    const discountRow = document.getElementById("promo-discount-row");
+    const discountText = document.getElementById("promo-discount");
+    const appliedCode = document.getElementById("applied-promo-code");
 
-    const removeButton =
-        document.getElementById("remove-promo");
+    const subtotalText = document.getElementById("cart-subtotal");
+    const shippingText = document.getElementById("cart-shipping");
+    const totalText = document.getElementById("cart-total");
 
-    const message =
-        document.getElementById("promo-message");
+    const cartList = document.getElementById("cart-items-list");
 
-    const discountRow =
-        document.getElementById("promo-discount-row");
-
-    const discountText =
-        document.getElementById("promo-discount");
-
-    const appliedCode =
-        document.getElementById("applied-promo-code");
-
-    const cartTotal =
-        document.getElementById("cart-total");
-
-    // Kiểm tra giao diện tồn tại
-    if (!promoInput || !applyButton ||
-        !removeButton || !message ||
-        !discountRow || !discountText ||
-        !appliedCode || !cartTotal) {
+    if (!input || !applyBtn || !removeBtn ||
+        !message || !discountRow || !discountText ||
+        !appliedCode || !subtotalText || !shippingText ||
+        !totalText || !cartList) {
         return;
     }
 
-    // Tổng tiền giỏ hàng demo
-    const ORIGINAL_TOTAL = 152000;
-
-    // Mỗi yêu cầu mang số thứ tự riêng
-    // để tránh kết quả cũ ghi đè kết quả mới
+    let originalTotal = 0;
+    let cartLoaded = false;
     let requestVersion = 0;
 
-    // ĐỊNH DẠNG TIỀN
+    // ĐỊNH DẠNG TIỀN VIỆT NAM
     function formatMoney(amount) {
         return Number(amount).toLocaleString("vi-VN") + "đ";
     }
@@ -56,34 +37,154 @@ document.addEventListener("DOMContentLoaded", function () {
 
         message.textContent = text;
         message.style.display = "block";
-
-        message.style.color =
-            success ? "#15803d" : "#dc2626";
+        message.style.color = success
+            ? "#15803d"
+            : "#dc2626";
     }
 
-    // KHÔI PHỤC TỔNG TIỀN GỐC
+    // HỦY KẾT QUẢ KHUYẾN MÃI ĐÃ ÁP DỤNG
     function resetPromotion() {
 
         requestVersion++;
 
         discountRow.style.display = "none";
-
         discountText.textContent = "-0đ";
         appliedCode.textContent = "";
 
-        cartTotal.textContent =
-            formatMoney(ORIGINAL_TOTAL);
+        totalText.textContent = formatMoney(originalTotal);
 
-        removeButton.style.display = "none";
+        removeBtn.style.display = "none";
+        applyBtn.disabled = false;
+        applyBtn.textContent = "Áp dụng";
+    }
 
-        applyButton.disabled = false;
-        applyButton.textContent = "Áp dụng";
+    // TẠO PHẦN TỬ GIAO DIỆN AN TOÀN
+    function createElement(tag, className, value) {
+
+        const element = document.createElement(tag);
+
+        if (className) {
+            element.className = className;
+        }
+
+        if (value !== undefined) {
+            element.textContent = value;
+        }
+
+        return element;
+    }
+
+    // TẢI TẤT CẢ MÓN TRONG GIỎ HÀNG TỪ SERVER
+    async function loadCart() {
+
+        cartLoaded = false;
+        resetPromotion();
+
+        cartList.textContent = "Đang tải giỏ hàng...";
+
+        const response = await fetch("/cart?cartData=1", {
+            method: "GET",
+            headers: {
+                "Accept": "application/json"
+            },
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error("Không tải được giỏ hàng");
+        }
+
+        const data = await response.json();
+
+        if (!data.success) {
+            cartList.textContent = data.message;
+            showMessage(data.message, false);
+            return;
+        }
+
+        cartLoaded = true;
+
+        originalTotal = Number(data.total);
+
+        // CẬP NHẬT TỔNG TIỀN THỰC TẾ
+        subtotalText.textContent =
+            formatMoney(data.subtotal);
+
+        shippingText.textContent =
+            formatMoney(data.shipping);
+
+        totalText.textContent =
+            formatMoney(data.total);
+
+        // XÓA DANH SÁCH CŨ
+        cartList.replaceChildren();
+
+        if (!data.items || data.items.length === 0) {
+            cartList.textContent = "Giỏ hàng chưa có món ăn.";
+            return;
+        }
+
+        // HIỂN THỊ TỪNG MÓN TRONG GIỎ
+        data.items.forEach(function (item) {
+
+            const row = createElement("div", "cart-line");
+
+            // ẢNH SẢN PHẨM
+            if (item.imageUrl) {
+
+                const image = document.createElement("img");
+
+                image.src = item.imageUrl;
+                image.alt = item.productName || "Món ăn";
+                image.loading = "lazy";
+
+                row.appendChild(image);
+            }
+
+            const details = createElement("div");
+
+            const name = createElement(
+                "strong",
+                "name",
+                item.productName
+            );
+
+            const quantity = createElement(
+                "div",
+                "small muted",
+                formatMoney(item.unitPrice) +
+                " × " + item.quantity
+            );
+
+            details.appendChild(name);
+            details.appendChild(quantity);
+
+            const amount = createElement(
+                "strong",
+                "",
+                formatMoney(item.lineTotal)
+            );
+
+            row.appendChild(details);
+            row.appendChild(amount);
+
+            cartList.appendChild(row);
+        });
+
     }
 
     // ÁP DỤNG MÃ KHUYẾN MÃI
     async function applyPromotion() {
 
-        const code = promoInput.value.trim();
+        const code = input.value.trim();
+
+        if (!cartLoaded) {
+            showMessage(
+                "Không thể áp dụng mã khi chưa tải giỏ hàng.",
+                false
+            );
+            return;
+        }
 
         if (!code) {
             showMessage(
@@ -95,66 +196,67 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const currentVersion = ++requestVersion;
 
-        applyButton.disabled = true;
-        applyButton.textContent = "Đang kiểm tra...";
-
-        message.style.display = "none";
+        applyBtn.disabled = true;
+        applyBtn.textContent = "Đang kiểm tra...";
 
         try {
 
-            // GỬI MÃ SANG CONTROLLER RIÊNG
-            const url =
-                "/cart?promo=" + encodeURIComponent(code);
-
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Accept": "application/json"
-                },
-                cache: "no-store"
-            });
+            const response = await fetch(
+                "/cart?promo=" + encodeURIComponent(code),
+                {
+                    method: "GET",
+                    headers: {
+                        "Accept": "application/json"
+                    },
+                    cache: "no-store"
+                }
+            );
 
             if (!response.ok) {
-                throw new Error("Không thể kết nối máy chủ");
+                throw new Error("Lỗi kiểm tra mã");
             }
 
             const data = await response.json();
 
-            // Không sử dụng kết quả đã cũ
             if (currentVersion !== requestVersion) {
                 return;
             }
 
-            // MÃ HỢP LỆ
-            if (data.success === true) {
+            // MÃ KHÔNG HỢP LỆ
+            if (!data.success) {
 
-                discountText.textContent =
-                    "-" + formatMoney(data.discount);
-
-                cartTotal.textContent =
-                    formatMoney(data.total);
-
-                appliedCode.textContent =
-                    "(" + data.code + ")";
-
-                discountRow.style.display = "flex";
-                removeButton.style.display = "inline-block";
-
-                showMessage(
-                    data.message,
-                    true
-                );
-
-            } else {
-
-                // MÃ KHÔNG HỢP LỆ
                 resetPromotion();
 
-                showMessage(
-                    data.message || "Mã không hợp lệ!",
-                    false
-                );
+                showMessage(data.message, false);
+                return;
             }
+
+            // CẬP NHẬT GIÁ TRỊ GIỎ HÀNG TỪ SERVER
+            originalTotal =
+                Number(data.subtotal) + Number(data.shipping);
+
+            subtotalText.textContent =
+                formatMoney(data.subtotal);
+
+            shippingText.textContent =
+                formatMoney(data.shipping);
+
+            // HIỂN THỊ SỐ TIỀN GIẢM
+            discountText.textContent =
+                "-" + formatMoney(data.discount);
+
+            appliedCode.textContent =
+                "(" + data.code + ")";
+
+            discountRow.style.display = "flex";
+
+            // HIỂN THỊ TỔNG SAU KHUYẾN MÃI
+            totalText.textContent =
+                formatMoney(data.total);
+
+            removeBtn.style.display = "inline-block";
+
+            showMessage(data.message, true);
 
         } catch (error) {
 
@@ -165,7 +267,7 @@ document.addEventListener("DOMContentLoaded", function () {
             resetPromotion();
 
             showMessage(
-                "Có lỗi khi kiểm tra mã. Vui lòng thử lại!",
+                "Không thể kiểm tra mã. Vui lòng thử lại!",
                 false
             );
 
@@ -174,56 +276,62 @@ document.addEventListener("DOMContentLoaded", function () {
         } finally {
 
             if (currentVersion === requestVersion) {
-                applyButton.disabled = false;
-                applyButton.textContent = "Áp dụng";
+                applyBtn.disabled = false;
+                applyBtn.textContent = "Áp dụng";
             }
         }
     }
 
-    // NHẤN NÚT ÁP DỤNG
-    applyButton.addEventListener(
-        "click",
-        applyPromotion
-    );
+    // NÚT ÁP DỤNG
+    applyBtn.addEventListener("click", applyPromotion);
 
-    // NHẤN ENTER ĐỂ ÁP DỤNG
-    promoInput.addEventListener(
-        "keydown",
-        function (event) {
+    // NHẤN ENTER
+    input.addEventListener("keydown", function (event) {
 
-            if (event.key === "Enter") {
-                event.preventDefault();
-                applyPromotion();
-            }
+        if (event.key === "Enter") {
+            event.preventDefault();
+            applyPromotion();
         }
-    );
+    });
 
-    // THAY ĐỔI MÃ THÌ XÓA KẾT QUẢ CŨ
-    promoInput.addEventListener(
-        "input",
-        function () {
+    // THAY MÃ THÌ BỎ KẾT QUẢ CŨ
+    input.addEventListener("input", function () {
 
-            resetPromotion();
-            message.style.display = "none";
-        }
-    );
+        resetPromotion();
+        message.style.display = "none";
+    });
 
-    // HỦY MÃ KHUYẾN MÃI
-    removeButton.addEventListener(
-        "click",
-        function () {
+    // HỦY MÃ
+    removeBtn.addEventListener("click", function () {
 
-            resetPromotion();
+        resetPromotion();
 
-            promoInput.value = "";
+        input.value = "";
 
-            showMessage(
-                "Đã hủy mã khuyến mãi.",
-                true
-            );
-        }
-    );
+        showMessage("Đã hủy mã khuyến mãi.", true);
+    });
+
+    // TẢI GIỎ HÀNG KHI MỞ TRANG
+    loadCart().catch(function (error) {
+
+        cartLoaded = false;
+        cartList.textContent = "Không thể tải giỏ hàng.";
+
+        showMessage(
+            "Có lỗi khi tải giỏ hàng. Vui lòng thử lại!",
+            false
+        );
+
+        console.error(error);
+    });
+
+    // CHO PHÉP GỌI LẠI KHI GIỎ HÀNG THAY ĐỔI
+    window.fitfoodReloadCart = function () {
+
+        return loadCart().catch(function (error) {
+            showMessage("Không thể cập nhật giỏ hàng.", false);
+            console.error(error);
+        });
+    };
 
 });
-
-
