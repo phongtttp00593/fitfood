@@ -1,3 +1,4 @@
+
 package com.fitfood;
 
 import org.springframework.context.annotation.Bean;
@@ -44,8 +45,11 @@ public class SecurityConfig {
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
                 .permitAll())
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.sameOrigin()))
             .exceptionHandling(ex -> ex.accessDeniedPage("/403"));
-        // Giữ CSRF mặc định BẬT. Mọi form POST cần chứa token CSRF.
+
+        // Giữ CSRF mặc định BẬT.
         return http.build();
     }
 }
