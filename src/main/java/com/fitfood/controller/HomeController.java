@@ -10,4 +10,8 @@ public class HomeController {
     @GetMapping("/product") public String product() { return "product"; }
     @GetMapping("/cart") public String cart() { return "cart"; }
     // Đăng nhập /dang-nhap được xử lý ở AuthController, KHÔNG khai báo ở đây.
+    @GetMapping("/admin/variants")
+    public String adminVariantsPage() {
+        return "admin-variants"; 
+    }
 }

@@ -1,95 +1,387 @@
+
 package com.fitfood.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
+
+import java.math.BigDecimal;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @RestController
-@RequestMapping("/api/foods")
+@RequestMapping("/api")
 public class ProductVariantController {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    // API trả về danh sách các nhóm biến thể và tùy chọn của 1 món ăn để load lên giao diện chi tiết sản phẩm
-    @GetMapping("/{id}/variants")
-    public ResponseEntity<Map<String, Object>> getFoodVariants(@PathVariable Long id) {
-        Map<String, Object> response = new HashMap<>();
-        
+    // =========================================
+    // 1. LAY DANH SACH MON AN TU SQL SERVER
+    // =========================================
+
+    @GetMapping("/admin/variants/foods")
+    public ResponseEntity<?> getFoodsForAdmin() {
         try {
-            // 1. Lấy danh sách nhóm biến thể (Size, Sốt, Topping...)
-            String groupsQuery = "SELECT id, group_name, is_required, allow_multiple, max_select FROM food_variant_groups WHERE food_id = ?";
-            List<Map<String, Object>> groups = jdbcTemplate.queryForList(groupsQuery, id);
+            String sql = """
+                SELECT id, name, price
+                FROM dbo.fitfood_products
+                ORDER BY id
+                """;
 
-            // 2. Lấy các tùy chọn con cho từng nhóm
-            for (Map<String, Object> group : groups) {
-                Long groupId = ((Number) group.get("id")).longValue();
-                String optionsQuery = "SELECT id, option_name, extra_price, extra_calories, is_default FROM food_variant_options WHERE group_id = ?";
-                List<Map<String, Object>> options = jdbcTemplate.queryForList(optionsQuery, groupId);
-                group.put("options", options);
-            }
-
-            response.put("food_id", id);
-            response.put("variant_groups", groups);
-            response.put("status", "success");
-            
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            response.put("status", "error");
-            response.put("message", e.getMessage());
-            return ResponseEntity.badRequest().body(response);
-        }
-    }
-
-    // API nhận yêu cầu thêm sản phẩm kèm biến thể vào giỏ hàng
-    @PostMapping("/add-to-cart")
-    public ResponseEntity<?> addToCartWithVariants(@RequestBody Map<String, Object> payload) {
-        try {
-            Long foodId = Long.valueOf(payload.get("food_id").toString());
-            int quantity = Integer.parseInt(payload.get("quantity").toString());
-            List<Map<String, Object>> selectedOptions = (List<Map<String, Object>>) payload.get("options");
-            String note = (String) payload.get("note");
-
-            double totalExtraPrice = 0;
-            int totalExtraCalo = 0;
-
-            // Kiểm tra và tính tiền, calo cộng thêm từ database một cách an toàn ở server
-            if (selectedOptions != null && !selectedOptions.isEmpty()) {
-                for (Map<String, Object> opt : selectedOptions) {
-                    Long optionId = Long.valueOf(opt.get("option_id").toString());
-                    
-                    Map<String, Object> optionData = jdbcTemplate.queryForMap(
-                        "SELECT extra_price, extra_calories FROM food_variant_options WHERE id = ?", optionId
-                    );
-                    
-                    totalExtraPrice += ((Number) optionData.get("extra_price")).doubleValue();
-                    totalExtraCalo += ((Number) optionData.get("extra_calories")).intValue();
-                }
-            }
-
-            // Lấy giá gốc món ăn
-            Map<String, Object> foodData = jdbcTemplate.queryForMap("SELECT price, calories FROM foods WHERE id = ?", foodId);
-            double basePrice = ((Number) foodData.get("price")).doubleValue();
-            int baseCalo = ((Number) foodData.get("calories")).intValue();
-
-            double finalUnitPrice = basePrice + totalExtraPrice;
-            double finalTotalPrice = finalUnitPrice * quantity;
-            int finalTotalCalo = (baseCalo + totalExtraCalo) * quantity;
-
-            // TODO: Lưu vào bảng giỏ hàng (Cart / CartItems) trong Database tại đây
+            List<Map<String, Object>> foods =
+                    jdbcTemplate.queryForList(sql);
 
             return ResponseEntity.ok(Map.of(
-                "status", "success",
-                "message", "Đã thêm vào giỏ hàng thành công!",
-                "unit_price", finalUnitPrice,
-                "total_price", finalTotalPrice,
-                "total_calories", finalTotalCalo
+                    "status", "success",
+                    "foods", foods
             ));
 
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(Map.of("status", "error", "message", e.getMessage()));
+            return error(e);
         }
+    }
+
+    // =========================================
+    // 2. HAM LAY CAC NHOM BIEN THE
+    // =========================================
+
+    private List<Map<String, Object>> loadVariantGroups(
+            Long foodId) {
+
+        String groupSql = """
+            SELECT id, group_name,
+                   is_required, allow_multiple,
+                   max_select, sort_order
+            FROM dbo.food_variant_groups
+            WHERE food_id = ?
+            ORDER BY sort_order, id
+            """;
+
+        List<Map<String, Object>> groups =
+                jdbcTemplate.queryForList(groupSql, foodId);
+
+        String optionSql = """
+            SELECT id, option_name, extra_price,
+                   extra_calories, is_default,
+                   is_available
+            FROM dbo.food_variant_options
+            WHERE group_id = ?
+            ORDER BY id
+            """;
+
+        for (Map<String, Object> group : groups) {
+
+            Long groupId = ((Number)
+                    group.get("id")).longValue();
+
+            List<Map<String, Object>> options =
+                    jdbcTemplate.queryForList(
+                            optionSql, groupId);
+
+            group.put("options", options);
+        }
+
+        return groups;
+    }
+
+    // =========================================
+    // 3. API BIEN THE CHO KHACH HANG
+    // =========================================
+
+    @GetMapping("/foods/{id}/variants")
+    public ResponseEntity<?> getFoodVariants(
+            @PathVariable Long id) {
+
+        try {
+            List<Map<String, Object>> groups =
+                    loadVariantGroups(id);
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "food_id", id,
+                    "variant_groups", groups
+            ));
+
+        } catch (Exception e) {
+            return error(e);
+        }
+    }
+
+    // =========================================
+    // 4. API BIEN THE CHO ADMIN
+    // =========================================
+
+    @GetMapping("/admin/variants/food/{foodId}")
+    public ResponseEntity<?> getVariantsForAdmin(
+            @PathVariable Long foodId) {
+
+        try {
+            List<Map<String, Object>> groups =
+                    loadVariantGroups(foodId);
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "variant_groups", groups
+            ));
+
+        } catch (Exception e) {
+            return error(e);
+        }
+    }
+
+    // =========================================
+    // 5. THEM NHOM BIEN THE
+    // =========================================
+
+    @PostMapping("/admin/variants/group/add")
+    public ResponseEntity<?> addVariantGroup(
+            @RequestBody Map<String, Object> payload) {
+
+        try {
+            Long foodId = Long.valueOf(
+                    payload.get("food_id").toString());
+
+            String groupName = payload.get(
+                    "group_name").toString().trim();
+
+            boolean isRequired = Boolean.parseBoolean(
+                    payload.get("is_required").toString());
+
+            boolean allowMultiple = Boolean.parseBoolean(
+                    payload.get("allow_multiple").toString());
+
+            int maxSelect = Integer.parseInt(
+                    payload.get("max_select").toString());
+
+            if (groupName.isEmpty() || maxSelect < 1) {
+                throw new IllegalArgumentException(
+                        "Ten nhom hoac so luong chon khong hop le");
+            }
+
+            Integer count = jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM dbo.fitfood_products WHERE id = ?",
+                    Integer.class, foodId);
+
+            if (count == null || count == 0) {
+                throw new IllegalArgumentException(
+                        "Mon an khong ton tai");
+            }
+
+            String sql = """
+                INSERT INTO dbo.food_variant_groups
+                (food_id, group_name, is_required,
+                 allow_multiple, max_select)
+                VALUES (?, ?, ?, ?, ?)
+                """;
+
+            jdbcTemplate.update(
+                    sql,
+                    foodId,
+                    groupName,
+                    isRequired,
+                    allowMultiple,
+                    maxSelect
+            );
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Da them nhom bien the thanh cong!"
+            ));
+
+        } catch (Exception e) {
+            return error(e);
+        }
+    }
+
+    // =========================================
+    // 6. THEM TUY CHON BIEN THE
+    // =========================================
+
+    @PostMapping("/admin/variants/option/add")
+    public ResponseEntity<?> addVariantOption(
+            @RequestBody Map<String, Object> payload) {
+
+        try {
+            Long groupId = Long.valueOf(
+                    payload.get("group_id").toString());
+
+            String optionName = payload.get(
+                    "option_name").toString().trim();
+
+            BigDecimal extraPrice = new BigDecimal(
+                    payload.get("extra_price").toString());
+
+            int extraCalories = Integer.parseInt(
+                    payload.get("extra_calories").toString());
+
+            boolean isDefault = Boolean.parseBoolean(
+                    payload.get("is_default").toString());
+
+            if (optionName.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Ten tuy chon khong duoc de trong");
+            }
+
+            String sql = """
+                INSERT INTO dbo.food_variant_options
+                (group_id, option_name, extra_price,
+                 extra_calories, is_default)
+                VALUES (?, ?, ?, ?, ?)
+                """;
+
+            jdbcTemplate.update(
+                    sql,
+                    groupId,
+                    optionName,
+                    extraPrice,
+                    extraCalories,
+                    isDefault
+            );
+
+            return ResponseEntity.ok(Map.of(
+                    "status", "success",
+                    "message", "Da them tuy chon thanh cong!"
+            ));
+
+        } catch (Exception e) {
+            return error(e);
+        }
+    }
+
+    // =========================================
+    // 7. TINH GIA MON AN KEM BIEN THE
+    // =========================================
+
+    @PostMapping("/foods/add-to-cart")
+    public ResponseEntity<?> addToCartWithVariants(
+            @RequestBody Map<String, Object> payload) {
+
+        try {
+            Long foodId = Long.valueOf(
+                    payload.get("food_id").toString());
+
+            int quantity = Integer.parseInt(
+                    payload.get("quantity").toString());
+
+            if (quantity <= 0) {
+                throw new IllegalArgumentException(
+                        "So luong phai lon hon 0");
+            }
+
+            BigDecimal basePrice =
+                    jdbcTemplate.queryForObject(
+                        """
+                        SELECT price
+                        FROM dbo.fitfood_products
+                        WHERE id = ?
+                        """,
+                        BigDecimal.class,
+                        foodId
+                    );
+
+            if (basePrice == null) {
+                throw new IllegalArgumentException(
+                        "Khong tim thay gia mon an");
+            }
+
+            @SuppressWarnings("unchecked")
+            List<Map<String, Object>> selectedOptions =
+                    (List<Map<String, Object>>)
+                    payload.get("options");
+
+            BigDecimal totalExtraPrice = BigDecimal.ZERO;
+            int totalExtraCalories = 0;
+
+            Set<Long> usedOptionIds = new HashSet<>();
+
+            if (selectedOptions != null) {
+
+                for (Map<String, Object> selected :
+                        selectedOptions) {
+
+                    Long optionId = Long.valueOf(
+                            selected.get("option_id").toString());
+
+                    if (!usedOptionIds.add(optionId)) {
+                        throw new IllegalArgumentException(
+                                "Tuy chon bi trung lap");
+                    }
+
+                    String optionSql = """
+                        SELECT o.extra_price, o.extra_calories
+                        FROM dbo.food_variant_options o
+                        JOIN dbo.food_variant_groups g
+                          ON g.id = o.group_id
+                        WHERE o.id = ?
+                          AND g.food_id = ?
+                          AND o.is_available = 1
+                        """;
+
+                    Map<String, Object> option =
+                            jdbcTemplate.queryForMap(
+                                    optionSql, optionId, foodId);
+
+                    totalExtraPrice = totalExtraPrice.add(
+                            new BigDecimal(
+                                option.get("extra_price").toString()
+                            )
+                    );
+
+                    totalExtraCalories += ((Number)
+                            option.get("extra_calories")).intValue();
+                }
+            }
+
+            BigDecimal unitPrice =
+                    basePrice.add(totalExtraPrice);
+
+            BigDecimal totalPrice =
+                    unitPrice.multiply(
+                            BigDecimal.valueOf(quantity));
+
+            if (unitPrice.signum() < 0) {
+                throw new IllegalArgumentException(
+                        "Gia mon an khong hop le");
+            }
+
+            Map<String, Object> result =
+                    new LinkedHashMap<>();
+
+            result.put("status", "success");
+            result.put("message",
+                    "Da tinh gia. Chua luu gio hang.");
+
+            result.put("food_id", foodId);
+            result.put("quantity", quantity);
+
+            result.put("unit_price", unitPrice);
+            result.put("total_price", totalPrice);
+
+            // SQL hien chua co calories goc cua mon.
+            result.put("total_calories", null);
+            result.put("extra_calories_total",
+                    totalExtraCalories * quantity);
+
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            return error(e);
+        }
+    }
+
+    // =========================================
+    // 8. TRA VE LOI API
+    // =========================================
+
+    private ResponseEntity<?> error(Exception e) {
+        return ResponseEntity.badRequest().body(Map.of(
+                "status", "error",
+                "message", String.valueOf(e.getMessage())
+        ));
     }
 }
