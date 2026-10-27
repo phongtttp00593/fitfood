@@ -812,3 +812,93 @@ SELECT COUNT(*) AS SoTaiKhoan FROM dbo.fitfood_users;
 GO
 PRINT N'HOAN THANH: DATABASE FITFOOD DA DUOC TAO MOI. HAY CHAY LAI SPRING BOOT.';
 GO
+
+
+USE FITFOOD;
+GO
+
+-- Xóa bảng cũ nếu đã tạo nháp trước đó để tránh trùng lặp
+IF OBJECT_ID('dbo.food_variant_options', 'U') IS NOT NULL
+    DROP TABLE dbo.food_variant_options;
+IF OBJECT_ID('dbo.food_variant_groups', 'U') IS NOT NULL
+    DROP TABLE dbo.food_variant_groups;
+GO
+
+-- 1. Bảng Nhóm biến thể của món ăn (VD: Chọn Size, Chọn Sốt, Thêm Topping)
+CREATE TABLE dbo.food_variant_groups (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    food_id INT NOT NULL,
+    group_name NVARCHAR(100) NOT NULL,      -- VD: N'Chọn Khẩu Phần', N'Loại Sốt'
+    is_required BIT NOT NULL DEFAULT 1,     -- 1: Bắt buộc chọn, 0: Tùy chọn
+    allow_multiple BIT NOT NULL DEFAULT 0,  -- 0: Chọn 1 (Radio), 1: Chọn nhiều (Checkbox)
+    max_select INT NOT NULL DEFAULT 1,      -- Số lượng tối đa được chọn
+    sort_order INT NOT NULL DEFAULT 0
+);
+GO
+
+-- 2. Bảng Các tùy chọn bên trong nhóm (VD: Size S, Size L, Sốt mè rang...)
+CREATE TABLE dbo.food_variant_options (
+    id INT IDENTITY(1,1) PRIMARY KEY,
+    group_id INT NOT NULL,
+    option_name NVARCHAR(100) NOT NULL,     -- VD: N'Size L (+150g ức gà)', N'Sốt Chanh Dây'
+    extra_price DECIMAL(10, 2) NOT NULL DEFAULT 0, -- Giá cộng thêm (VD: 15000, hoặc 0)
+    extra_calories INT NOT NULL DEFAULT 0,  -- Calo cộng/trừ thêm (VD: +120 Kcal)
+    is_default BIT NOT NULL DEFAULT 0,      -- 1: Mặc định chọn sẵn
+    is_available BIT NOT NULL DEFAULT 1,    -- 1: Còn hàng, 0: Hết hàng
+    CONSTRAINT FK_VariantOptions_Group FOREIGN KEY (group_id) 
+        REFERENCES dbo.food_variant_groups(id) ON DELETE CASCADE
+);
+GO
+
+-- 3. Thêm cột lưu biến thể vào bảng chi tiết đơn hàng (nếu bảng order_items đã tồn tại)
+IF OBJECT_ID('dbo.order_items', 'U') IS NOT NULL
+BEGIN
+    IF COL_LENGTH('dbo.order_items', 'variants_json') IS NULL
+    BEGIN
+        ALTER TABLE dbo.order_items
+        ADD variants_json NVARCHAR(MAX) NULL,
+            unit_final_price DECIMAL(10, 2) NOT NULL DEFAULT 0;
+    END
+END
+GO
+
+-- Tạo nhóm biến thể mẫu cho món ăn có food_id = 1
+INSERT INTO dbo.food_variant_groups (food_id, group_name, is_required, allow_multiple, max_select, sort_order)
+VALUES 
+(1, N'1. Chọn Khẩu Phần (Size)', 1, 0, 1, 1),
+(1, N'2. Chọn Nền Tinh Bột (Carb)', 1, 0, 1, 2),
+(1, N'3. Topping & Sốt thêm', 0, 1, 2, 3);
+
+-- Lấy ID của 3 nhóm vừa tạo
+DECLARE @GroupSize INT = (SELECT TOP 1 id FROM dbo.food_variant_groups WHERE food_id = 1 AND sort_order = 1 ORDER BY id DESC);
+DECLARE @GroupCarb INT = (SELECT TOP 1 id FROM dbo.food_variant_groups WHERE food_id = 1 AND sort_order = 2 ORDER BY id DESC);
+DECLARE @GroupTopping INT = (SELECT TOP 1 id FROM dbo.food_variant_groups WHERE food_id = 1 AND sort_order = 3 ORDER BY id DESC);
+
+-- Thêm các tùy chọn cho nhóm Size
+INSERT INTO dbo.food_variant_options (group_id, option_name, extra_price, extra_calories, is_default, is_available)
+VALUES
+(@GroupSize, N'Size S - Giảm cân (Low Carb)', -10000, -90, 0, 1),	
+(@GroupSize, N'Size M - Tiêu chuẩn (Balance)', 0, 0, 1, 1),
+(@GroupSize, N'Size L - Tăng cơ (+100g ức gà)', 25000, 165, 0, 1);
+
+-- Thêm các tùy chọn cho nhóm Tinh bột
+INSERT INTO dbo.food_variant_options (group_id, option_name, extra_price, extra_calories, is_default, is_available)
+VALUES
+(@GroupCarb, N'Gạo lứt huyết rồng', 0, 110, 1, 1),
+(@GroupCarb, N'Khoai lang mật nướng', 5000, 95, 0, 1),
+(@GroupCarb, N'100% Rau xanh (Không tinh bột)', 0, 25, 0, 1);
+
+-- Thêm các tùy chọn cho nhóm Topping & Sốt
+INSERT INTO dbo.food_variant_options (group_id, option_name, extra_price, extra_calories, is_default, is_available)
+VALUES
+(@GroupTopping, N'Trứng lòng đào ngâm tương', 12000, 75, 0, 1),
+(@GroupTopping, N'Thêm Bơ sáp tươi (50g)', 18000, 80, 0, 1),
+(@GroupTopping, N'Sốt mè rang Kewpie', 8000, 60, 0, 1);
+GO
+
+-- Kiểm tra kết quả
+SELECT g.group_name, o.option_name, o.extra_price, o.extra_calories, o.is_default
+FROM dbo.food_variant_groups g
+JOIN dbo.food_variant_options o ON g.id = o.group_id
+WHERE g.food_id = 1
+ORDER BY g.sort_order, o.id;
