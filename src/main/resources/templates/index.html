@@ -11,6 +11,7 @@
     <link rel="stylesheet" th:href="@{/css/fitfood-auth.css}" />
     <link rel="stylesheet" th:href="@{/css/fitfood-account.css}" />
     <link rel="stylesheet" th:href="@{/css/site-theme.css}" />
+    <link rel="stylesheet" th:href="@{/css/support-chat.css}" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect"
@@ -481,5 +482,9 @@
 </footer>
 
 <script defer th:src="@{/js/site-motion.js}"></script>
+
+<!-- CHAT HO TRO KHACH HANG -->
+<div th:replace="~{fragments/support-chat :: widget}"></div>
+
 </body>
 </html>

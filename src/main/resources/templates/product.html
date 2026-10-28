@@ -14,6 +14,7 @@
     <link rel="stylesheet" th:href="@{/css/fitfood-auth.css}">
     <link rel="stylesheet" th:href="@{/css/fitfood-account.css}">
     <link rel="stylesheet" th:href="@{/css/site-theme.css}">
+    <link rel="stylesheet" th:href="@{/css/support-chat.css}">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -462,6 +463,9 @@
 <!-- Giữ file hiện có nếu nó dùng để hiển thị các nhóm biến thể -->
 <script defer th:src="@{/js/product-detail.js}"></script>
 <script defer th:src="@{/js/site-motion.js}"></script>
+
+<!-- CHAT HO TRO KHACH HANG -->
+<div th:replace="~{fragments/support-chat :: widget}"></div>
 
 </body>
 </html>

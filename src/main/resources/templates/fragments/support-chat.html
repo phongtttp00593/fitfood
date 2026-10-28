@@ -1,0 +1,131 @@
+
+<!doctype html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<!-- WIDGET CHAT HO TRO KHACH HANG -->
+<th:block th:fragment="widget">
+
+    <th:block th:if="${supportFullPage == null}">
+
+        <!-- USER DA DANG NHAP -->
+        <div class="ff-chat-widget"
+             th:if="${accountInfo != null and !isAdmin}"
+             data-support-chat
+             data-mode="widget"
+             th:attr="
+                data-csrf=${_csrf.token},
+                data-csrf-header=${_csrf.headerName}">
+
+            <!-- NUT MO CHAT -->
+            <button class="ff-chat-fab"
+                    type="button"
+                    data-chat-toggle
+                    aria-expanded="false"
+                    aria-controls="ffChatPanel"
+                    title="Trò chuyện với FITFOOD">
+
+                <span aria-hidden="true">✉</span>
+                <span>Hỗ trợ</span>
+            </button>
+
+            <!-- KHUNG CHAT -->
+            <section class="ff-chat-panel"
+                     id="ffChatPanel"
+                     hidden
+                     aria-label="Chat hỗ trợ FITFOOD">
+
+                <!-- HEADER -->
+                <header class="ff-chat-panel-head">
+
+                    <div>
+                        <strong>
+                            FITFOOD · Hỗ trợ
+                        </strong>
+
+                        <small>
+                            Gửi lời nhắn đến bộ phận hỗ trợ
+                        </small>
+                    </div>
+
+                    <button type="button"
+                            class="ff-chat-close"
+                            data-chat-close
+                            aria-label="Đóng chat">
+                        ×
+                    </button>
+                </header>
+
+                <!-- TRANG THAI -->
+                <p class="ff-chat-status"
+                   data-chat-status
+                   role="status">
+                    Đang kết nối…
+                </p>
+
+                <!-- DANH SACH TIN NHAN -->
+                <div class="ff-chat-messages"
+                     data-chat-messages
+                     role="log"
+                     aria-live="polite"
+                     aria-label="Nội dung cuộc trò chuyện">
+                </div>
+
+                <!-- NHAP TIN NHAN -->
+                <form class="ff-chat-form"
+                      data-chat-form>
+
+                    <label class="ff-chat-sr"
+                           for="ffChatInput">
+                        Nhập tin nhắn
+                    </label>
+
+                    <textarea id="ffChatInput"
+                              data-chat-input
+                              maxlength="1000"
+                              rows="2"
+                              placeholder="Nhập câu hỏi của bạn…"
+                              required></textarea>
+
+                    <button data-chat-send
+                            type="submit">
+                        Gửi
+                    </button>
+                </form>
+
+                <!-- THONG BAO LOI -->
+                <p class="ff-chat-error"
+                   data-chat-error
+                   role="alert"
+                   hidden>
+                </p>
+
+                <!-- MO CHAT TOAN MAN HINH -->
+                <a class="ff-chat-full-link"
+                   th:href="@{/ho-tro}">
+                    Mở toàn bộ cuộc trò chuyện →
+                </a>
+
+            </section>
+        </div>
+
+        <!-- KHACH CHUA DANG NHAP -->
+        <a class="ff-chat-guest"
+           th:if="${accountInfo == null}"
+           th:href="@{/dang-nhap}"
+           title="Đăng nhập để chat hỗ trợ">
+
+            ✉ Hỗ trợ
+        </a>
+
+        <script defer
+                th:src="@{/js/support-chat.js}">
+        </script>
+
+    </th:block>
+</th:block>
+
+</body>
+</html>
