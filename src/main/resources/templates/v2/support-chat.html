@@ -1,0 +1,141 @@
+
+<!doctype html>
+<html lang="vi"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{v2/fragments/layout :: head('Chat hỗ trợ')}">
+</head>
+
+<body>
+
+<div th:replace="~{v2/fragments/layout :: header('support')}">
+</div>
+
+<main id="main"
+      class="ff-chat-page-wrap">
+
+    <div class="container">
+
+        <nav class="breadcrumb"
+             aria-label="Đường dẫn">
+
+            <a th:href="@{/}">
+                Trang chủ
+            </a>
+
+            <i>›</i>
+
+            <span>
+                Chat hỗ trợ
+            </span>
+        </nav>
+
+        <div class="ff-chat-page-heading">
+
+            <p class="eyebrow">
+                CHĂM SÓC KHÁCH HÀNG
+            </p>
+
+            <h1>
+                Chat hỗ trợ FITFOOD
+            </h1>
+
+            <p>
+                Gửi câu hỏi hoặc yêu cầu hỗ trợ.
+                Tin nhắn sẽ được lưu lại trong
+                tài khoản của bạn.
+            </p>
+        </div>
+
+        <!-- NOI DUNG CHAT -->
+        <section class="ff-chat-screen"
+                 data-support-chat
+                 data-mode="page"
+                 th:attr="
+                    data-csrf=${_csrf.token},
+                    data-csrf-header=${_csrf.headerName}">
+
+            <div class="ff-chat-screen-top">
+
+                <div class="ff-chat-brand-icon">
+                    ✉
+                </div>
+
+                <div>
+                    <h2>
+                        Trò chuyện với FITFOOD
+                    </h2>
+
+                    <p data-chat-status
+                       role="status">
+                        Đang kết nối…
+                    </p>
+                </div>
+
+                <button type="button"
+                        class="ff-chat-refresh"
+                        data-chat-refresh>
+
+                    ↻ Làm mới
+                </button>
+            </div>
+
+            <!-- TIN NHAN -->
+            <div class="ff-chat-messages"
+                 data-chat-messages
+                 role="log"
+                 aria-live="polite"
+                 aria-label="Nội dung cuộc trò chuyện">
+            </div>
+
+            <!-- GUI TIN NHAN -->
+            <form class="ff-chat-form"
+                  data-chat-form>
+
+                <label class="ff-chat-sr"
+                       for="ffChatPageInput">
+
+                    Nội dung tin nhắn
+                </label>
+
+                <textarea id="ffChatPageInput"
+                          data-chat-input
+                          maxlength="1000"
+                          rows="2"
+                          placeholder="Hãy mô tả điều bạn cần hỗ trợ…"
+                          required></textarea>
+
+                <button type="submit"
+                        data-chat-send>
+
+                    Gửi tin nhắn
+                </button>
+            </form>
+
+            <p class="ff-chat-error"
+               data-chat-error
+               role="alert"
+               hidden>
+            </p>
+
+            <p class="ff-chat-note">
+                Bạn có thể quay lại trang này
+                để xem lịch sử và phản hồi mới.
+            </p>
+
+        </section>
+    </div>
+</main>
+
+<footer th:replace="~{v2/fragments/layout :: footer}">
+</footer>
+
+<th:block th:replace="~{v2/fragments/layout :: scripts}">
+</th:block>
+
+<script defer
+        th:src="@{/js/support-chat.js}">
+</script>
+
+</body>
+</html>

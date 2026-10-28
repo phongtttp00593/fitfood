@@ -1,0 +1,496 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Oct 28, 2026, 11:47:10 PM
+    Author     : Hoang Am
+*/
+
+
+/* FITFOOD - CHAT HO TRO USER */
+
+.ff-chat-widget,
+.ff-chat-screen,
+.ff-chat-guest {
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.ff-chat-widget *,
+.ff-chat-screen * {
+    box-sizing: border-box;
+}
+
+/* NUT CHAT NOI */
+
+.ff-chat-fab,
+.ff-chat-guest {
+    position: fixed;
+    right: 24px;
+    bottom: 24px;
+    z-index: 1190;
+
+    background: #166534;
+    color: #fff !important;
+
+    border: 0;
+    border-radius: 999px;
+
+    padding: 13px 19px;
+
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    box-shadow: 0 10px 34px #14532d44;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.ff-chat-fab:hover,
+.ff-chat-guest:hover {
+    background: #14532d;
+    transform: translateY(-2px);
+}
+
+.ff-chat-fab span:first-child {
+    font-size: 21px;
+}
+
+/* KHUNG CHAT */
+
+.ff-chat-panel {
+    position: fixed;
+    right: 24px;
+    bottom: 83px;
+
+    z-index: 1191;
+
+    width: min(370px, calc(100vw - 24px));
+    height: min(560px, calc(100dvh - 116px));
+
+    background: #fff;
+    color: #172b24;
+
+    border-radius: 18px;
+    border: 1px solid #d7e7db;
+
+    box-shadow: 0 16px 55px #172b2450;
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.ff-chat-panel[hidden] {
+    display: none !important;
+}
+
+/* HEADER CHAT */
+
+.ff-chat-panel-head {
+    background: #166534;
+    color: white;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 16px 18px;
+    gap: 12px;
+}
+
+.ff-chat-panel-head strong {
+    display: block;
+    font-size: 17px;
+}
+
+.ff-chat-panel-head small {
+    display: block;
+    font-size: 12px;
+    color: #d8f4de;
+    margin-top: 3px;
+}
+
+.ff-chat-close {
+    background: none;
+    color: white;
+    border: 0;
+
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+}
+
+/* TRANG THAI HO TRO */
+
+.ff-chat-status {
+    font-size: 12px !important;
+    color: #547063 !important;
+
+    margin: 0 !important;
+    padding: 9px 17px;
+
+    border-bottom: 1px solid #eef4f0;
+    background: #f7fbf8;
+}
+
+/* DANH SACH TIN NHAN */
+
+.ff-chat-messages {
+    flex: 1;
+    min-height: 0;
+
+    overflow-y: auto;
+    padding: 15px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+
+    overscroll-behavior: contain;
+    background: #fafdfb;
+}
+
+/* CHUA CO TIN NHAN */
+
+.ff-chat-empty {
+    margin: auto;
+    max-width: 275px;
+
+    padding: 25px 15px;
+    text-align: center;
+
+    color: #4b6356;
+}
+
+.ff-chat-empty strong {
+    font-size: 20px;
+    color: #14532d;
+}
+
+.ff-chat-empty p {
+    font-size: 14px;
+    line-height: 1.7;
+    margin-top: 9px;
+}
+
+/* TUNG TIN NHAN */
+
+.ff-chat-message {
+    display: flex;
+    flex-direction: column;
+
+    max-width: 86%;
+    gap: 4px;
+
+    align-self: flex-start;
+    overflow-wrap: anywhere;
+}
+
+.ff-chat-message.is-own {
+    align-self: flex-end;
+    align-items: flex-end;
+}
+
+.ff-chat-sender {
+    font-size: 11px;
+    color: #73877b;
+    font-weight: 600;
+}
+
+.ff-chat-bubble {
+    background: #e9f2eb;
+
+    padding: 10px 13px;
+
+    border-radius: 14px 14px 14px 3px;
+
+    white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.55;
+
+    color: #1e3b2c;
+}
+
+/* TIN NHAN USER */
+
+.ff-chat-message.is-own .ff-chat-bubble {
+    background: #166534;
+    color: white;
+
+    border-radius: 14px 14px 3px 14px;
+}
+
+.ff-chat-time {
+    font-size: 10px;
+    color: #7f9286;
+}
+
+/* FORM GUI TIN */
+
+.ff-chat-form {
+    display: flex;
+    gap: 8px;
+    align-items: flex-end;
+
+    padding: 12px;
+
+    border-top: 1px solid #e4ede6;
+    background: #fff;
+}
+
+.ff-chat-form textarea {
+    flex: 1;
+    min-width: 0;
+
+    resize: vertical;
+    max-height: 130px;
+
+    border: 1px solid #d0dcd2;
+    background: #fff;
+    border-radius: 10px;
+
+    padding: 11px;
+
+    color: #193a24;
+
+    font: inherit;
+    font-size: 14px;
+    line-height: 1.4;
+
+    outline: none;
+}
+
+.ff-chat-form textarea:focus {
+    border-color: #15803d;
+    box-shadow: 0 0 0 3px #15803d22;
+}
+
+.ff-chat-form button {
+    background: #166534;
+
+    border: 0;
+    border-radius: 10px;
+
+    color: white;
+    font: inherit;
+    font-weight: 700;
+
+    padding: 12px 16px;
+
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.ff-chat-form button:hover {
+    background: #14532d;
+}
+
+.ff-chat-form button:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+/* LOI GUI TIN */
+
+.ff-chat-error {
+    font-size: 12px !important;
+    color: #b91c1c !important;
+
+    padding: 8px 14px !important;
+    margin: 0 !important;
+
+    background: #fff0ef;
+}
+
+.ff-chat-full-link {
+    font-size: 12px;
+    text-align: center;
+
+    color: #166534;
+
+    padding: 9px;
+    text-decoration: none;
+
+    background: #fff;
+    font-weight: 600;
+}
+
+.ff-chat-full-link:hover {
+    text-decoration: underline;
+}
+
+.ff-chat-sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+/* TRANG CHAT RIENG */
+
+.ff-chat-page-wrap {
+    padding: 34px 0 65px;
+    min-height: 70vh;
+}
+
+.ff-chat-container {
+    width: min(940px, calc(100% - 36px));
+    margin: auto;
+}
+
+.ff-chat-page-heading {
+    margin-bottom: 24px;
+}
+
+.ff-chat-page-heading h1 {
+    font-size: clamp(25px, 4vw, 39px);
+    color: #154c2c;
+    margin: 10px 0;
+}
+
+.ff-chat-page-heading p {
+    color: #5f7567;
+    line-height: 1.7;
+}
+
+.ff-chat-screen {
+    background: white;
+
+    border: 1px solid #d8e8db;
+    border-radius: 18px;
+
+    overflow: hidden;
+    box-shadow: 0 15px 40px #173d2410;
+
+    display: flex;
+    flex-direction: column;
+
+    min-height: 570px;
+    height: min(70vh, 700px);
+
+    color: #172b24;
+}
+
+.ff-chat-screen-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    padding: 19px 24px;
+
+    border-bottom: 1px solid #e7efe8;
+    background: #f8fbf8;
+}
+
+.ff-chat-brand-icon {
+    width: 45px;
+    height: 45px;
+
+    border-radius: 14px;
+
+    background: #166534;
+    color: #fff;
+
+    display: grid;
+    place-items: center;
+
+    font-size: 23px;
+}
+
+.ff-chat-screen-top h2 {
+    font-size: 18px;
+    margin: 0 0 3px;
+
+    color: #123b26;
+}
+
+.ff-chat-screen-top p {
+    font-size: 12px;
+    margin: 0;
+
+    color: #638272;
+}
+
+.ff-chat-refresh {
+    margin-left: auto;
+
+    background: #e5f4e8;
+    border: 0;
+    border-radius: 8px;
+
+    color: #166534;
+
+    padding: 9px 12px;
+    cursor: pointer;
+}
+
+.ff-chat-screen .ff-chat-messages {
+    padding: 20px 26px;
+    gap: 19px;
+}
+
+.ff-chat-screen .ff-chat-message {
+    max-width: 75%;
+}
+
+.ff-chat-screen .ff-chat-form {
+    padding: 18px 24px;
+}
+
+.ff-chat-note {
+    font-size: 12px;
+    color: #819286;
+
+    margin: 0;
+    padding: 0 24px 14px;
+}
+
+/* MOBILE */
+
+@media (max-width: 580px) {
+
+    .ff-chat-panel {
+        right: 12px;
+        bottom: 76px;
+
+        width: calc(100vw - 24px);
+    }
+
+    .ff-chat-fab,
+    .ff-chat-guest {
+        right: 12px;
+        bottom: 12px;
+    }
+
+    .ff-chat-screen {
+        min-height: 490px;
+        height: 70dvh;
+    }
+
+    .ff-chat-screen .ff-chat-messages {
+        padding: 14px;
+    }
+
+    .ff-chat-screen .ff-chat-form {
+        padding: 12px;
+    }
+
+    .ff-chat-refresh {
+        font-size: 12px;
+    }
+
+    .ff-chat-screen-top {
+        padding: 12px;
+    }
+}
