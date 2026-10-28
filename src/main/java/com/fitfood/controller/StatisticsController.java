@@ -65,7 +65,7 @@ public class StatisticsController {
 
         String filterError = null;
 
-        // Xác định khoảng thời gian lọc
+        // Xác định khoảng thời gian locs
         try {
             switch (period) {
                 case "day": {
