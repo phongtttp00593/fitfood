@@ -1,265 +1,299 @@
-
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-
 <head th:replace="~{v2/fragments/layout :: head('Giỏ hàng')}">
+    <meta charset="UTF-8">
+    <title>Giỏ hàng - FITFOOD</title>
 </head>
+<body style="background-color: #fcf9f2; margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
 
-<body>
-
-<!-- HEADER -->
 <div th:replace="~{v2/fragments/layout :: header('cart')}"></div>
 
-<main id="main">
-
-    <header class="page-hero compact-title">
-        <div class="container">
-
-            <p class="eyebrow">Đơn hàng của bạn</p>
-
-            <h1>Giỏ hàng</h1>
-
-            <ol class="checkout-steps"
-                aria-label="Các bước đặt hàng">
-
-                <li class="on" aria-current="step">
-                    <b>1</b>
-                    <span>Giỏ hàng</span>
-                </li>
-
-                <li>
-                    <b>2</b>
-                    <span>Thông tin nhận hàng</span>
-                </li>
-
-                <li>
-                    <b>3</b>
-                    <span>Thanh toán</span>
-                </li>
-
-            </ol>
-
-        </div>
-    </header>
-
-    <div class="container layout-2">
-
-        <!-- DANH SÁCH MÓN ĂN THỰC TẾ -->
-        <div class="card pad cart-card"
-             data-reveal="0"
-             data-reveal-dir="left">
-
-            <h2 class="card-title">Món đã chọn</h2>
-
-            <!-- JAVASCRIPT SẼ HIỂN THỊ MÓN TỪ DATABASE -->
-            <div id="cart-items-list"
-                 aria-live="polite">
-
-                Đang tải giỏ hàng...
-
+<!-- POPUP THÔNG BÁO XÓA HIỆN ĐẠI (CONFIRM -> LOADING XOAY -> THÀNH CÔNG) -->
+<div id="deleteModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.55); backdrop-filter: blur(3px); align-items: center; justify-content: center; z-index: 999999;">
+    <div style="background: #fff; width: 340px; max-width: 90%; border-radius: 16px; padding: 28px 24px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.15); animation: zoomIn 0.25s ease;">
+        
+        <!-- TRẠNG THÁI 1: XÁC NHẬN HỎI XÓA -->
+        <div id="deleteConfirmBox">
+            <div style="width: 58px; height: 58px; background: #fff5f5; color: #e53e3e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px;">
+                🗑️
             </div>
-
-        </div>
-
-        <!-- TÓM TẮT GIỎ HÀNG -->
-        <aside class="card pad summary"
-               aria-label="Tóm tắt"
-               data-reveal="120"
-               data-reveal-dir="right">
-
-            <h2 class="card-title">Tóm tắt</h2>
-
-            <!-- MÃ KHUYẾN MÃI -->
-            <div style="
-                border:1px dashed #22c55e;
-                background:#f0fdf4;
-                border-radius:12px;
-                padding:16px;
-                margin-bottom:20px;
-            ">
-
-                <label for="promo-code"
-                       style="
-                           display:block;
-                           font-weight:700;
-                           color:#166534;
-                           margin-bottom:10px;
-                       ">
-                    🎟 Mã khuyến mãi
-                </label>
-
-                <div style="
-                    display:flex;
-                    gap:8px;
-                    flex-wrap:wrap;
-                ">
-
-                    <input
-                        id="promo-code"
-                        type="text"
-                        maxlength="50"
-                        placeholder="Nhập mã giảm giá"
-                        autocomplete="off"
-                        style="
-                            flex:1;
-                            min-width:130px;
-                            padding:11px;
-                            background:white;
-                            border:1px solid #d1d5db;
-                            border-radius:8px;
-                            font-size:14px;
-                        "
-                    />
-
-                    <button
-                        id="apply-promo"
-                        type="button"
-                        class="btn sm"
-                        style="
-                            background:#16a34a;
-                            color:white;
-                            border-radius:8px;
-                            padding:10px 16px;
-                        ">
-                        Áp dụng
-                    </button>
-
-                </div>
-
-                <!-- THÔNG BÁO -->
-                <p id="promo-message"
-                   role="status"
-                   aria-live="polite"
-                   style="
-                       display:none;
-                       font-size:13px;
-                       margin-top:10px;
-                   ">
-                </p>
-
-                <!-- NÚT HỦY MÃ -->
-                <button
-                    id="remove-promo"
-                    type="button"
-                    style="
-                        display:none;
-                        margin-top:10px;
-                        border:none;
-                        background:transparent;
-                        color:#dc2626;
-                        cursor:pointer;
-                        font-size:13px;
-                    ">
-                    ✕ Hủy mã khuyến mãi
+            <h3 style="margin: 0 0 8px; color: #2d3748; font-size: 1.2rem;">Xác nhận xóa món?</h3>
+            <p style="color: #718096; font-size: 0.95rem; margin: 0 0 22px;">Món ăn này sẽ được gỡ khỏi giỏ hàng của bạn.</p>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button type="button" onclick="closeDeleteModal()" 
+                        style="flex: 1; padding: 10px; border: 1px solid #e2e8f0; background: #edf2f7; color: #4a5568; border-radius: 8px; font-weight: 600; cursor: pointer;">
+                    Hủy bỏ
                 </button>
-
+                <button type="button" onclick="executeDeleteProcess()" 
+                        style="flex: 1; padding: 10px; border: none; background: #e53e3e; color: #fff; border-radius: 8px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(229,62,62,0.25);">
+                    Đồng ý xóa
+                </button>
             </div>
+        </div>
 
-            <!-- TẠM TÍNH -->
-            <div class="line">
+        <!-- TRẠNG THÁI 2: VÒNG XOAY LOADING -->
+        <div id="deleteLoadingBox" style="display: none; padding: 10px 0;">
+            <div class="custom-spinner"></div>
+            <p style="color: #4a5568; font-weight: 600; font-size: 1rem; margin-top: 16px;">Đang xóa món...</p>
+        </div>
 
-                <span>Tạm tính</span>
-
-                <strong id="cart-subtotal">
-                    0đ
-                </strong>
-
+        <!-- TRẠNG THÁI 3: DẤU TÍCH XANH & THÔNG BÁO XÓA THÀNH CÔNG -->
+        <div id="deleteSuccessBox" style="display: none; padding: 10px 0;">
+            <div style="width: 58px; height: 58px; background: #f0fff4; color: #27ae60; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: bold; margin: 0 auto 12px; border: 2px solid #c6f6d5;">
+                ✓
             </div>
-
-            <!-- PHÍ VẬN CHUYỂN -->
-            <div class="line">
-
-                <span>Phí vận chuyển</span>
-
-                <strong id="cart-shipping">
-                    0đ
-                </strong>
-
-            </div>
-
-            <!-- TIỀN ĐƯỢC GIẢM -->
-            <div class="line"
-                 id="promo-discount-row"
-                 style="display:none;">
-
-                <span style="color:#16a34a;">
-
-                    Khuyến mãi
-
-                    <small id="applied-promo-code"></small>
-
-                </span>
-
-                <strong
-                    id="promo-discount"
-                    style="color:#16a34a;">
-
-                    -0đ
-
-                </strong>
-
-            </div>
-
-            <!-- TỔNG SAU KHUYẾN MÃI -->
-            <div class="line total">
-
-                <span>Tổng cộng</span>
-
-                <strong
-                    id="cart-total"
-                    style="
-                        color:#16a34a;
-                        font-size:21px;
-                    ">
-                    0đ
-                </strong>
-
-            </div>
-
-            <p class="small muted"
-               style="margin-top:12px;">
-
-                Mã khuyến mãi áp dụng trên tổng tiền
-                các món hợp lệ trong giỏ hàng.
-                Phí vận chuyển không được giảm.
-
-            </p>
-
-            <!-- NÚT ĐẶT HÀNG HIỆN TẠI -->
-            <button
-                class="btn block"
-                type="button"
-                data-add-to-cart
-                data-msg="Chức năng đặt hàng đang được phát triển.">
-
-                Tiến hành đặt hàng
-
-            </button>
-
-            <a class="btn ghost block"
-               th:href="@{/menu}">
-
-                ← Tiếp tục chọn món
-
-            </a>
-
-        </aside>
+            <h3 style="margin: 0; color: #27ae60; font-size: 1.15rem; font-weight: bold;">Xóa thành công!</h3>
+            <p style="color: #718096; font-size: 0.9rem; margin-top: 6px;">Đang cập nhật lại giỏ hàng...</p>
+        </div>
 
     </div>
+</div>
 
+<!-- TOAST CẢNH BÁO KHI SỐ LƯỢNG LÀ 1 -->
+<div id="toastWarning" style="display: none; position: fixed; top: 25px; right: 25px; z-index: 100000; background: #e67e22; color: #fff; padding: 14px 22px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-weight: 600; align-items: center; gap: 10px; animation: slideIn 0.3s ease;">
+    <span>⚠️</span>
+    <span id="toastWarningText">Không thể trừ thêm! Số lượng tối thiểu là 1.</span>
+</div>
+
+<main style="max-width: 1100px; margin: 30px auto; padding: 0 15px;">
+    <div style="display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap;">
+
+        <!-- CỘT TRÁI: MÓN ĐÃ CHỌN -->
+        <div style="flex: 1 1 600px; background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f0e6d6;">
+            <h2 style="font-size: 1.25rem; color: #2d3748; margin-top: 0; margin-bottom: 20px; display: flex; align-items: center; gap: 8px;">
+                🥗 Món đã chọn
+            </h2>
+
+            <!-- Danh sách món -->
+            <div th:if="${cart != null and cart.items != null and !cart.items.isEmpty()}">
+                <div th:each="item : ${cart.items}" 
+                     style="display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px dashed #e2e8f0;">
+                    
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <!-- Nút XÓA tròn bên trái ảnh món ăn -->
+                        <form th:id="'form-delete-' + ${item.id}" th:action="@{/cart/remove}" method="post" style="margin: 0;">
+                            <input type="hidden" name="itemId" th:value="${item.id}" />
+                            <button type="button" 
+                                    th:onclick="'openDeleteModal(' + ${item.id} + ')'"
+                                    title="Xóa món này"
+                                    style="background: transparent; border: 1px solid #e2e8f0; color: #a0aec0; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.2s;"
+                                    onmouseover="this.style.color='#e53e3e'; this.style.borderColor='#e53e3e'; this.style.backgroundColor='#fff5f5';"
+                                    onmouseout="this.style.color='#a0aec0'; this.style.borderColor='#e2e8f0'; this.style.backgroundColor='transparent';">
+                                ✕
+                            </button>
+                        </form>
+
+                        <!-- Ảnh món ăn -->
+                        <img th:src="${item.product.imageUrl != null ? item.product.imageUrl : '/images/chicken-bowl.jpg'}" 
+                             th:alt="${item.product.name}" 
+                             style="width: 70px; height: 70px; object-fit: cover; border-radius: 10px; border: 1px solid #edf2f7;" />
+
+                        <!-- Thông tin món & nút - + bên dưới -->
+                        <div>
+                            <div style="font-weight: 600; color: #2d3748; font-size: 1.05rem;" th:text="${item.product.name}">Tên món ăn</div>
+                            <div style="color: #718096; font-size: 0.9rem; margin-top: 2px;"
+                                 th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + 'đ'">
+                                65.000đ
+                            </div>
+
+                            <!-- Nút - + bên dưới sản phẩm để chỉnh số lượng -->
+                            <div style="display: flex; align-items: center; gap: 6px; margin-top: 8px;">
+                                <form th:action="@{/cart/update-quantity}" method="post" style="margin: 0;"
+                                      th:attr="onsubmit='return handleDecreaseQuantity(event, ' + ${item.quantity} + ')'">
+                                    <input type="hidden" name="itemId" th:value="${item.id}" />
+                                    <input type="hidden" name="change" value="-1" />
+                                    <button type="submit" 
+                                            style="width: 26px; height: 26px; border: 1px solid #cbd5e0; background: #f7fafc; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                                        -
+                                    </button>
+                                </form>
+
+                                <span style="min-width: 24px; text-align: center; font-weight: 700; font-size: 14px; color: #2d3748;" 
+                                      th:text="${item.quantity}">1</span>
+
+                                <form th:action="@{/cart/update-quantity}" method="post" style="margin: 0;">
+                                    <input type="hidden" name="itemId" th:value="${item.id}" />
+                                    <input type="hidden" name="change" value="1" />
+                                    <button type="submit" 
+                                            style="width: 26px; height: 26px; border: 1px solid #cbd5e0; background: #f7fafc; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                                        +
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Thành tiền -->
+                    <div style="font-weight: 700; color: #2d3748; font-size: 1.1rem;"
+                         th:text="${#numbers.formatDecimal(item.unitPrice * item.quantity, 0, 'COMMA', 0, 'POINT')} + 'đ'">
+                        260.000đ
+                    </div>
+                </div>
+            </div>
+
+            <!-- Giỏ hàng rỗng -->
+            <div th:if="${cart == null or cart.items == null or cart.items.isEmpty()}" style="text-align: center; padding: 40px 0; color: #a0aec0;">
+                <p>Giỏ hàng của bạn đang trống.</p>
+                <a th:href="@{/menu}" style="color: #27ae60; font-weight: 600; text-decoration: none;">Xem thực đơn ngay</a>
+            </div>
+        </div>
+
+        <!-- CỘT PHẢI: TÓM TẮT & ĐẶT HÀNG -->
+        <div style="flex: 1 1 340px; background: #fff; border-radius: 14px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border: 1px solid #f0e6d6;">
+            <h2 style="font-size: 1.25rem; color: #2d3748; margin-top: 0; margin-bottom: 20px;">
+                🥗 Tóm tắt
+            </h2>
+
+            <!-- Box mã khuyến mãi -->
+            <div style="background: #fbf8f2; border: 1px dashed #48bb78; border-radius: 10px; padding: 14px; margin-bottom: 20px;">
+                <div style="font-size: 0.9rem; font-weight: 600; color: #27ae60; margin-bottom: 8px;">🏷️ Mã khuyến mãi</div>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" placeholder="Nhập mã giảm giá" 
+                           style="flex: 1; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.9rem; outline: none;" />
+                    <button type="button" 
+                            style="background: #27ae60; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+                        Áp dụng
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chi tiết hóa đơn -->
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px; color: #4a5568; font-size: 0.95rem;">
+                <span>Tạm tính</span>
+                <strong style="color: #2d3748;" th:text="${#numbers.formatDecimal(cartTotal, 0, 'COMMA', 0, 'POINT')} + 'đ'">0đ</strong>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; margin-bottom: 16px; color: #4a5568; font-size: 0.95rem;">
+                <span>Phí vận chuyển</span>
+                <strong style="color: #2d3748;">15.000đ</strong>
+            </div>
+
+            <div style="border-top: 1px solid #edf2f7; padding-top: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <span style="font-size: 1.15rem; font-weight: 700; color: #2d3748;">Tổng cộng</span>
+                <strong style="font-size: 1.35rem; font-weight: 700; color: #27ae60;" 
+                        th:text="${#numbers.formatDecimal(cartTotal + 15000, 0, 'COMMA', 0, 'POINT')} + 'đ'">
+                    15.000đ
+                </strong>
+            </div>
+
+            <p style="font-size: 0.8rem; color: #a0aec0; margin-bottom: 24px; line-height: 1.4;">
+                Mã khuyến mãi áp dụng trên tổng tiền các món hợp lệ trong giỏ hàng. Phí vận chuyển không được giảm.
+            </p>
+
+            <button type="button" 
+                    style="width: 100%; background: #9b2c2c; color: #fff; border: none; padding: 14px; border-radius: 8px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-bottom: 14px; box-shadow: 0 4px 10px rgba(155, 44, 44, 0.2);">
+                Tiến hành đặt hàng
+            </button>
+
+            <div style="text-align: center;">
+                <a th:href="@{/menu}" style="color: #718096; text-decoration: none; font-size: 0.9rem; font-weight: 500;">
+                    ← Tiếp tục chọn món
+                </a>
+            </div>
+        </div>
+
+    </div>
 </main>
 
-<!-- FOOTER -->
-<footer th:replace="~{v2/fragments/layout :: footer}">
-</footer>
+<footer th:replace="~{v2/fragments/layout :: footer}"></footer>
+<th:block th:replace="~{v2/fragments/layout :: scripts}"></th:block>
 
-<!-- SCRIPT GỐC -->
-<th:block th:replace="~{v2/fragments/layout :: scripts}">
-</th:block>
+<script>
+    let activeDeleteItemId = null;
 
-<!-- SCRIPT ÁP DỤNG MÃ -->
-<script th:src="@{/js/promotion-apply.js}"
-        src="/js/promotion-apply.js"></script>
+    // 1. Mở Modal hỏi xác nhận xóa
+    function openDeleteModal(itemId) {
+        activeDeleteItemId = itemId;
+        document.getElementById('deleteConfirmBox').style.display = 'block';
+        document.getElementById('deleteLoadingBox').style.display = 'none';
+        document.getElementById('deleteSuccessBox').style.display = 'none';
+        document.getElementById('deleteModalOverlay').style.display = 'flex';
+    }
+
+    // 2. Đóng Modal
+    function closeDeleteModal() {
+        document.getElementById('deleteModalOverlay').style.display = 'none';
+        activeDeleteItemId = null;
+    }
+
+    // 3. Tiến hành xoay loading -> Hiện "Xóa thành công" -> Gửi request
+    function executeDeleteProcess() {
+        if (!activeDeleteItemId) return;
+
+        // Chuyển sang vòng xoay loading
+        document.getElementById('deleteConfirmBox').style.display = 'none';
+        document.getElementById('deleteLoadingBox').style.display = 'block';
+
+        // Sau 800ms xoay, chuyển sang trạng thái "Xóa thành công!"
+        setTimeout(() => {
+            document.getElementById('deleteLoadingBox').style.display = 'none';
+            document.getElementById('deleteSuccessBox').style.display = 'block';
+
+            // Chờ 700ms để người dùng đọc thông báo thành công rồi mới submit form
+            setTimeout(() => {
+                const targetForm = document.getElementById('form-delete-' + activeDeleteItemId);
+                if (targetForm) {
+                    targetForm.submit();
+                }
+            }, 700);
+        }, 800);
+    }
+
+    // 4. Chặn không cho trừ khi số lượng = 1
+    function handleDecreaseQuantity(event, currentQty) {
+        if (currentQty <= 1) {
+            event.preventDefault();
+            showWarningToast("Không thể trừ thêm! Số lượng tối thiểu là 1.");
+            return false;
+        }
+        return true;
+    }
+
+    // 5. Hiện Toast cảnh báo cam
+    function showWarningToast(message) {
+        const toast = document.getElementById('toastWarning');
+        const text = document.getElementById('toastWarningText');
+        if (toast && text) {
+            text.innerText = message;
+            toast.style.display = 'flex';
+            toast.style.opacity = '1';
+
+            setTimeout(() => {
+                toast.style.transition = 'opacity 0.5s ease';
+                toast.style.opacity = '0';
+                setTimeout(() => { toast.style.display = 'none'; }, 500);
+            }, 2500);
+        }
+    }
+</script>
+
+<style>
+/* Vòng xoay Loading */
+.custom-spinner {
+    width: 44px;
+    height: 44px;
+    margin: 0 auto;
+    border: 4px solid #edf2f7;
+    border-top: 4px solid #e53e3e;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.85); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideIn {
+    from { transform: translateX(50px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+</style>
 
 </body>
 </html>
