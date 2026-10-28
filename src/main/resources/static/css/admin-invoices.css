@@ -1,25 +1,178 @@
-/* Styles riêng cho trang danh sách hóa đơn. Không đặt font-family trên html/body/* để không ảnh hưởng trang khác. */
-.invoice-list-page { padding: 30px clamp(20px, 3vw, 42px) 42px; }
-.invoice-list-page .cat-heading { align-items:center; gap:24px; margin-bottom:24px; }
-.invoice-list-page .cat-heading h1 { margin-bottom:8px; }
-.invoice-list-page .cat-heading p { margin:0; }
-.invoice-total-chip { display:flex; flex-direction:column; gap:5px; min-width:140px; padding:14px 20px; border:1px solid #dceee3; border-radius:16px; background:linear-gradient(135deg,#f4fbf6,#fff); color:#61756a; box-shadow:0 5px 18px rgba(17,94,57,.05); }
-.invoice-total-chip strong { color:#087f55; font-size:28px; line-height:1.15; }
-.invoice-list-card { overflow:hidden; border-radius:18px; }
-.invoice-list-page .cat-card-header { padding-bottom:18px; }
-.invoice-filters { gap:10px; padding:16px; margin:0 18px 18px; border:1px solid #e7eee9; border-radius:14px; background:#f8fbf9; }
-.invoice-filters input, .invoice-filters select { min-height:42px; border-radius:10px; }
-.invoice-table { min-width:920px; }
-.invoice-table th { white-space:nowrap; }
-.invoice-table td { vertical-align:middle; }
-.invoice-id { display:inline-flex; padding:6px 9px; border-radius:8px; background:#eaf7ef; color:#087f55; font-weight:800; letter-spacing:.02em; }
-.invoice-email { display:block; margin-top:4px; color:#77867d; overflow-wrap:anywhere; }
-.invoice-money { white-space:nowrap; font-weight:800; color:#087f55; font-variant-numeric:tabular-nums; }
-.invoice-action { display:inline-flex; align-items:center; gap:8px; padding:9px 12px; border-radius:10px; background:#087f55; color:#fff; text-decoration:none; font-weight:700; white-space:nowrap; transition:transform .15s ease, background .15s ease; }
-.invoice-action:hover { background:#066644; transform:translateY(-1px); }
-.invoice-empty { text-align:center; padding:52px 20px; color:#718579; }
-.invoice-empty strong { display:block; margin-top:12px; color:#24392e; font-size:17px; }
-.invoice-empty p { margin:7px 0 0; }
-.invoice-empty-icon { display:grid; place-items:center; width:54px; height:54px; margin:auto; border-radius:16px; background:#eaf7ef; color:#087f55; font-size:28px; }
-@media(max-width:900px) { .invoice-list-page { padding:22px 18px 30px; } .invoice-filters { margin-inline:12px; } }
-@media(max-width:600px) { .invoice-list-page .cat-heading { align-items:stretch; flex-direction:column; } .invoice-total-chip { flex-direction:row; align-items:center; justify-content:space-between; } .invoice-total-chip strong { font-size:23px; } .invoice-filters { align-items:stretch; } }
+
+/* Styles riêng cho trang danh sách hóa đơn. Không đặt font-family trên html/body/* để không ảnh hưởng trang khác */
+
+.invoice-list-page {
+    padding: 30px clamp(20px, 3vw, 42px) 42px;
+}
+
+.invoice-list-page .cat-heading {
+    align-items: center;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.invoice-list-page .cat-heading h1 {
+    margin-bottom: 8px;
+}
+
+.invoice-list-page .cat-heading p {
+    margin: 0;
+}
+
+.invoice-total-chip {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 140px;
+    padding: 14px 20px;
+    border: 1px solid #dceee3;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f4fbf6, #fff);
+    color: #61756a;
+    box-shadow: 0 5px 18px rgba(17, 94, 57, .05);
+}
+
+.invoice-total-chip strong {
+    color: #087f55;
+    font-size: 28px;
+    line-height: 1.15;
+}
+
+.invoice-list-card {
+    overflow: hidden;
+    border-radius: 18px;
+}
+
+.invoice-list-page .cat-card-header {
+    padding-bottom: 18px;
+}
+
+.invoice-filters {
+    gap: 10px;
+    padding: 16px;
+    margin: 0 18px 18px;
+    border: 1px solid #e7eee9;
+    border-radius: 14px;
+    background: #f8fbf9;
+}
+
+.invoice-filters input,
+.invoice-filters select {
+    min-height: 42px;
+    border-radius: 10px;
+}
+
+.invoice-table {
+    min-width: 920px;
+}
+
+.invoice-table th {
+    white-space: nowrap;
+}
+
+.invoice-table td {
+    vertical-align: middle;
+}
+
+.invoice-id {
+    display: inline-flex;
+    padding: 6px 9px;
+    border-radius: 8px;
+    background: #eaf7ef;
+    color: #087f55;
+    font-weight: 800;
+    letter-spacing: .02em;
+}
+
+.invoice-email {
+    display: block;
+    margin-top: 4px;
+    color: #77867d;
+    overflow-wrap: anywhere;
+}
+
+.invoice-money {
+    white-space: nowrap;
+    font-weight: 800;
+    color: #087f55;
+    font-variant-numeric: tabular-nums;
+}
+
+.invoice-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    background: #087f55;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 700;
+    white-space: nowrap;
+    transition: transform .15s ease, background .15s ease;
+}
+
+.invoice-action:hover {
+    background: #066644;
+    transform: translateY(-1px);
+}
+
+.invoice-empty {
+    text-align: center;
+    padding: 52px 20px;
+    color: #718579;
+}
+
+.invoice-empty strong {
+    display: block;
+    margin-top: 12px;
+    color: #24392e;
+    font-size: 17px;
+}
+
+.invoice-empty p {
+    margin: 7px 0 0;
+}
+
+.invoice-empty-icon {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    margin: auto;
+    border-radius: 16px;
+    background: #eaf7ef;
+    color: #087f55;
+    font-size: 28px;
+}
+
+@media (max-width: 900px) {
+    .invoice-list-page {
+        padding: 22px 18px 30px;
+    }
+
+    .invoice-filters {
+        margin-inline: 12px;
+    }
+}
+
+@media (max-width: 600px) {
+    .invoice-list-page .cat-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .invoice-total-chip {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .invoice-total-chip strong {
+        font-size: 23px;
+    }
+
+    .invoice-filters {
+        align-items: stretch;
+    }
+}
