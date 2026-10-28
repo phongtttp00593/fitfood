@@ -1,5 +1,5 @@
 
-/* Styles chỉ áp dụng trong trang chi tiết hóa đơn; kế thừa font chữ của giao diện quản trị hiện tại */
+/* Styles chỉ áp dụng trong trang chi tiết hóa đơn; kế thừa font chữ của giao diện quản trị hiện tại, */
 
 .invoice-detail-page {
     padding: 28px clamp(18px, 3.5vw, 48px) 48px;
