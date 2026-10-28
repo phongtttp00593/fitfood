@@ -1,0 +1,1036 @@
+
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>Chat hỗ trợ khách hàng | FITFOOD Admin</title>
+
+    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
+    <link rel="stylesheet" th:href="@{/css/fitfood-categories.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
+
+    <style>
+        .sc-wrap {
+            max-width: 1370px;
+            margin: 0 auto;
+        }
+
+        .sc-heading {
+            margin: 6px 0 22px;
+        }
+
+        .sc-heading h1 {
+            font-size: 29px;
+            margin: 6px 0;
+            color: #3a2217;
+        }
+
+        .sc-heading p {
+            margin: 0;
+            color: #7b6858;
+            font-size: 14px;
+        }
+
+        .sc-grid {
+            display: grid;
+            grid-template-columns: 330px minmax(0, 1fr);
+            gap: 17px;
+            align-items: stretch;
+        }
+
+        .sc-card {
+            background: #fffdf8;
+            border: 1px solid #e6d8bc;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px #3a22170c;
+            overflow: hidden;
+        }
+
+        .sc-left,
+        .sc-right {
+            height: min(72vh, 730px);
+            min-height: 530px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sc-left-title {
+            padding: 17px;
+            border-bottom: 1px solid #eee0c8;
+        }
+
+        .sc-left-title h2 {
+            margin: 0 0 9px;
+            font-size: 18px;
+        }
+
+        .sc-counter {
+            color: #8c4637;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .sc-controls {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 9px;
+            margin-top: 12px;
+        }
+
+        .sc-controls input,
+        .sc-controls select {
+            width: 100%;
+            border: 1px solid #decfb8;
+            border-radius: 9px;
+            padding: 10px;
+            font: inherit;
+            background: #fff;
+        }
+
+        .sc-list {
+            flex: 1;
+            overflow: auto;
+            padding: 9px;
+            min-height: 0;
+        }
+
+        .sc-customer {
+            width: 100%;
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 11px;
+            padding: 13px;
+            display: block;
+            text-align: left;
+            font: inherit;
+            cursor: pointer;
+            color: #3a2217;
+            margin-bottom: 5px;
+        }
+
+        .sc-customer:hover {
+            background: #f8f1e3;
+        }
+
+        .sc-customer.is-active {
+            background: #f6e8d5;
+            border-color: #dcbf94;
+        }
+
+        .sc-customer-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .sc-customer-line strong {
+            font-size: 13px;
+        }
+
+        .sc-customer small {
+            display: block;
+            color: #89796c;
+            font-size: 11px;
+            margin: 4px 0;
+            overflow-wrap: anywhere;
+        }
+
+        .sc-preview {
+            font-size: 12px;
+            color: #715f51;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .sc-status {
+            flex: none;
+            border-radius: 30px;
+            padding: 4px 7px;
+            font-size: 10px;
+            background: #f4e7d6;
+            color: #814023;
+        }
+
+        .sc-status.is-closed {
+            background: #edf1ed;
+            color: #5a6c5b;
+        }
+
+        .sc-status.is-active {
+            background: #e6efe9;
+            color: #226447;
+        }
+
+        .sc-thread-head {
+            padding: 17px 19px;
+            background: #fbf7ef;
+            border-bottom: 1px solid #e6d8bc;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sc-thread-head h2 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .sc-thread-head p {
+            color: #7d7066;
+            margin: 5px 0 0;
+            font-size: 12px;
+            overflow-wrap: anywhere;
+        }
+
+        .sc-small-btn {
+            padding: 8px 11px;
+            border: 1px solid #d8c49f;
+            border-radius: 9px;
+            background: #fffaf1;
+            color: #683f24;
+            font-weight: 650;
+            cursor: pointer;
+            font: inherit;
+            font-size: 12px;
+        }
+
+        .sc-small-btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        .sc-thread-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+        }
+
+        .sc-messages {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            background: #fffdf8;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+        }
+
+        .sc-msg {
+            max-width: 78%;
+            align-self: flex-start;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .sc-msg.from-admin {
+            align-self: flex-end;
+            align-items: flex-end;
+        }
+
+        .sc-msg small {
+            color: #8a8178;
+            font-size: 11px;
+        }
+
+        .sc-bubble {
+            padding: 10px 14px;
+            background: #f3e8d8;
+            border-radius: 14px 14px 14px 3px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .sc-msg.from-admin .sc-bubble {
+            color: #fff;
+            background: #8f2f20;
+            border-radius: 14px 14px 3px 14px;
+        }
+
+        .sc-empty {
+            padding: 35px 16px;
+            text-align: center;
+            margin: auto;
+            color: #8a7361;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .sc-compose {
+            display: flex;
+            gap: 10px;
+            padding: 14px;
+            border-top: 1px solid #eadbc5;
+            background: #fbf7ef;
+            align-items: flex-end;
+        }
+
+        .sc-compose textarea {
+            flex: 1;
+            min-width: 0;
+            resize: vertical;
+            max-height: 130px;
+            min-height: 45px;
+            border: 1px solid #d8c49f;
+            border-radius: 10px;
+            padding: 11px 13px;
+            font: inherit;
+            font-size: 13px;
+        }
+
+        .sc-send {
+            background: #9b2c1f;
+            color: white;
+            border: 0;
+            border-radius: 10px;
+            padding: 12px 18px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .sc-send:disabled {
+            opacity: .55;
+            cursor: not-allowed;
+        }
+
+        .sc-flash {
+            padding: 9px 14px;
+            background: #fff0e9;
+            color: #9c3428;
+            border-top: 1px solid #f0d5c7;
+            font-size: 12px;
+        }
+
+        .sc-flash:empty {
+            display: none;
+        }
+
+        .sc-note {
+            padding: 9px 16px;
+            color: #8c7866;
+            font-size: 11px;
+            background: #fffaf2;
+        }
+
+        @media (max-width: 950px) {
+            .sc-grid {
+                grid-template-columns: 280px minmax(0, 1fr);
+            }
+        }
+
+        @media (max-width: 680px) {
+            .sc-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .sc-left {
+                height: 320px;
+                min-height: 0;
+            }
+
+            .sc-right {
+                min-height: 500px;
+                height: 65vh;
+            }
+
+            .sc-thread-head {
+                flex-wrap: wrap;
+            }
+
+            .sc-heading h1 {
+                font-size: 23px;
+            }
+        }
+    </style>
+</head>
+
+<body class="admin-body">
+<div class="adm-layout">
+
+    <!-- SIDEBAR ADMIN HIỆN CÓ -->
+    <aside class="adm-sidebar"
+           th:replace="~{fragments/admin-sidebar :: sidebar('support')}">
+    </aside>
+
+    <div class="adm-main">
+
+        <header class="adm-top">
+            <div class="admin-breadcrumb">
+                FITFOOD
+                <span>/</span>
+                <b>Hỗ trợ khách hàng</b>
+            </div>
+
+            <a th:href="@{/admin}"
+               style="font-size:13px;color:#9b2c1f">
+                ← Tổng quan
+            </a>
+        </header>
+
+        <main class="adm-content sc-wrap"
+              id="supportAdminApp"
+              th:attr="data-api-base=@{/admin/support/api/conversations}">
+
+            <div class="sc-heading">
+                <h1>Chat hỗ trợ khách hàng</h1>
+
+                <p>
+                    Xem tin nhắn từ khách hàng, trả lời và đóng cuộc trò chuyện.
+                    Dữ liệu lấy trực tiếp từ SQL Server.
+                </p>
+            </div>
+
+            <div class="sc-grid">
+
+                <!-- DANH SÁCH KHÁCH HÀNG -->
+                <section class="sc-card sc-left"
+                         aria-label="Danh sách cuộc trò chuyện">
+
+                    <div class="sc-left-title">
+                        <h2>Hội thoại khách hàng</h2>
+
+                        <span class="sc-counter"
+                              id="supportCount">
+                            Đang tải...
+                        </span>
+
+                        <div class="sc-controls">
+                            <input id="supportSearch"
+                                   type="search"
+                                   placeholder="Tìm tên, email, mã cuộc chat…"
+                                   aria-label="Tìm cuộc trò chuyện">
+
+                            <select id="supportFilter"
+                                    aria-label="Lọc trạng thái">
+
+                                <option value="">
+                                    Tất cả trạng thái
+                                </option>
+
+                                <option value="Chờ xử lý">
+                                    Chờ xử lý
+                                </option>
+
+                                <option value="Đang xử lý">
+                                    Đang xử lý
+                                </option>
+
+                                <option value="Đã đóng">
+                                    Đã đóng
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="sc-list"
+                         id="supportConversationList">
+                    </div>
+                </section>
+
+                <!-- KHUNG CHAT ADMIN -->
+                <section class="sc-card sc-right"
+                         aria-label="Nội dung cuộc trò chuyện">
+
+                    <header class="sc-thread-head">
+                        <div>
+                            <h2 id="supportCustomerName">
+                                Chọn một cuộc trò chuyện
+                            </h2>
+
+                            <p id="supportCustomerEmail">
+                                Tin nhắn của khách hàng sẽ hiển thị tại đây.
+                            </p>
+                        </div>
+
+                        <div class="sc-thread-actions">
+                            <button class="sc-small-btn"
+                                    id="supportRefresh"
+                                    type="button">
+                                ↻ Làm mới
+                            </button>
+
+                            <button class="sc-small-btn"
+                                    id="supportClose"
+                                    type="button"
+                                    disabled>
+                                ✓ Đóng chat
+                            </button>
+                        </div>
+                    </header>
+
+                    <!-- LỊCH SỬ TIN NHẮN -->
+                    <div class="sc-messages"
+                         id="supportMessages"
+                         aria-live="polite"
+                         aria-label="Lịch sử chat">
+
+                        <div class="sc-empty">
+                            Chọn khách hàng ở danh sách bên trái
+                            để xem tin nhắn.
+                        </div>
+                    </div>
+
+                    <!-- FORM ADMIN TRẢ LỜI -->
+                    <form class="sc-compose"
+                          id="supportReplyForm">
+
+                        <textarea id="supportReply"
+                                  rows="2"
+                                  maxlength="1000"
+                                  placeholder="Nhập phản hồi cho khách hàng..."
+                                  aria-label="Phản hồi khách hàng"
+                                  required
+                                  disabled></textarea>
+
+                        <button type="submit"
+                                class="sc-send"
+                                id="supportSend"
+                                disabled>
+                            Gửi
+                        </button>
+                    </form>
+
+                    <div class="sc-flash"
+                         id="supportError"
+                         role="alert">
+                    </div>
+
+                    <div class="sc-note">
+                        Tin nhắn được tự cập nhật khoảng 8 giây/lần
+                        khi trang đang mở.
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    const root = document.getElementById('supportAdminApp');
+    if (!root) return;
+
+    const base = root.dataset.apiBase;
+
+    const token =
+        document.querySelector('meta[name="_csrf"]')?.content || '';
+
+    const csrfHeader =
+        document.querySelector('meta[name="_csrf_header"]')?.content
+        || 'X-CSRF-TOKEN';
+
+    const $ = (id) => document.getElementById(id);
+
+    const listEl = $('supportConversationList');
+    const messagesEl = $('supportMessages');
+    const searchEl = $('supportSearch');
+    const filterEl = $('supportFilter');
+    const replyEl = $('supportReply');
+    const sendEl = $('supportSend');
+    const closeEl = $('supportClose');
+
+    let conversations = [];
+    let activeId = null;
+    let lastMessages = '';
+    let listBusy = false;
+    let threadBusy = false;
+    let sending = false;
+    let lastRenderedTicket = null;
+
+    function error(message) {
+        $('supportError').textContent = message || '';
+    }
+
+    function make(tag, className, text) {
+        const el = document.createElement(tag);
+
+        if (className) {
+            el.className = className;
+        }
+
+        if (text != null) {
+            el.textContent = text;
+        }
+
+        return el;
+    }
+
+    function showEmpty(parent, message) {
+        parent.replaceChildren(
+            make('div', 'sc-empty', message)
+        );
+    }
+
+    async function api(url, options = {}) {
+        const response = await fetch(url, {
+            credentials: 'same-origin',
+            cache: 'no-store',
+            ...options,
+            headers: {
+                'Accept': 'application/json',
+                ...(options.headers || {})
+            }
+        });
+
+        const type =
+            response.headers.get('content-type') || '';
+
+        if (!response.ok ||
+            !type.includes('application/json')) {
+
+            if (response.status === 400) {
+                throw new Error(
+                    'Tin nhắn phải có từ 1 đến 1000 ký tự.'
+                );
+            }
+
+            if (response.status === 401 ||
+                response.status === 403 ||
+                response.redirected) {
+
+                throw new Error(
+                    'Phiên đăng nhập hoặc quyền Admin không hợp lệ. ' +
+                    'Hãy đăng nhập lại.'
+                );
+            }
+
+            if (response.status === 404) {
+                throw new Error(
+                    'Cuộc chat không còn tồn tại.'
+                );
+            }
+
+            throw new Error(
+                'Không tải được dữ liệu. ' +
+                'Kiểm tra kết nối và bảng SQL chat.'
+            );
+        }
+
+        return response.json();
+    }
+
+    function post(url, body) {
+        const headers = {
+            'Content-Type': 'application/json'
+        };
+
+        headers[csrfHeader] = token;
+
+        return api(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(body)
+        });
+    }
+
+    function statusClass(status) {
+        return status === 'Đã đóng'
+            ? 'is-closed'
+            : status === 'Đang xử lý'
+                ? 'is-active'
+                : '';
+    }
+
+    // HIỂN THỊ DANH SÁCH HỘI THOẠI
+    function renderList() {
+
+        const query = searchEl.value
+            .toLocaleLowerCase('vi-VN')
+            .trim();
+
+        const status = filterEl.value;
+
+        const filtered = conversations.filter(c => {
+
+            const text = [
+                c.id,
+                c.customerName,
+                c.customerEmail,
+                c.preview
+            ].join(' ').toLocaleLowerCase('vi-VN');
+
+            return (!status || c.status === status)
+                && (!query || text.includes(query));
+        });
+
+        $('supportCount').textContent =
+            filtered.length + ' / ' +
+            conversations.length +
+            ' cuộc chat (tối đa 200 gần nhất)';
+
+        const scrollPos = listEl.scrollTop;
+
+        listEl.replaceChildren();
+
+        if (!filtered.length) {
+            showEmpty(
+                listEl,
+                'Chưa có hội thoại phù hợp. ' +
+                'Khách hàng cần gửi tin nhắn trước.'
+            );
+            return;
+        }
+
+        filtered.forEach(c => {
+
+            const button = make(
+                'button',
+                'sc-customer' +
+                (c.id === activeId ? ' is-active' : '')
+            );
+
+            button.type = 'button';
+
+            const line = make(
+                'div',
+                'sc-customer-line'
+            );
+
+            line.append(
+                make(
+                    'strong',
+                    '',
+                    c.customerName || ('Khách #' + c.id)
+                )
+            );
+
+            line.append(
+                make(
+                    'span',
+                    'sc-status ' + statusClass(c.status),
+                    c.status
+                )
+            );
+
+            button.append(
+                line,
+                make('small', '', c.customerEmail || '')
+            );
+
+            button.append(
+                make(
+                    'div',
+                    'sc-preview',
+                    c.preview || 'Chưa có tin nhắn'
+                )
+            );
+
+            button.append(
+                make('small', '', c.lastAt || '')
+            );
+
+            button.addEventListener('click', () => {
+                activeId = c.id;
+                lastMessages = '';
+                renderList();
+                loadThread(false);
+            });
+
+            listEl.append(button);
+        });
+
+        listEl.scrollTop = scrollPos;
+    }
+
+    // TẢI DANH SÁCH HỘI THOẠI
+    async function loadList(silent = false) {
+
+        if (listBusy) return;
+
+        listBusy = true;
+
+        try {
+            const result = await api(base);
+
+            conversations = Array.isArray(result)
+                ? result
+                : [];
+
+            renderList();
+
+            if (!silent) {
+                error('');
+            }
+
+        } catch (e) {
+
+            if (!silent) {
+                error(e.message);
+            }
+
+        } finally {
+            listBusy = false;
+        }
+    }
+
+    // HIỂN THỊ TIN NHẮN
+    function renderThread(data) {
+
+        const c = data.conversation;
+
+        if (lastRenderedTicket !== c.id) {
+            messagesEl.dataset.loaded = '';
+            lastRenderedTicket = c.id;
+        }
+
+        $('supportCustomerName').textContent =
+            c.customerName || ('Khách #' + c.id);
+
+        $('supportCustomerEmail').textContent =
+            (c.customerEmail || '') + ' · ' + c.status;
+
+        closeEl.disabled = c.status === 'Đã đóng';
+        replyEl.disabled = false;
+        sendEl.disabled = false;
+
+        const messages = Array.isArray(data.messages)
+            ? data.messages
+            : [];
+
+        const snapshot = JSON.stringify(messages);
+
+        if (snapshot === lastMessages) return;
+
+        lastMessages = snapshot;
+
+        const nearBottom =
+            messagesEl.scrollHeight -
+            messagesEl.scrollTop -
+            messagesEl.clientHeight < 90;
+
+        messagesEl.replaceChildren();
+
+        if (!messages.length) {
+            showEmpty(
+                messagesEl,
+                'Chưa có tin nhắn trong cuộc trò chuyện.'
+            );
+            return;
+        }
+
+        messages.forEach(m => {
+
+            const admin = m.sender === 'ADMIN';
+
+            const row = make(
+                'div',
+                'sc-msg' + (admin ? ' from-admin' : '')
+            );
+
+            row.append(
+                make(
+                    'small',
+                    '',
+                    admin
+                        ? 'Quản trị viên FITFOOD'
+                        : c.customerName
+                )
+            );
+
+            row.append(
+                make(
+                    'div',
+                    'sc-bubble',
+                    m.content || ''
+                )
+            );
+
+            row.append(
+                make(
+                    'small',
+                    '',
+                    m.sentAt || ''
+                )
+            );
+
+            messagesEl.append(row);
+        });
+
+        if (nearBottom || !messagesEl.dataset.loaded) {
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        messagesEl.dataset.loaded = 'true';
+    }
+
+    // TẢI LỊCH SỬ HỘI THOẠI
+    async function loadThread(silent = false) {
+
+        if (threadBusy || activeId == null) {
+            return;
+        }
+
+        threadBusy = true;
+
+        const requestedId = activeId;
+
+        try {
+
+            const data = await api(
+                base + '/' + encodeURIComponent(requestedId)
+            );
+
+            if (requestedId === activeId) {
+                renderThread(data);
+            }
+
+            if (!silent) {
+                error('');
+            }
+
+        } catch (e) {
+
+            if (!silent) {
+                error(e.message);
+            }
+
+        } finally {
+
+            threadBusy = false;
+
+            if (requestedId !== activeId && activeId != null) {
+                loadThread(false);
+            }
+        }
+    }
+
+    // ADMIN GỬI PHẢN HỒI
+    $('supportReplyForm').addEventListener(
+        'submit',
+        async function (event) {
+
+            event.preventDefault();
+
+            if (sending || activeId == null) {
+                return;
+            }
+
+            const content = replyEl.value.trim();
+
+            if (!content || content.length > 1000) {
+                error(
+                    'Tin nhắn phải có từ 1 đến 1000 ký tự.'
+                );
+                return;
+            }
+
+            sending = true;
+            sendEl.disabled = true;
+            error('');
+
+            try {
+
+                const data = await post(
+                    base + '/' + activeId + '/reply',
+                    { content }
+                );
+
+                replyEl.value = '';
+                lastMessages = '';
+
+                renderThread(data);
+                await loadList(true);
+
+            } catch (e) {
+
+                error(e.message);
+
+            } finally {
+
+                sending = false;
+                sendEl.disabled = false;
+                replyEl.focus();
+            }
+        }
+    );
+
+    // ĐÓNG HỘI THOẠI
+    closeEl.addEventListener('click', async function () {
+
+        if (activeId == null ||
+            !confirm(
+                'Đánh dấu cuộc trò chuyện này đã đóng?'
+            )) {
+            return;
+        }
+
+        closeEl.disabled = true;
+        error('');
+
+        try {
+
+            const data = await post(
+                base + '/' + activeId + '/close',
+                {}
+            );
+
+            renderThread(data);
+
+            await loadList(true);
+
+        } catch (e) {
+
+            error(e.message);
+            closeEl.disabled = false;
+        }
+    });
+
+    // LÀM MỚI THỦ CÔNG
+    $('supportRefresh').addEventListener(
+        'click',
+        async function () {
+
+            error('');
+
+            await loadList(false);
+            await loadThread(false);
+        }
+    );
+
+    // TÌM KIẾM VÀ LỌC
+    searchEl.addEventListener('input', renderList);
+    filterEl.addEventListener('change', renderList);
+
+    // ENTER GỬI, SHIFT + ENTER XUỐNG DÒNG
+    replyEl.addEventListener('keydown', function (event) {
+
+        if (event.key === 'Enter' &&
+            !event.shiftKey &&
+            !event.isComposing) {
+
+            event.preventDefault();
+
+            $('supportReplyForm').requestSubmit();
+        }
+    });
+
+    // TẢI DỮ LIỆU BAN ĐẦU
+    loadList(false);
+
+    // KIỂM TRA TIN NHẮN MỚI SAU MỖI 8 GIÂY
+    setInterval(function () {
+
+        if (!document.hidden) {
+            loadList(true);
+            loadThread(true);
+        }
+
+    }, 8000);
+
+})();
+</script>
+
+</body>
+</html>
