@@ -1,5 +1,5 @@
 
-/* Styles riêng cho trang danh sách hóa đơn. Không đặt font-family trên html/body/* để không ảnh hưởng trang khác */
+/* Styles riêng cho trang danh sách hóa đơn. Không đặt font-family trên html/body/* để không ảnh hưởng trang khác, */
 
 .invoice-list-page {
     padding: 30px clamp(20px, 3vw, 42px) 42px;
