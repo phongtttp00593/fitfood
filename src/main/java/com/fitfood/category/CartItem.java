@@ -1,7 +1,5 @@
+package com.fitfood.category;
 
-package com.fitfood.cart.model;
-
-import com.fitfood.category.Product;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 
@@ -13,19 +11,18 @@ public class CartItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cart_id", nullable = false)
     private Cart cart;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "quantity", nullable = false)
-    private int quantity;
+    @Column(nullable = false)
+    private int quantity = 1;
 
-    @Column(name = "unit_price", nullable = false,
-            precision = 18, scale = 2)
+    @Column(name = "unit_price", nullable = false, precision = 18, scale = 2)
     private BigDecimal unitPrice;
 
     public CartItem() {
@@ -69,13 +66,5 @@ public class CartItem {
 
     public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
-    }
-
-    @Transient
-    public BigDecimal getLineTotal() {
-        if (unitPrice == null) {
-            return BigDecimal.ZERO;
-        }
-        return unitPrice.multiply(BigDecimal.valueOf(quantity));
     }
 }

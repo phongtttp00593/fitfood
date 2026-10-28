@@ -1,19 +1,12 @@
+package com.fitfood.auth.repository;
 
-package com.fitfood.cart.repository;
-
-import com.fitfood.cart.model.CartItem;
-import java.util.List;
-import java.util.Optional;
+import com.fitfood.category.CartItem;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface CartItemRepository
-        extends JpaRepository<CartItem, Long> {
+import java.util.Optional;
 
-    List<CartItem> findByCart_IdOrderByIdDesc(Long cartId);
-
-    Optional<CartItem> findByCart_IdAndProduct_Id(
-            Long cartId, Long productId);
-
-    Optional<CartItem> findByIdAndCart_Id(
-            Long itemId, Long cartId);
+@Repository
+public interface CartItemRepository extends JpaRepository<CartItem, Long> {
+    Optional<CartItem> findByCartIdAndProductId(Long cartId, Long productId);
 }

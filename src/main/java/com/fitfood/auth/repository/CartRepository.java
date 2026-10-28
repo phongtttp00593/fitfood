@@ -1,11 +1,12 @@
+package com.fitfood.auth.repository;
 
-package com.fitfood.cart.repository;
-
-import com.fitfood.cart.model.Cart;
-import java.util.Optional;
+import com.fitfood.category.Cart;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
+@Repository
 public interface CartRepository extends JpaRepository<Cart, Long> {
-
     Optional<Cart> findByUserId(Long userId);
 }

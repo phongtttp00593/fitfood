@@ -1,10 +1,16 @@
-
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{v2/fragments/layout :: head('Thực đơn')}"></head>
 <body>
 
 <div th:replace="~{v2/fragments/layout :: header('menu')}"></div>
+
+<!-- TOAST THÔNG BÁO THÀNH CÔNG -->
+<div id="toastSuccess" th:if="${successMessage}" 
+     style="position: fixed; top: 25px; right: 25px; z-index: 100000; background: #27ae60; color: #fff; padding: 14px 22px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-weight: 600; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease;">
+    <span>✓</span>
+    <span th:text="${successMessage}">Thêm món vào giỏ hàng thành công!</span>
+</div>
 
 <main id="main">
     <header class="page-hero">
@@ -138,7 +144,10 @@
 
                                 <button class="btn sm"
                                         type="button"
-                                        data-add-to-cart>
+                                        th:data-id="${p.id}"
+                                        th:data-name="${p.name}"
+                                        th:data-price="${p.price}"
+                                        onclick="openQuickAddModal(this)">
                                     Thêm vào giỏ
                                 </button>
                             </div>
@@ -156,11 +165,103 @@
     </div>
 </main>
 
-<footer th:replace="~{v2/fragments/layout :: footer}"></footer>
+<!-- HỘP THOẠI POPUP CHỌN SỐ LƯỢNG & TỰ TÍNH TIỀN -->
+<div id="quickAddModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; z-index: 99999;">
+    <div class="modal-content-box" style="background: #fff; width: 360px; max-width: 90%; border-radius: 12px; padding: 24px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.3); font-family: inherit;">
+        <h3 id="modalName" style="margin-bottom: 6px; color: #2c3e50; font-size: 1.25rem;">Tên Món</h3>
+        <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 16px;">Đơn giá: <strong id="modalUnitPriceDisplay">0</strong> đ</p>
 
+        <form th:action="@{/cart/add}" method="post">
+            <input type="hidden" name="productId" id="modalProductId" />
+
+            <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin: 16px 0;">
+                <button type="button" onclick="modifyQty(-1)" style="width: 38px; height: 38px; font-size: 20px; font-weight: bold; background: #f1f2f6; border: 1px solid #ced6e0; border-radius: 6px; cursor: pointer;">-</button>
+                <input type="number" id="modalQtyInput" name="quantity" value="1" min="1" readonly style="width: 60px; height: 38px; text-align: center; font-size: 17px; font-weight: bold; border: 1px solid #ced6e0; border-radius: 6px; outline: none;" />
+                <button type="button" onclick="modifyQty(1)" style="width: 38px; height: 38px; font-size: 20px; font-weight: bold; background: #f1f2f6; border: 1px solid #ced6e0; border-radius: 6px; cursor: pointer;">+</button>
+            </div>
+
+            <div style="font-size: 16px; margin: 16px 0;">
+                Tổng tiền: <strong id="modalTotalDisplay" style="color: #27ae60; font-size: 22px;">0</strong> <strong style="color: #27ae60;">đ</strong>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button type="button" onclick="closeQuickAddModal()" style="background: #f1f2f6; border: 1px solid #ced6e0; padding: 9px 18px; border-radius: 6px; cursor: pointer; font-weight: 500;">Hủy</button>
+                <button type="submit" style="background: #27ae60; color: #fff; border: none; padding: 9px 20px; border-radius: 6px; font-weight: 600; cursor: pointer;">Thêm vào giỏ</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<footer th:replace="~{v2/fragments/layout :: footer}"></footer>
 <th:block th:replace="~{v2/fragments/layout :: scripts}"></th:block>
 
-<script th:src="@{/js/v2-menu.js}" defer></script>
+<script>
+    let selectedProductPrice = 0;
+
+    function openQuickAddModal(button) {
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+        const price = parseFloat(button.getAttribute('data-price')) || 0;
+
+        selectedProductPrice = price;
+
+        document.getElementById('modalProductId').value = id;
+        document.getElementById('modalName').innerText = name;
+        document.getElementById('modalUnitPriceDisplay').innerText = price.toLocaleString('vi-VN');
+        document.getElementById('modalQtyInput').value = 1;
+
+        calculateModalTotal();
+        document.getElementById('quickAddModal').style.display = 'flex';
+    }
+
+    function closeQuickAddModal() {
+        document.getElementById('quickAddModal').style.display = 'none';
+    }
+
+    function modifyQty(amount) {
+        const qtyInput = document.getElementById('modalQtyInput');
+        if (!qtyInput) return;
+        let current = parseInt(qtyInput.value) || 1;
+        current += amount;
+        if (current < 1) current = 1;
+        qtyInput.value = current;
+        calculateModalTotal();
+    }
+
+    function calculateModalTotal() {
+        const qtyInput = document.getElementById('modalQtyInput');
+        const totalDisplay = document.getElementById('modalTotalDisplay');
+        if (!qtyInput || !totalDisplay) return;
+
+        const qty = parseInt(qtyInput.value) || 1;
+        const total = selectedProductPrice * qty;
+        totalDisplay.innerText = total.toLocaleString('vi-VN');
+    }
+
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('quickAddModal');
+        if (event.target === modal) {
+            closeQuickAddModal();
+        }
+    });
+
+    // Tự động ẩn Toast sau 3 giây
+    setTimeout(() => {
+        const toast = document.getElementById('toastSuccess');
+        if (toast) {
+            toast.style.transition = 'opacity 0.5s ease';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 500);
+        }
+    }, 3000);
+</script>
+
+<style>
+@keyframes slideIn {
+    from { transform: translateX(50px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+</style>
 
 </body>
 </html>
