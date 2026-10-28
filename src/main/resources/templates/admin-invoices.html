@@ -1,25 +1,169 @@
+
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-<title>Quản lý hóa đơn | FITFOOD</title>
-<link rel="stylesheet" th:href="@{/css/fitfood-modern.css}"><link rel="stylesheet" th:href="@{/css/fitfood-categories.css}"><link rel="stylesheet" th:href="@{/css/admin-theme.css}"><link rel="stylesheet" th:href="@{/css/admin-invoices.css}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <title>Quản lý hóa đơn | FITFOOD</title>
+
+    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
+    <link rel="stylesheet" th:href="@{/css/fitfood-categories.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-invoices.css}">
 </head>
-<body class="admin-body"><div class="adm-layout">
-<aside class="adm-sidebar" th:replace="~{fragments/admin-sidebar :: sidebar('invoices')}"></aside>
-<div class="adm-main">
-<header class="adm-top cat-top"><div class="admin-breadcrumb">FITFOOD <span>/</span> <b>Quản lý hóa đơn</b></div><div class="cat-header-tools"><span class="cat-admin-label">Quản trị viên</span><form method="post" th:action="@{/dang-xuat}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="cat-outline-btn" type="submit">Đăng xuất</button></form></div></header>
-<main class="adm-content cat-content invoice-list-page">
-<div class="cat-heading"><div><span class="cat-overline">FITFOOD / HÓA ĐƠN</span><h1>Quản lý hóa đơn</h1><p>Theo dõi đơn hàng, tra cứu khách hàng và mở bản chi tiết hóa đơn.</p></div><div class="invoice-total-chip"><span>Tổng hóa đơn</span><strong th:text="${#lists.size(invoices)}">0</strong></div></div>
-<section class="cat-card invoice-list-card"><div class="cat-card-header"><div><h2>Danh sách hóa đơn</h2><p>Tìm theo mã hóa đơn, tên hoặc email khách hàng.</p></div></div>
-<form class="cat-filters invoice-filters" method="get" th:action="@{/admin/invoices}">
-<label class="cat-search-label" for="invoiceKeyword">Tìm kiếm</label><input id="invoiceKeyword" type="search" name="keyword" th:value="${keyword}" placeholder="Mã hóa đơn, tên hoặc email…">
-<label class="cat-search-label" for="invoiceStatus">Trạng thái</label><select id="invoiceStatus" name="filter"><option value="all" th:selected="${filter == 'all'}">Tất cả trạng thái</option><option th:each="s : ${statuses}" th:value="${s}" th:text="${s}" th:selected="${filter == s}">Hoàn thành</option></select>
-<button type="submit" class="cat-filter-btn">Tìm kiếm</button><a class="cat-clear" th:href="@{/admin/invoices}">Xóa lọc</a></form>
-<div class="cat-table-wrap" th:if="${!#lists.isEmpty(invoices)}"><table class="cat-table invoice-table"><thead><tr><th>MÃ HÓA ĐƠN</th><th>KHÁCH HÀNG</th><th>NGÀY LẬP</th><th>SỐ MẶT HÀNG</th><th>TỔNG TIỀN</th><th>TRẠNG THÁI</th><th>THAO TÁC</th></tr></thead><tbody>
-<tr th:each="inv : ${invoices}"><td><span class="invoice-id" th:text="'HD-' + ${inv.id}">HD-1</span></td><td><strong th:text="${inv.customerName}">Khách hàng</strong><small class="invoice-email" th:text="${inv.email}">email</small></td><td th:text="${inv.placedAt != null ? #temporals.format(inv.placedAt, 'dd/MM/yyyy HH:mm') : '—'}">25/10/2026</td><td th:text="${inv.itemCount}">2</td><td class="invoice-money" th:text="${#numbers.formatDecimal(inv.total, 0, 'POINT', 0, 'COMMA')} + ' đ'">100.000 đ</td><td><span class="cat-pill" th:text="${inv.status}">Hoàn thành</span></td><td><a class="invoice-action" th:href="@{/admin/invoices/{id}(id=${inv.id})}">Xem chi tiết <span aria-hidden="true">→</span></a></td></tr>
-</tbody></table></div><div class="invoice-empty" th:if="${#lists.isEmpty(invoices)}"><div class="invoice-empty-icon">▤</div><strong>Chưa có hóa đơn phù hợp</strong><p>Thử đổi từ khóa tìm kiếm hoặc trạng thái lọc.</p></div>
-</section></main></div></div></body></html>
+
+<body class="admin-body">
+    <div class="adm-layout">
+
+        <aside class="adm-sidebar" th:replace="~{fragments/admin-sidebar :: sidebar('invoices')}"></aside>
+
+        <div class="adm-main">
+
+            <header class="adm-top cat-top">
+                <div class="admin-breadcrumb">
+                    FITFOOD
+                    <span>/</span>
+                    <b>Quản lý hóa đơn</b>
+                </div>
+
+                <div class="cat-header-tools">
+                    <span class="cat-admin-label">Quản trị viên</span>
+
+                    <form method="post" th:action="@{/dang-xuat}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <button class="cat-outline-btn" type="submit">Đăng xuất</button>
+                    </form>
+                </div>
+            </header>
+
+            <main class="adm-content cat-content invoice-list-page">
+
+                <div class="cat-heading">
+                    <div>
+                        <span class="cat-overline">FITFOOD / HÓA ĐƠN</span>
+                        <h1>Quản lý hóa đơn</h1>
+                        <p>Theo dõi đơn hàng, tra cứu khách hàng và mở bản chi tiết hóa đơn.</p>
+                    </div>
+
+                    <div class="invoice-total-chip">
+                        <span>Tổng hóa đơn</span>
+                        <strong th:text="${#lists.size(invoices)}">0</strong>
+                    </div>
+                </div>
+
+                <section class="cat-card invoice-list-card">
+
+                    <div class="cat-card-header">
+                        <div>
+                            <h2>Danh sách hóa đơn</h2>
+                            <p>Tìm theo mã hóa đơn, tên hoặc email khách hàng.</p>
+                        </div>
+                    </div>
+
+                    <form class="cat-filters invoice-filters" method="get" th:action="@{/admin/invoices}">
+
+                        <label class="cat-search-label" for="invoiceKeyword">Tìm kiếm</label>
+
+                        <input
+                            id="invoiceKeyword"
+                            type="search"
+                            name="keyword"
+                            th:value="${keyword}"
+                            placeholder="Mã hóa đơn, tên hoặc email…"
+                        >
+
+                        <label class="cat-search-label" for="invoiceStatus">Trạng thái</label>
+
+                        <select id="invoiceStatus" name="filter">
+                            <option value="all" th:selected="${filter == 'all'}">Tất cả trạng thái</option>
+
+                            <option
+                                th:each="s : ${statuses}"
+                                th:value="${s}"
+                                th:text="${s}"
+                                th:selected="${filter == s}"
+                            >Hoàn thành</option>
+                        </select>
+
+                        <button type="submit" class="cat-filter-btn">Tìm kiếm</button>
+
+                        <a class="cat-clear" th:href="@{/admin/invoices}">Xóa lọc</a>
+
+                    </form>
+
+                    <div class="cat-table-wrap" th:if="${!#lists.isEmpty(invoices)}">
+
+                        <table class="cat-table invoice-table">
+
+                            <thead>
+                                <tr>
+                                    <th>MÃ HÓA ĐƠN</th>
+                                    <th>KHÁCH HÀNG</th>
+                                    <th>NGÀY LẬP</th>
+                                    <th>SỐ MẶT HÀNG</th>
+                                    <th>TỔNG TIỀN</th>
+                                    <th>TRẠNG THÁI</th>
+                                    <th>THAO TÁC</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                <tr th:each="inv : ${invoices}">
+
+                                    <td>
+                                        <span class="invoice-id" th:text="'HD-' + ${inv.id}">HD-1</span>
+                                    </td>
+
+                                    <td>
+                                        <strong th:text="${inv.customerName}">Khách hàng</strong>
+                                        <small class="invoice-email" th:text="${inv.email}">email</small>
+                                    </td>
+
+                                    <td th:text="${inv.placedAt != null ? #temporals.format(inv.placedAt, 'dd/MM/yyyy HH:mm') : '—'}">25/10/2026</td>
+
+                                    <td th:text="${inv.itemCount}">2</td>
+
+                                    <td class="invoice-money" th:text="${#numbers.formatDecimal(inv.total, 0, 'POINT', 0, 'COMMA')} + ' đ'">100.000 đ</td>
+
+                                    <td>
+                                        <span class="cat-pill" th:text="${inv.status}">Hoàn thành</span>
+                                    </td>
+
+                                    <td>
+                                        <a class="invoice-action" th:href="@{/admin/invoices/{id}(id=${inv.id})}">
+                                            Xem chi tiết
+                                            <span aria-hidden="true">→</span>
+                                        </a>
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                    <div class="invoice-empty" th:if="${#lists.isEmpty(invoices)}">
+                        <div class="invoice-empty-icon">▤</div>
+                        <strong>Chưa có hóa đơn phù hợp</strong>
+                        <p>Thử đổi từ khóa tìm kiếm hoặc trạng thái lọc.</p>
+                    </div>
+
+                </section>
+
+            </main>
+
+        </div>
+
+    </div>
+</body>
+</html>.
