@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
@@ -57,7 +58,8 @@ public class HomeController {
 
         p.put("id", id);
         p.put("name", name);
-        p.put("description", description == null ? "" : description);
+        p.put("description",
+                description == null ? "" : description);
         p.put("price", price);
 
         p.put("priceLabel",
@@ -76,7 +78,8 @@ public class HomeController {
 
     private List<String> loadCategories() {
         return jdbcTemplate.queryForList(
-                "SELECT name FROM dbo.fitfood_categories WHERE active = 1 ORDER BY id",
+                "SELECT name FROM dbo.fitfood_categories "
+                + "WHERE active = 1 ORDER BY id",
                 String.class
         );
     }
@@ -173,10 +176,8 @@ public class HomeController {
         }
     }
 
-    @GetMapping("/cart")
-    public String cart() {
-        return "cart";
-    }
+    // Đã bỏ phương thức cart() để tránh trùng đường dẫn GET /cart.
+    // CartController sẽ đảm nhiệm việc hiển thị giỏ hàng.
 
     @GetMapping("/admin/variants")
     public String adminVariantsPage() {
