@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-/** Hóa đơn hiển thị dữ liệu trực tiếp từ đơn hàng hiện có. */
+/** Hóa đơn hiển thị dữ liệu trực tiếp từ đơn hàng hiện có **/
 @Controller
 @RequestMapping("/admin/invoices")
 @PreAuthorize("@permissionService.allowed(authentication, 'HOA_DON')")
