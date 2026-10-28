@@ -492,58 +492,377 @@
     }
 }
 
-/* Chế độ in hóa đơn khổ A4 */
+
+/* =========================================
+   PRINT INVOICE - RESTAURANT RECEIPT 80MM
+*/
+
+@page {
+    size: 80mm auto;
+    margin: 3mm;
+}
 
 @media print {
-    @page {
-        size: A4;
-        margin: 12mm;
+    *,
+    *::before,
+    *::after {
+        box-sizing: border-box !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        box-shadow: none !important;
+        text-shadow: none !important;
     }
 
-    body.admin-body {
+    html,
+    body {
+        width: 74mm !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
         background: #fff !important;
+        color: #000 !important;
+        font-family: Arial, Helvetica, sans-serif !important;
+        font-size: 9pt !important;
+        line-height: 1.35 !important;
+        overflow: visible !important;
     }
 
+    /* Ẩn giao diện quản trị và các nút thao tác */
     .adm-sidebar,
     .adm-top,
     .invoice-detail-toolbar,
-    .invoice-bottom-actions {
+    .invoice-bottom-actions,
+    button,
+    .no-print {
         display: none !important;
     }
 
+    /* Bỏ bố cục sidebar của trang quản trị */
     .adm-layout,
-    .adm-main {
-        display: block !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-    }
-
-    .adm-content.invoice-detail-page {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-
+    .adm-main,
+    .adm-content,
+    .adm-content.invoice-detail-page,
     .invoice-detail-shell {
-        max-width: none;
+        display: block !important;
+        width: 74mm !important;
+        max-width: 74mm !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        background: #fff !important;
+        border: 0 !important;
     }
 
+    /* Tờ hóa đơn hẹp như hóa đơn quán ăn */
     .invoice-paper {
-        max-width: none;
+        display: block !important;
+        width: 74mm !important;
+        max-width: 74mm !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
         padding: 0 !important;
         border: 0 !important;
         border-radius: 0 !important;
-        box-shadow: none !important;
+        background: #fff !important;
+        color: #000 !important;
+        overflow: visible !important;
+        page-break-inside: auto !important;
+        break-inside: auto !important;
     }
 
-    .invoice-info-card,
-    .invoice-grand {
-        break-inside: avoid;
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
+    /* Phần đầu hóa đơn */
+    .invoice-brand-row {
+        display: block !important;
+        margin: 0 0 3mm !important;
+        padding: 0 0 2mm !important;
+        text-align: center !important;
+        border-bottom: 1px dashed #555 !important;
+    }
+
+    .invoice-brand-row h1,
+    .invoice-brand-row h2,
+    .invoice-brand-row h3,
+    .invoice-brand-row p {
+        margin: 1mm 0 !important;
+        color: #000 !important;
+        text-align: center !important;
+    }
+
+    .invoice-brand-row h1,
+    .invoice-brand-row h2 {
+        font-size: 13pt !important;
+        font-weight: 800 !important;
+    }
+
+    .invoice-title-row {
+        display: block !important;
+        margin: 2mm 0 !important;
+        padding: 0 !important;
+        text-align: center !important;
+    }
+
+    .invoice-title-row h1,
+    .invoice-title-row h2,
+    .invoice-title-row h3 {
+        margin: 0 0 1mm !important;
+        font-size: 12pt !important;
+        font-weight: 800 !important;
+        color: #000 !important;
+        text-align: center !important;
+    }
+
+    /* Thông tin hóa đơn và khách hàng */
+    .invoice-info {
+        display: block !important;
+        width: 100% !important;
+        margin: 2mm 0 !important;
+        padding: 0 0 2mm !important;
+        border-bottom: 1px dashed #555 !important;
+    }
+
+    .invoice-info-card {
+        display: block !important;
+        width: 100% !important;
+        margin: 0 0 2mm !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        color: #000 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .invoice-info-card h1,
+    .invoice-info-card h2,
+    .invoice-info-card h3,
+    .invoice-info-card h4 {
+        margin: 1mm 0 !important;
+        font-size: 9pt !important;
+        color: #000 !important;
+    }
+
+    .invoice-info-card p,
+    .invoice-info-card span,
+    .invoice-info-card div {
+        font-size: 8.5pt !important;
+        line-height: 1.35 !important;
+        overflow-wrap: anywhere !important;
+        color: #000 !important;
+    }
+
+    /* Tiêu đề danh sách món */
+    .invoice-items-heading {
+        margin: 2mm 0 1mm !important;
+        padding: 0 !important;
+        font-size: 9pt !important;
+        font-weight: 800 !important;
+        color: #000 !important;
+    }
+
+    /* Bỏ khung cuộn bảng */
+    .cat-table-wrap.invoice-items-wrap,
+    .invoice-items-wrap {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        overflow: visible !important;
+        border: 0 !important;
+        border-radius: 0 !important;
     }
 
     .invoice-items-table {
-        min-width: 0;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        border-collapse: collapse !important;
+        table-layout: fixed !important;
+        font-size: 8pt !important;
+        color: #000 !important;
+    }
+
+    .invoice-items-table thead {
+        display: table-header-group !important;
+    }
+
+    .invoice-items-table th,
+    .invoice-items-table td {
+        padding: 1.5mm 0.5mm !important;
+        border-bottom: 1px dashed #aaa !important;
+        background: #fff !important;
+        color: #000 !important;
+        font-size: 8pt !important;
+        line-height: 1.25 !important;
+        vertical-align: top !important;
+        overflow-wrap: anywhere !important;
+        white-space: normal !important;
+    }
+
+    .invoice-items-table th {
+        font-weight: 800 !important;
+        border-bottom: 1px solid #555 !important;
+    }
+
+    .invoice-items-table tr {
+        break-inside: avoid !important;
+        page-break-inside: avoid !important;
+    }
+
+    /* Tổng tiền và ghi chú xếp dọc */
+    .invoice-bottom-grid {
+        display: block !important;
+        width: 100% !important;
+        margin: 2mm 0 0 !important;
+        padding: 0 !important;
+    }
+
+    .invoice-note,
+    .invoice-totals {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 2mm 0 !important;
+        padding: 0 0 2mm !important;
+        border: 0 !important;
+        border-bottom: 1px dashed #555 !important;
+        border-radius: 0 !important;
+        background: #fff !important;
+        color: #000 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    .invoice-note *,
+    .invoice-totals * {
+        color: #000 !important;
+        font-size: 8.5pt !important;
+        line-height: 1.35 !important;
+    }
+
+    .invoice-grand {
+        margin-top: 2mm !important;
+        padding-top: 2mm !important;
+        border-top: 1px solid #000 !important;
+        font-size: 11pt !important;
+        font-weight: 800 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Lời cảm ơn cuối hóa đơn */
+    .invoice-thankyou {
+        display: block !important;
+        margin: 3mm 0 0 !important;
+        padding: 2mm 0 0 !important;
+        border-top: 1px dashed #555 !important;
+        font-size: 8pt !important;
+        line-height: 1.4 !important;
+        text-align: center !important;
+        color: #000 !important;
+    }
+
+    /* Không in màu nền trang trí */
+    .cat-card,
+    .invoice-paper * {
+        background-image: none !important;
+    }
+
+    a {
+        color: #000 !important;
+        text-decoration: none !important;
     }
 }
+
+
+/* Căn hóa đơn 80mm ra giữa trang khi in */
+@media print {
+    @page {
+        size: auto;
+        margin: 5mm;
+    }
+
+    html,
+    body {
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .adm-layout,
+    .adm-main,
+    .adm-content,
+    .adm-content.invoice-detail-page,
+    .invoice-detail-shell {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 auto !important;
+        padding: 0 !important;
+    }
+
+    .invoice-paper {
+        width: 74mm !important;
+        max-width: 74mm !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+}
+
+
+/* Giữ lời cảm ơn nằm sát cuối hóa đơn */
+@media print {
+    .invoice-paper {
+        height: auto !important;
+        min-height: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .invoice-bottom-grid {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    .invoice-note,
+    .invoice-totals {
+        margin-bottom: 1mm !important;
+        padding-bottom: 1mm !important;
+    }
+
+    .invoice-thankyou {
+        display: block !important;
+        margin-top: 2mm !important;
+        padding-top: 1.5mm !important;
+        font-size: 7.5pt !important;
+        line-height: 1.2 !important;
+        page-break-before: avoid !important;
+        break-before: avoid !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+}
+
+/* Ẩn toàn bộ phần trạng thái đơn hàng khi in */
+@media print {
+    /* Ẩn nhãn trạng thái cạnh mã hóa đơn */
+    .invoice-paper .invoice-code-block .invoice-status {
+        display: none !important;
+    }
+
+    /* Ẩn thẻ thông tin trạng thái đơn hàng thứ hai */
+    .invoice-paper .invoice-info > .invoice-info-card:nth-child(2) {
+        display: none !important;
+    }
+}
+
+
+
