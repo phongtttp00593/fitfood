@@ -1,15 +1,48 @@
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
--->
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Xóa Sản Phẩm - FitFood Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-product-delete.css}">
+</head>
+<body class="admin-body">
+    <div class="admin-layout">
+        <!-- Gọi sidebar đúng tham số 'products' -->
+        <aside class="adm-sidebar" th:replace="~{fragments/admin-sidebar :: sidebar('products')}"></aside>
+
+        <main class="admin-main-content">
+            <div class="delete-product-container">
+                <div class="delete-card">
+                    <div class="delete-icon">⚠️</div>
+                    <h2>Xác Nhận Xóa Sản Phẩm</h2>
+                    <p class="delete-warning">Bạn có chắc chắn muốn xóa sản phẩm này khỏi hệ thống?</p>
+                    
+                    <div class="product-info-box">
+                        <div class="info-thumb">
+                            <img th:if="${product.imageUrl}" th:src="${product.imageUrl}" alt="Ảnh món ăn">
+                            <div th:unless="${product.imageUrl}" class="no-img">No Image</div>
+                        </div>
+                        <div class="info-detail">
+                            <h3 th:text="${product.name}">Tên sản phẩm</h3>
+                            <p><strong>Mã món:</strong> #<span th:text="${product.id}"></span></p>
+                            <p><strong>Danh mục:</strong> <span th:text="${categoryName != null ? categoryName : 'Chưa phân loại'}"></span></p>
+                            <p><strong>Giá bán:</strong> <span th:text="${#numbers.formatDecimal(product.price, 0, 'POINT', 0, 'POINT') + ' VNĐ'}"></span></p>
+                            <p><strong>Trạng thái:</strong> 
+                                <span th:if="${product.active}" class="badge badge-success">Đang kinh doanh</span>
+                                <span th:unless="${product.active}" class="badge badge-danger">Ngưng kinh doanh</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <form th:action="@{/admin/products/delete/{id}(id=${product.id})}" method="post" class="delete-action-form">
+                        <button type="submit" class="btn btn-danger">Xác Nhận Xóa</button>
+                        <a th:href="@{/admin/products}" class="btn btn-secondary">Hủy Bỏ</a>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
 </html>
