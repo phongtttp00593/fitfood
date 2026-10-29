@@ -1,9 +1,143 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
-*/
-/* 
-    Created on : 28 thg 10, 2026, 00:05:57
-    Author     : Administrator
-*/
+* {
+    box-sizing: border-box;
+    font-family: "Be Vietnam Pro", Arial, sans-serif;
+}
 
+body {
+    background: var(--surface, #fffcf5);
+    margin: 0;
+    padding: 18px 24px 30px;
+    color: var(--lacquer, #3a2217);
+    font-size: 14px;
+}
+
+.edit-product-container {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 6px;
+    color: var(--lacquer, #3a2217);
+}
+
+.required {
+    color: var(--red, #9b2c1f);
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--line, #e6d8bc);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--paper, #fdfaf3);
+    color: var(--lacquer, #3a2217);
+    outline: none;
+    transition: 0.2s;
+}
+
+.form-control:focus {
+    border-color: var(--gold-300, #dcc07e);
+    box-shadow: 0 0 0 3px rgba(220, 192, 126, 0.25);
+    background: #ffffff;
+}
+
+.form-row {
+    display: flex;
+    gap: 16px;
+}
+
+.col-half {
+    flex: 1;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.text-error {
+    color: var(--red, #9b2c1f);
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.alert-box {
+    background: #fdf2f2;
+    border: 1px solid #f8b4b4;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+}
+
+.current-image-preview img.preview-img {
+    width: 80px;
+    height: 80px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid var(--line, #e6d8bc);
+}
+
+.no-img-text {
+    font-size: 13px;
+    color: var(--muted, #6e5d4f);
+}
+
+.file-input {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.checkbox-group {
+    margin-top: 14px;
+}
+
+.switch-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--lacquer, #3a2217);
+}
+
+.switch-label input[type="checkbox"] {
+    width: 17px;
+    height: 17px;
+    accent-color: var(--lacquer, #3a2217);
+    cursor: pointer;
+}
+
+.form-actions {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line, #e6d8bc);
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-primary {
+    background: var(--lacquer, #3a2217);
+    color: #ffffff;
+    border: 1px solid var(--lacquer, #3a2217);
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-primary:hover {
+    background: #503123;
+}

@@ -1,152 +1,216 @@
-
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Thêm sản phẩm - FITFOOD</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" />
+
+    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
     <link rel="stylesheet" th:href="@{/css/admin-product-add.css}">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Be Vietnam Pro", Arial, sans-serif;
+        }
+        body {
+            background: var(--surface, #fffcf5);
+            margin: 0;
+            padding: 18px 24px 30px;
+            color: var(--lacquer, #3a2217);
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        .message.error {
+            background: #fdf2f2;
+            color: #9b1c1c;
+            border: 1px solid #f8b4b4;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .message.success {
+            background: #def7ec;
+            color: #03543f;
+            border: 1px solid #bcf0da;
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        label {
+            display: block;
+            font-weight: 700;
+            font-size: 13px;
+            margin: 14px 0 6px;
+            color: var(--lacquer, #3a2217);
+        }
+        input[type="text"], input[type="number"], select, textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--line, #e6d8bc);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--paper, #fdfaf3);
+            color: var(--lacquer, #3a2217);
+            outline: none;
+            transition: 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--gold-300, #dcc07e);
+            box-shadow: 0 0 0 3px rgba(220, 192, 126, 0.25);
+            background: #ffffff;
+        }
+        .active-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 16px;
+        }
+        .active-row input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--lacquer, #3a2217);
+            cursor: pointer;
+        }
+        .active-row label {
+            margin: 0;
+            cursor: pointer;
+        }
+        #preview {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 8px;
+            margin-top: 10px;
+            display: none;
+            object-fit: cover;
+            border: 1px solid var(--line, #e6d8bc);
+        }
+        .actions {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid var(--line, #e6d8bc);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        .btn.save {
+            background: var(--lacquer, #3a2217);
+            color: #ffffff;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn.save:hover {
+            background: #503123;
+        }
+        .btn.cancel {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+        .btn.cancel:hover {
+            background: #cbd5e0;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Thêm sản phẩm</h1>
-    <p>Điền thông tin sản phẩm mới bên dưới.</p>
+    <div class="message error" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
+    <div id="productAddSuccess" class="message success" th:if="${productAddSuccess != null}" th:text="${productAddSuccess}"></div>
 
-    <div class="message error"
-         th:if="${errorMessage != null}"
-         th:text="${errorMessage}"></div>
-
-    <div id="productAddSuccess"
-         class="message success"
-         th:if="${productAddSuccess != null}"
-         th:text="${productAddSuccess}"></div>
-
+    <!-- KHÔNG DÙNG target="_top" ĐỂ MỌI THAO TÁC NẰM GỌN TRONG POPUP -->
     <form th:action="@{/admin/products/save}"
           th:object="${productForm}"
           method="post"
           enctype="multipart/form-data">
 
         <label for="name">Tên sản phẩm *</label>
-        <input id="name"
-               type="text"
-               th:field="*{name}"
-               maxlength="150"
-               required>
+        <input id="name" type="text" th:field="*{name}" maxlength="150" required placeholder="Nhập tên món ăn">
 
         <label for="categoryId">Danh mục *</label>
         <select id="categoryId" th:field="*{categoryId}" required>
             <option value="">-- Chọn danh mục --</option>
-            <option th:each="category : ${categories}"
-                    th:value="${category.id}"
-                    th:text="${category.name}">
-            </option>
+            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
         </select>
 
         <label for="price">Giá sản phẩm (VNĐ) *</label>
-        <input id="price"
-               type="number"
-               th:field="*{price}"
-               min="0"
-               step="any"
-               required>
+        <input id="price" type="number" th:field="*{price}" min="0" step="1000" required placeholder="65000">
 
         <label for="description">Mô tả</label>
-        <textarea id="description"
-                  th:field="*{description}"
-                  rows="4"></textarea>
+        <textarea id="description" th:field="*{description}" rows="3" placeholder="Mô tả thành phần, calo..."></textarea>
 
         <label for="imageFile">Ảnh sản phẩm</label>
-        <input id="imageFile"
-               type="file"
-               name="imageFile"
-               accept=".jpg,.jpeg,.png,.webp">
-
+        <input id="imageFile" type="file" name="imageFile" accept=".jpg,.jpeg,.png,.webp">
         <img id="preview" alt="Ảnh xem trước">
 
         <div class="active-row">
             <input id="active" type="checkbox" th:field="*{active}">
-            <label for="active">Đang kinh doanh</label>
+            <label for="active">Đang kinh doanh (Hiển thị thực đơn)</label>
         </div>
 
         <div class="actions">
-            <a th:href="@{/admin/products}" class="btn cancel">
-                Quay lại
-            </a>
-
-            <button type="submit" class="btn save">
-                Lưu sản phẩm
-            </button>
+            <button type="button" class="btn cancel" id="btnCancelAdd">Hủy bỏ</button>
+            <button type="submit" class="btn save">Lưu sản phẩm</button>
         </div>
     </form>
 </div>
 
 <script>
-    // Xem trước ảnh trước khi lưu
+    // Xem trước ảnh khi chọn
     const input = document.getElementById('imageFile');
     const preview = document.getElementById('preview');
-
     let previewUrl = null;
 
     input.addEventListener('change', function () {
         const file = this.files && this.files[0];
-
         if (previewUrl) {
             URL.revokeObjectURL(previewUrl);
             previewUrl = null;
         }
-
         if (!file) {
             preview.style.display = 'none';
-            preview.removeAttribute('src');
             return;
         }
-
-        const allowedTypes = [
-            'image/jpeg',
-            'image/png',
-            'image/webp'
-        ];
-
-        if (!allowedTypes.includes(file.type)) {
-            alert('Ảnh phải có định dạng JPG, PNG hoặc WEBP.');
-            this.value = '';
-            preview.style.display = 'none';
-            preview.removeAttribute('src');
-            return;
-        }
-
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Ảnh không được vượt quá 5 MB.');
-            this.value = '';
-            preview.style.display = 'none';
-            preview.removeAttribute('src');
-            return;
-        }
-
         previewUrl = URL.createObjectURL(file);
         preview.src = previewUrl;
         preview.style.display = 'block';
     });
 
-    // Chỉ báo cho trang danh sách sau khi server xác nhận lưu thành công.
-    const successMessage = document.getElementById('productAddSuccess');
-
-    if (successMessage && window.parent !== window) {
-        window.parent.postMessage(
-            { type: 'FITFOOD_PRODUCT_ADDED' },
-            window.location.origin
-        );
-    }
+    // Nút hủy bỏ -> Báo trang cha đóng modal
+    document.getElementById('btnCancelAdd').addEventListener('click', function() {
+        if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: 'FITFOOD_CLOSE_MODAL' }, window.location.origin);
+        }
+    });
 </script>
 
+<!-- TỰ ĐỘNG BÁO TRANG CHA KHI LƯU THÀNH CÔNG -->
 <script th:if="${productAdded}">
-    // Cờ này chỉ được gửi sau khi ProductAddController lưu thành công.
     if (window.parent && window.parent !== window) {
-        window.parent.postMessage(
-            { type: 'FITFOOD_PRODUCT_ADDED' },
-            window.location.origin
-        );
+        window.parent.postMessage({ type: 'FITFOOD_PRODUCT_ADDED' }, window.location.origin);
     }
 </script>
 
