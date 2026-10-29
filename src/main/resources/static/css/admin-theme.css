@@ -222,3 +222,17 @@ body.admin-body .adm-nav > a:nth-child(10) { animation-delay: .45s; } body.admin
 @media (prefers-reduced-motion: reduce) {
   body.admin-body *, body.admin-body *::before, body.admin-body *::after { animation: none !important; transition: none !important; }
 }
+
+
+/* ---------- Thanh trên đồng bộ + nút đăng xuất duy nhất của khu vực admin ---------- */
+body.admin-body .adm-top { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:0 28px; }
+body.admin-body .fit-admin-top-actions { display:flex; align-items:center; justify-content:flex-end; gap:14px; margin-left:auto; min-width:0; }
+body.admin-body .fit-admin-top-label { color:var(--muted); font-size:12px; font-weight:650; white-space:nowrap; padding:8px 12px; border:1px solid var(--line); border-radius:999px; background:rgba(255,252,245,.8); }
+body.admin-body .fit-admin-logout { margin:0; display:inline-flex; }
+body.admin-body .fit-admin-logout button { display:inline-flex; align-items:center; justify-content:center; gap:9px; min-height:40px; padding:0 16px; border:1px solid rgba(155,44,31,.2); border-radius:999px; background:linear-gradient(135deg,#a83325,#812116); color:#fff8ec; font:inherit; font-size:12px; font-weight:750; letter-spacing:.01em; cursor:pointer; box-shadow:0 5px 14px rgba(129,33,22,.18); transition:transform .18s ease,box-shadow .18s ease,background .18s ease; }
+body.admin-body .fit-admin-logout button svg { width:16px; height:16px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+body.admin-body .fit-admin-logout button:hover { transform:translateY(-1px); background:linear-gradient(135deg,#852318,#64180f); box-shadow:0 8px 18px rgba(129,33,22,.25); }
+body.admin-body .fit-admin-logout button:active { transform:translateY(0); }
+body.admin-body .reports-topbar { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:0 28px; }
+body.admin-body .reports-topbar-right { display:flex; align-items:center; gap:14px; }
+@media(max-width:760px){ body.admin-body .adm-top{padding:0 14px;gap:10px;} body.admin-body .fit-admin-top-label{display:none;} body.admin-body .fit-admin-logout button{min-height:38px;padding:0 12px;} body.admin-body .fit-admin-logout button span{display:inline;} body.admin-body .reports-topbar{padding:0 14px;} }

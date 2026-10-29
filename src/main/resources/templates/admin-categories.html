@@ -28,16 +28,17 @@
           </div>
           <div class="cat-header-tools">
             <span class="cat-admin-label">Quản trị viên</span>
-            <form method="post" th:action="@{/dang-xuat}">
-              <input
-                type="hidden"
-                th:name="${_csrf.parameterName}"
-                th:value="${_csrf.token}"
-              />
-              <button type="submit" class="cat-outline-btn">Đăng xuất</button>
-            </form>
+            
           </div>
-        </header>
+        
+                    <div class="fit-admin-top-actions">
+                      <span class="fit-admin-top-label">Khu vực quản trị</span>
+                      <form class="fit-admin-logout" method="post" th:action="@{/logout}">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <button type="submit" aria-label="Đăng xuất khỏi trang quản trị"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg><span>Đăng xuất</span></button>
+                      </form>
+                    </div>
+                </header>
 
         <main class="adm-content cat-content">
           <div class="cat-heading">
