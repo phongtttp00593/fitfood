@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý gói ăn | FITFOOD Admin</title>
+  <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" /><link rel="stylesheet" th:href="@{/css/admin-theme.css}" />
+  <style>
+    .meal-alert.error{background:#fff0eb;color:#a33322}.plans-page{max-width:1180px;margin:0 auto}.plans-page h1{color:#2b180f;margin:10px 0}.plans-lead{color:#746255}.plans-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin:22px 0}.plans-stat,.plans-list{background:#fff;border:1px solid #ead8bd;border-radius:15px}.plans-stat{padding:18px 22px}.plans-stat span,.plans-stat small{display:block;color:#746255}.plans-stat strong{display:block;color:#a53021;font-size:25px;margin:6px 0}.plans-list{padding:22px}.plans-list h2{margin:0 0 4px;color:#2b180f;font-size:20px}.plans-table-wrap{overflow:auto;margin-top:18px}.plans-table{width:100%;min-width:760px;border-collapse:collapse}.plans-table th{padding:13px;text-align:left;background:#f7efde;color:#776453;font-size:12px}.plans-table td{padding:14px 13px;border-bottom:1px solid #eee5d8;color:#402d21;font-size:13px}.plans-table tr:hover td{background:#fffaf2}.plan-chip{display:inline-block;background:#f8efd9;color:#80551e;padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}.plan-chip.off{background:#f1f1f1;color:#666}.plan-actions{display:flex;gap:8px;flex-wrap:wrap}.plan-action{display:inline-block;background:#a53021;color:#fff;text-decoration:none;border-radius:8px;padding:10px 14px;font-weight:700;font-size:12px;white-space:nowrap}.plan-action.secondary{background:#f8efd9;color:#8e3323}.plan-action.danger{background:#fff0eb;color:#a33322;border:0;cursor:pointer}.plan-actions form{margin:0}.plans-empty{text-align:center;padding:28px!important;color:#746255!important}.plans-top-action{float:right}@media(max-width:700px){.plans-page{padding:0 8px}.plans-stats{grid-template-columns:1fr}.plans-list{padding:15px}.plans-top-action{float:none;display:inline-block;margin-top:10px}}
+  </style>
+</head>
+<body class="admin-body"><div class="adm-layout">
+  <aside class="adm-sidebar" th:replace="~{fragments/admin-sidebar :: sidebar('meal-plans')}"></aside>
+  <div class="adm-main"><header class="adm-top"><div class="admin-breadcrumb">FITFOOD <span>/</span> <b>Gói ăn</b></div></header>
+    <main class="adm-content plans-page">
+      <span class="admin-eyebrow">FITFOOD / QUẢN LÝ CỬA HÀNG</span><a class="plan-action plans-top-action" th:href="@{/admin/meal-plans/new}">+ Thêm gói ăn</a><a class="plan-action secondary plans-top-action" th:href="@{/admin/customers}">Gán gói cho khách hàng →</a>
+      <h1>Quản lý gói ăn</h1><p class="plans-lead">Chọn sản phẩm có sẵn để thiết lập món trong từng gói. Thay đổi sẽ áp dụng cho khách hàng đang dùng gói đó.</p>
+      <div class="meal-alert" th:if="${success}" th:text="${success}" role="status"></div><div class="meal-alert error" th:if="${error}" th:text="${error}" role="alert"></div><section class="plans-stats" aria-label="Thống kê gói ăn"><div class="plans-stat"><span>Gói đang hoạt động</span><strong th:text="${activeCount}">0</strong><small>Có thể chọn cho khách hàng</small></div><div class="plans-stat"><span>Tổng sản phẩm trong các gói</span><strong th:text="${productCount}">0</strong><small>Tính cả các gói đã tạm ngừng</small></div></section>
+      <section class="plans-list"><h2>Danh sách gói ăn</h2><p class="plans-lead">Mở một gói để thêm hoặc bỏ sản phẩm.</p><div class="plans-table-wrap"><table class="plans-table">
+        <thead><tr><th>TÊN GÓI</th><th>THỜI HẠN</th><th>NGÀY ÁP DỤNG</th><th>GIÁ</th><th>SẢN PHẨM TRONG GÓI</th><th>TRẠNG THÁI</th><th>THAO TÁC</th></tr></thead>
+        <tbody><tr th:each="plan : ${mealPlans}"><td><strong th:text="${plan.name}">Gói ăn 7 ngày</strong><div class="plans-lead" th:if="${plan.description != null}" th:text="${plan.description}">Mô tả gói ăn</div></td><td th:text="${plan.numberOfDays != null ? plan.numberOfDays + ' ngày' : '—'}">7 ngày</td><td th:text="${plan.availableFrom != null ? #temporals.format(plan.availableFrom, 'dd/MM/yyyy') : 'Chưa đặt ngày'}">27/10/2026</td><td th:text="${#numbers.formatDecimal(plan.price,0,'COMMA',0,'POINT')} + 'đ'">450.000đ</td><td th:text="${plan.productCount} + ' sản phẩm'">2 sản phẩm</td><td><span class="plan-chip" th:if="${plan.active}">Đang bán</span><span class="plan-chip off" th:unless="${plan.active}">Ngừng bán</span></td><td><div class="plan-actions"><a class="plan-action" th:href="@{/admin/meal-plans/{id}(id=${plan.id})}">Chọn sản phẩm</a><a class="plan-action secondary" th:href="@{/admin/meal-plans/{id}/edit(id=${plan.id})}">Sửa</a><form method="post" th:action="@{/admin/meal-plans/{id}/delete(id=${plan.id})}"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/><button class="plan-action danger" type="submit">Xóa</button></form><a class="plan-action secondary" th:href="@{/admin/meal-plans/{id}/customers(id=${plan.id})}">Gán cho khách hàng</a></div></td></tr><tr th:if="${#lists.isEmpty(mealPlans)}"><td class="plans-empty" colspan="7">Chưa có gói ăn nào.</td></tr></tbody>
+      </table></div></section>
+    </main>
+  </div>
+</div></body></html>
+
+
+
