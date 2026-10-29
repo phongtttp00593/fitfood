@@ -124,6 +124,21 @@
                     </span>
                 </a>
 
+                <!-- QUẢN LÝ GÓI ĂN -->
+                <a th:href="@{/admin/meal-plans}"
+                   th:classappend="${active == 'meal-plans'} ? 'adm-nav-on' : ''"
+                   title="Quản lý gói ăn và thực đơn theo gói">
+                    <svg class="ic" width="19" height="19"
+                         viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round"
+                         aria-hidden="true">
+                        <rect x="3" y="4" width="18" height="16" rx="2"/>
+                        <path d="M8 4V2m8 2V2M3 9h18M8 13h3m-3 3h8"/>
+                    </svg>
+                    <span>Gói ăn</span>
+                </a>
+
                 <!-- 4. BIẾN THỂ MÓN ĂN -->
                 <a th:href="@{/admin/variants}"
                    th:classappend="${active == 'variants'} ? 'adm-nav-on' : ''"
