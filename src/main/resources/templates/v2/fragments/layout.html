@@ -209,15 +209,13 @@
                             Chat hỗ trợ
                         </a>
 
-                        <form th:action="@{/dang-xuat}"
-                              method="post">
-
-                            <input type="hidden"
-                                   th:name="${_csrf.parameterName}"
-                                   th:value="${_csrf.token}" />
-
-                            <button type="submit">
-                                Đăng xuất
+                        <!-- NÚT ĐĂNG XUẤT RIÊNG CHO NGƯỜI DÙNG -->
+                        <form th:if="${!isAdmin}"
+                              th:action="@{/logout}"
+                              method="post"
+                              class="user-logout-form">
+                            <button type="submit" class="user-logout-button">
+                                <span aria-hidden="true">↪</span> Đăng xuất
                             </button>
                         </form>
                     </div>

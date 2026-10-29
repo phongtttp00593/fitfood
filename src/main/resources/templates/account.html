@@ -27,14 +27,7 @@
         </nav>
         <div class="nav-right">
           <a class="fit-account-back" th:href="@{/}">← Về trang chủ</a>
-          <form class="auth-nav-logout" method="post" th:action="@{/dang-xuat}">
-            <input
-              type="hidden"
-              th:name="${_csrf.parameterName}"
-              th:value="${_csrf.token}"
-            />
-            <button type="submit">Đăng xuất</button>
-          </form>
+          
         </div>
       </div>
     </header>
