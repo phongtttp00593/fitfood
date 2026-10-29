@@ -26,7 +26,7 @@
         var name = normalize(card.getAttribute('data-name'));
         var description = normalize(card.getAttribute('data-description'));
         var matchesCategory = !cat || cardCategory === normalize(cat);
-        var matchesKeyword = !keyword || name.indexOf(keyword) !== -1 || description.indexOf(keyword) !== -1;
+        var matchesKeyword = !keyword || name.indexOf(keyword) !== -1 || description.indexOf(keyword) !== -1 || cardCategory.indexOf(keyword) !== -1;
         return matchesCategory && matchesKeyword;
       });
 

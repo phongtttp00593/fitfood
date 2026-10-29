@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Map;
 import java.util.Locale;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.fitfood.meal.CustomerMealPlanRepository;
@@ -14,6 +15,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class HomeController {
@@ -30,7 +32,29 @@ public class HomeController {
         this.jdbc = jdbc;
     }
 
-    @GetMapping("/") public String home() { return "index"; }
+    @GetMapping("/")
+    public String home(Model model) {
+        // Homepage v2 expects featuredProducts; without this attribute Thymeleaf renders
+        // the "Món ngon hôm nay" grid empty even though products exist in SQL Server.
+        model.addAttribute("featuredProducts", jdbc.query("""
+            SELECT TOP (8) p.id, p.name, p.description, p.price, p.image_url,
+                   c.name AS category_name
+            FROM dbo.fitfood_products p
+            LEFT JOIN dbo.fitfood_categories c ON c.id = p.category_id
+            WHERE p.active = 1
+            ORDER BY p.created_at DESC, p.id DESC
+            """, (rs, rowNum) -> {
+                BigDecimal price = rs.getBigDecimal("price");
+                DecimalFormat formatter = new DecimalFormat("#,##0",
+                    DecimalFormatSymbols.getInstance(new Locale("vi", "VN")));
+                String imageUrl = rs.getString("image_url");
+                if (imageUrl == null || imageUrl.isBlank()) imageUrl = "/images/hero-bowl.jpg";
+                return new FeaturedProduct(rs.getLong("id"), rs.getString("name"),
+                    rs.getString("description"), price, formatter.format(price) + "đ",
+                    imageUrl, rs.getString("category_name") == null ? "Món ngon" : rs.getString("category_name"));
+            }));
+        return "index";
+    }
 
     @GetMapping("/menu")
     public String menu(Model model, Authentication authentication) {
@@ -119,6 +143,52 @@ public class HomeController {
             String slotProductName, String selectedProductName) { }
     public record MealDishOption(Long id, String name, BigDecimal price) { }
 
-    @GetMapping("/product") public String product() { return "product"; }
+    @GetMapping("/product")
+    public String product(@RequestParam(value = "id", required = false) Long id, Model model) {
+        if (id == null || id <= 0) return "redirect:/menu";
+        List<FeaturedProduct> matches = jdbc.query("""
+            SELECT p.id, p.name, p.description, p.price, p.image_url,
+                   c.name AS category_name
+            FROM dbo.fitfood_products p
+            LEFT JOIN dbo.fitfood_categories c ON c.id = p.category_id
+            WHERE p.id = ? AND p.active = 1
+            """, (rs, rowNum) -> {
+                BigDecimal price = rs.getBigDecimal("price");
+                DecimalFormat formatter = new DecimalFormat("#,##0",
+                    DecimalFormatSymbols.getInstance(new Locale("vi", "VN")));
+                String imageUrl = rs.getString("image_url");
+                if (imageUrl == null || imageUrl.isBlank()) imageUrl = "/images/hero-bowl.jpg";
+                return new FeaturedProduct(rs.getLong("id"), rs.getString("name"),
+                    rs.getString("description"), price, formatter.format(price) + "đ",
+                    imageUrl, rs.getString("category_name") == null ? "Món ngon" : rs.getString("category_name"));
+            }, id);
+        if (matches.isEmpty()) return "redirect:/menu";
+        FeaturedProduct product = matches.get(0);
+        model.addAttribute("product", product);
+        model.addAttribute("variantGroups", loadProductVariantGroups(id));
+        return "product";
+    }
+
+    private List<Map<String, Object>> loadProductVariantGroups(Long productId) {
+        List<Map<String, Object>> groups = jdbc.queryForList("""
+            SELECT id, group_name, is_required, allow_multiple, max_select, sort_order
+            FROM dbo.food_variant_groups WHERE food_id = ? ORDER BY sort_order, id
+            """, productId);
+        for (Map<String, Object> group : groups) {
+            Object rawId = group.get("id");
+            Long groupId = ((Number) rawId).longValue();
+            group.put("options", jdbc.queryForList("""
+                SELECT id, option_name, extra_price, extra_calories, is_default, is_available
+                FROM dbo.food_variant_options
+                WHERE group_id = ? AND is_available = 1
+                ORDER BY id
+                """, groupId));
+        }
+        return groups;
+    }
+
+    public record FeaturedProduct(Long id, String name, String description,
+            BigDecimal price, String priceLabel, String imageUrl, String categoryName) { }
+
     // Đăng nhập /dang-nhap được xử lý ở AuthController, KHÔNG khai báo ở đây.
 }
