@@ -2,7 +2,10 @@ package com.fitfood.controller;
 
 import com.fitfood.auth.repository.AppUserRepository;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.jdbc.core.JdbcTemplate;
 import com.fitfood.meal.CustomerMealPlanRepository;
 import com.fitfood.meal.MealPlanRepository;
@@ -32,6 +35,37 @@ public class HomeController {
     @GetMapping("/menu")
     public String menu(Model model, Authentication authentication) {
         model.addAttribute("mealPlans", mealPlans.findByActiveTrueOrderByNameAsc());
+        // Lấy món ăn đang bán từ SQL Server để thực đơn luôn đồng bộ với quản trị sản phẩm.
+        model.addAttribute("menuProducts", jdbc.query("""
+            SELECT id, name, description, price, image_url
+            FROM dbo.fitfood_products
+            WHERE active = 1
+            ORDER BY name
+            """, (rs, rowNum) -> new MenuProduct(
+                rs.getLong("id"), rs.getString("name"), rs.getString("description"),
+                rs.getBigDecimal("price"), rs.getString("image_url"))));
+
+        // Dữ liệu cho giao diện thực đơn v2: danh mục và món ăn đều lấy trực tiếp từ SQL Server.
+        model.addAttribute("categories", jdbc.queryForList("""
+            SELECT c.name
+            FROM dbo.fitfood_categories c
+            WHERE c.active = 1
+            ORDER BY c.name
+            """, String.class));
+        model.addAttribute("products", jdbc.query("""
+            SELECT p.id, p.name, p.description, p.price, p.image_url, c.name AS category_name
+            FROM dbo.fitfood_products p
+            INNER JOIN dbo.fitfood_categories c ON c.id = p.category_id
+            WHERE p.active = 1 AND c.active = 1
+            ORDER BY p.name
+            """, (rs, rowNum) -> {
+                BigDecimal price = rs.getBigDecimal("price");
+                DecimalFormatSymbols symbols = DecimalFormatSymbols.getInstance(new Locale("vi", "VN"));
+                DecimalFormat formatter = new DecimalFormat("#,##0", symbols);
+                return new MenuPageProduct(rs.getLong("id"), rs.getString("name"),
+                    rs.getString("description"), price, formatter.format(price) + "đ",
+                    rs.getString("image_url"), rs.getString("category_name"));
+            }));
         Long selectedMealPlanId = null;
         if (authentication != null && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken)) {
@@ -72,14 +106,19 @@ public class HomeController {
             SELECT id, name, price FROM dbo.fitfood_products WHERE active = 1 ORDER BY name
             """, (rs, rowNum) -> new MealDishOption(rs.getLong("id"),
                 rs.getString("name"), rs.getBigDecimal("price"))));
-        return "menu";
+        return "v2/menu";
     }
+
+    public record MenuPageProduct(Long id, String name, String description,
+            BigDecimal price, String priceLabel, String imageUrl, String categoryName) { }
+
+    public record MenuProduct(Long id, String name, String description,
+            BigDecimal price, String imageUrl) { }
 
     public record MealSlotView(Long slotProductId, int quantity, Long selectedProductId,
             String slotProductName, String selectedProductName) { }
     public record MealDishOption(Long id, String name, BigDecimal price) { }
 
     @GetMapping("/product") public String product() { return "product"; }
-    @GetMapping("/cart") public String cart() { return "cart"; }
     // Đăng nhập /dang-nhap được xử lý ở AuthController, KHÔNG khai báo ở đây.
 }
