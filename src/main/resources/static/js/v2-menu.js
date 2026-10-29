@@ -1,57 +1,81 @@
-// Lọc / tìm / sắp xếp món và chuyển giữa món ăn với danh mục gói ăn.
+// Lọc danh mục, tìm kiếm và sắp xếp món ăn trên trang /menu.
 (function () {
   'use strict';
-  var grid = document.getElementById('menuGrid');
-  if (!grid) return;
-  var cards = Array.prototype.slice.call(grid.children);
-  var original = cards.slice();
-  var q = document.getElementById('q');
-  var sort = document.getElementById('sort');
-  var count = document.getElementById('resultCount');
-  var empty = document.getElementById('menuEmpty');
-  var filters = document.querySelector('.filter-bar');
-  var packagePanel = document.getElementById('mealPlansPanel');
-  var tabs = document.querySelectorAll('.cat-list .tab');
-  var cat = '';
-  var initialCategory = new URLSearchParams(window.location.search).get('category');
 
-  function apply() {
-    var showingPackages = cat === '__mealplans';
-    if (packagePanel) packagePanel.hidden = !showingPackages;
-    if (filters) filters.hidden = showingPackages;
-    count.hidden = showingPackages;
-    grid.hidden = showingPackages;
-    empty.hidden = true;
-    if (showingPackages) return;
+  function initMenu() {
+    var grid = document.getElementById('menuGrid');
+    if (!grid) return;
 
-    var kw = (q.value || '').trim().toLowerCase();
-    var list = original.filter(function (el) {
-      return (!cat || el.dataset.cat === cat) && (!kw || el.dataset.name.indexOf(kw) !== -1);
+    var cards = Array.prototype.slice.call(grid.children);
+    var q = document.getElementById('q');
+    var sort = document.getElementById('sort');
+    var count = document.getElementById('resultCount');
+    var empty = document.getElementById('menuEmpty');
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('.cat-list .tab'));
+    var cat = '';
+    var initialCategory = new URLSearchParams(window.location.search).get('category');
+
+    function normalize(value) {
+      return (value || '').toString().trim().toLocaleLowerCase('vi-VN');
+    }
+
+    function apply() {
+      var keyword = normalize(q ? q.value : '');
+      var visible = cards.filter(function (card) {
+        var cardCategory = normalize(card.getAttribute('data-cat'));
+        var name = normalize(card.getAttribute('data-name'));
+        var description = normalize(card.getAttribute('data-description'));
+        var matchesCategory = !cat || cardCategory === normalize(cat);
+        var matchesKeyword = !keyword || name.indexOf(keyword) !== -1 || description.indexOf(keyword) !== -1;
+        return matchesCategory && matchesKeyword;
+      });
+
+      if (sort && sort.value === 'price_asc') {
+        visible.sort(function (a, b) { return Number(a.dataset.price || 0) - Number(b.dataset.price || 0); });
+      } else if (sort && sort.value === 'price_desc') {
+        visible.sort(function (a, b) { return Number(b.dataset.price || 0) - Number(a.dataset.price || 0); });
+      }
+
+      cards.forEach(function (card) { card.hidden = true; });
+      visible.forEach(function (card) {
+        card.hidden = false;
+        grid.appendChild(card);
+      });
+
+      if (count) count.textContent = visible.length + ' món';
+      if (empty) empty.hidden = visible.length !== 0;
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        cat = tab.getAttribute('data-filter') || '';
+        tabs.forEach(function (other) {
+          other.classList.remove('on', 'active');
+          other.setAttribute('aria-pressed', 'false');
+        });
+        tab.classList.add('on', 'active');
+        tab.setAttribute('aria-pressed', 'true');
+        apply();
+      });
     });
-    if (sort.value === 'price_asc') list.sort(function (a, b) { return a.dataset.price - b.dataset.price; });
-    if (sort.value === 'price_desc') list.sort(function (a, b) { return b.dataset.price - a.dataset.price; });
-    original.forEach(function (el) { el.hidden = true; });
-    list.forEach(function (el) { el.hidden = false; grid.appendChild(el); });
-    count.textContent = list.length + ' món';
-    empty.hidden = list.length > 0;
+
+    if (q) q.addEventListener('input', apply);
+    if (sort) sort.addEventListener('change', apply);
+
+    if (initialCategory) {
+      var requested = tabs.find(function (tab) {
+        return normalize(tab.getAttribute('data-filter')) === normalize(initialCategory);
+      });
+      if (requested) requested.click();
+      else apply();
+    } else {
+      apply();
+    }
   }
 
-  tabs.forEach(function (t) {
-    t.addEventListener('click', function () {
-      tabs.forEach(function (x) { x.classList.remove('on'); });
-      t.classList.add('on');
-      cat = t.dataset.filter || '';
-      apply();
-    });
-  });
-  q.addEventListener('input', apply);
-  sort.addEventListener('change', apply);
-  if (initialCategory === 'goi-an') {
-    tabs.forEach(function (t) {
-      var selected = t.dataset.filter === '__mealplans';
-      t.classList.toggle('on', selected);
-      if (selected) cat = '__mealplans';
-    });
-    apply();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMenu);
+  } else {
+    initMenu();
   }
 })();
