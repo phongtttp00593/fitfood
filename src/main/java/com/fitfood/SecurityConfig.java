@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .failureUrl("/dang-nhap?error")
                 .permitAll())
             .logout(logout -> logout
-                .logoutUrl("/dang-xuat")
+                .logoutUrl("/logout")
                 .logoutSuccessUrl("/dang-nhap?logout")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
