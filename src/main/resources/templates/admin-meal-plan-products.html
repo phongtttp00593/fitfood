@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Chọn sản phẩm cho gói | FITFOOD Admin</title>
+
+  <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
+  <link rel="stylesheet" th:href="@{/css/admin-theme.css}" />
+
+  <style>
+    .edit-page {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+
+    .edit-page h1 {
+      margin: 8px 0;
+      color: #2b180f;
+    }
+
+    .edit-lead {
+      color: #746255;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 12px;
+      color: #8e3323;
+      text-decoration: none;
+    }
+
+    .edit-card {
+      margin: 18px 0;
+      padding: 22px;
+      background: #fff;
+      border: 1px solid #ead8bd;
+      border-radius: 16px;
+    }
+
+    .edit-card h2 {
+      margin: 0 0 8px;
+      font-size: 20px;
+    }
+
+    .package-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px;
+      color: #604c3c;
+    }
+
+    .package-summary strong {
+      color: #a53021;
+    }
+
+    .meal-alert {
+      margin: 12px 0;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: #edf8ef;
+      color: #22623d;
+    }
+
+    .meal-alert.error {
+      background: #fff0eb;
+      color: #a33322;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .product-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid #eadfce;
+      border-radius: 12px;
+      background: #fffdf8;
+      cursor: pointer;
+    }
+
+    .product-option:has(input:checked) {
+      border-color: #a53021;
+      box-shadow: 0 0 0 2px #a5302118;
+      background: #fffaf2;
+    }
+
+    .product-option input {
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+      margin-top: 4px;
+      accent-color: #a53021;
+    }
+
+    .product-option b {
+      display: block;
+      color: #321c12;
+    }
+
+    .product-option small {
+      display: block;
+      margin-top: 5px;
+      color: #817466;
+      line-height: 1.5;
+    }
+
+    .product-option .price {
+      display: block;
+      margin-top: 8px;
+      color: #a53021;
+      font-weight: 700;
+    }
+
+    .product-option.disabled {
+      opacity: 0.62;
+      cursor: not-allowed;
+    }
+
+    .edit-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .save-button {
+      border: 0;
+      border-radius: 9px;
+      padding: 13px 20px;
+      background: #a53021;
+      color: #fff;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .edit-note {
+      color: #817466;
+      font-size: 13px;
+    }
+
+    @media (max-width: 650px) {
+      .edit-card {
+        padding: 16px;
+      }
+
+      .edit-actions {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .save-button {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body class="admin-body">
+  <div class="adm-layout">
+    <aside
+      class="adm-sidebar"
+      th:replace="~{fragments/admin-sidebar :: sidebar('meal-plans')}"
+    ></aside>
+
+    <div class="adm-main">
+      <header class="adm-top">
+        <div class="admin-breadcrumb">
+          FITFOOD
+          <span>/</span>
+          <a th:href="@{/admin/meal-plans}">Gói ăn</a>
+          <span>/</span>
+          <b>Chọn sản phẩm</b>
+        </div>
+      </header>
+
+      <main class="adm-content edit-page">
+        <a class="back-link" th:href="@{/admin/meal-plans}">
+          ← Danh sách gói ăn
+        </a>
+
+        <span class="admin-eyebrow">THIẾT LẬP THỰC ĐƠN</span>
+        <h1>Chọn sản phẩm cho gói</h1>
+
+        <section class="edit-card">
+          <h2 th:text="${mealPlan.name}">Gói ăn 7 ngày</h2>
+
+          <div class="package-summary">
+            <span>
+              Thời hạn:
+              <strong
+                th:text="${mealPlan.numberOfDays != null ? mealPlan.numberOfDays + ' ngày' : '—'}"
+              >7 ngày</strong>
+            </span>
+
+            <span>
+              Giá gói:
+              <strong
+                th:text="${#numbers.formatDecimal(mealPlan.price, 0, 'COMMA', 0, 'POINT')} + 'đ'"
+              >450.000đ</strong>
+            </span>
+
+            <span>
+              Ngày áp dụng:
+              <strong
+                th:text="${mealPlan.availableFrom != null ? #temporals.format(mealPlan.availableFrom, 'dd/MM/yyyy') : 'Chưa đặt ngày'}"
+              >27/10/2026</strong>
+            </span>
+
+            <span>
+              Đang chọn:
+              <strong th:text="${selectedCount} + ' sản phẩm'">2 sản phẩm</strong>
+            </span>
+          </div>
+
+          <p class="edit-lead" th:text="${mealPlan.description}">
+            Mô tả gói ăn
+          </p>
+        </section>
+
+        <div
+          class="meal-alert"
+          th:if="${mealPlanSuccess}"
+          th:text="${mealPlanSuccess}"
+          role="status"
+        ></div>
+
+        <div
+          class="meal-alert error"
+          th:if="${mealPlanError}"
+          th:text="${mealPlanError}"
+          role="alert"
+        ></div>
+
+        <form
+          method="post"
+          th:action="@{/admin/meal-plans/{id}/products(id=${mealPlan.id})}"
+        >
+          <input
+            type="hidden"
+            th:name="${_csrf.parameterName}"
+            th:value="${_csrf.token}"
+          />
+
+          <section class="edit-card">
+            <h2>Sản phẩm trong gói</h2>
+            <p class="edit-lead">
+              Tích chọn các món muốn đưa vào thực đơn của gói. Chọn ít nhất một món đang bán.
+            </p>
+
+            <div class="product-grid">
+              <label
+                class="product-option"
+                th:each="product : ${products}"
+                th:classappend="${!product.active} ? ' disabled' : ''"
+              >
+                <input
+                  type="checkbox"
+                  name="productIds"
+                  th:value="${product.id}"
+                  th:checked="${product.selected && product.active}"
+                  th:disabled="${!product.active}"
+                />
+
+                <span>
+                  <b th:text="${product.name}">Tên món</b>
+
+                  <small
+                    th:if="${product.description != null}"
+                    th:text="${product.description}"
+                  >Mô tả món</small>
+
+                  <small th:unless="${product.active}">
+                    Món đã ngừng bán — sẽ được gỡ khỏi gói khi lưu.
+                  </small>
+
+                  <strong
+                    class="price"
+                    th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + 'đ'"
+                  >49.000đ</strong>
+                </span>
+              </label>
+            </div>
+
+            <div class="edit-actions">
+              <span class="edit-note">
+                Món đã chọn sẽ là các suất mặc định trong gói.
+              </span>
+              <button class="save-button" type="submit">
+                Lưu sản phẩm cho gói
+              </button>
+            </div>
+          </section>
+        </form>
+
+        <a class="back-link" th:href="@{/admin/customers}">
+          Tiếp tục gán gói cho khách hàng →
+        </a>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
