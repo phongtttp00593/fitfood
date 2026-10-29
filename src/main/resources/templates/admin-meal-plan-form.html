@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title th:text="${pageTitle} + ' | FITFOOD Admin'">Thêm gói ăn | FITFOOD Admin</title>
+
+  <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
+  <link rel="stylesheet" th:href="@{/css/admin-theme.css}" />
+
+  <style>
+    .form-page {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .form-page h1 {
+      color: #2b180f;
+      margin: 8px 0;
+    }
+
+    .form-lead {
+      color: #746255;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-bottom: 12px;
+      color: #8e3323;
+      text-decoration: none;
+    }
+
+    .form-card {
+      background: #fff;
+      border: 1px solid #ead8bd;
+      border-radius: 16px;
+      padding: 22px;
+      margin: 18px 0;
+    }
+
+    .form-card h2 {
+      font-size: 20px;
+      margin: 0 0 8px;
+    }
+
+    .meal-fields {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .meal-field {
+      display: grid;
+      gap: 7px;
+      color: #67564a;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .meal-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .meal-field input,
+    .meal-field textarea {
+      box-sizing: border-box;
+      min-height: 44px;
+      border: 1px solid #dfc79f;
+      border-radius: 9px;
+      padding: 10px 12px;
+      font: inherit;
+      background: #fffdf8;
+    }
+
+    .meal-field textarea {
+      min-height: 82px;
+      resize: vertical;
+    }
+
+    .field-error {
+      color: #a33322;
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(255px, 1fr));
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .product-option {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      padding: 16px;
+      border: 1px solid #eadfce;
+      border-radius: 12px;
+      background: #fffdf8;
+      cursor: pointer;
+    }
+
+    .product-option:has(input:checked) {
+      border-color: #a53021;
+      box-shadow: 0 0 0 2px #a5302118;
+      background: #fffaf2;
+    }
+
+    .product-option input {
+      flex: 0 0 auto;
+      width: 18px;
+      height: 18px;
+      margin-top: 4px;
+      accent-color: #a53021;
+    }
+
+    .product-option b {
+      display: block;
+      color: #321c12;
+    }
+
+    .product-option small {
+      display: block;
+      margin-top: 5px;
+      color: #817466;
+      line-height: 1.5;
+    }
+
+    .product-option .price {
+      display: block;
+      margin-top: 8px;
+      color: #a53021;
+      font-weight: 700;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .save-button {
+      border: 0;
+      border-radius: 9px;
+      padding: 13px 20px;
+      background: #a53021;
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .save-button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .cancel-button {
+      border-radius: 9px;
+      padding: 13px 18px;
+      background: #f8efd9;
+      color: #8e3323;
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .empty-products {
+      padding: 22px;
+      border: 1px dashed #ddc79f;
+      border-radius: 12px;
+      color: #76644e;
+      text-align: center;
+    }
+
+    @media (max-width: 650px) {
+      .form-card {
+        padding: 16px;
+      }
+
+      .meal-fields {
+        grid-template-columns: 1fr;
+      }
+
+      .meal-field.full {
+        grid-column: auto;
+      }
+
+      .form-actions {
+        flex-direction: column;
+      }
+
+      .form-actions > * {
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body class="admin-body">
+  <div class="adm-layout">
+    <aside
+      class="adm-sidebar"
+      th:replace="~{fragments/admin-sidebar :: sidebar('meal-plans')}"
+    ></aside>
+
+    <div class="adm-main">
+      <header class="adm-top">
+        <div class="admin-breadcrumb">
+          FITFOOD
+          <span>/</span>
+          <a th:href="@{/admin/meal-plans}">Gói ăn</a>
+          <span>/</span>
+          <b th:text="${pageTitle}">Thêm gói</b>
+        </div>
+      </header>
+
+      <main class="adm-content form-page">
+        <a class="back-link" th:href="@{/admin/meal-plans}">
+          ← Danh sách gói ăn
+        </a>
+
+        <span class="admin-eyebrow">THỰC ĐƠN FITFOOD</span>
+        <h1 th:text="${pageTitle}">Thêm gói ăn mới</h1>
+        <p class="form-lead">
+          Gói mới sẽ tự xuất hiện trên thực đơn của user sau khi lưu.
+        </p>
+
+        <form method="post" th:action="${formAction}" th:object="${mealPlanForm}">
+          <input
+            type="hidden"
+            th:name="${_csrf.parameterName}"
+            th:value="${_csrf.token}"
+          />
+
+          <section class="form-card">
+            <h2>Thông tin gói ăn</h2>
+
+            <div class="meal-fields">
+              <label class="meal-field full" for="name">
+                Tên gói ăn *
+                <input
+                  id="name"
+                  type="text"
+                  th:field="*{name}"
+                  maxlength="150"
+                  placeholder="Ví dụ: Gói ăn healthy 7 ngày"
+                  required
+                />
+                <span
+                  class="field-error"
+                  th:if="${#fields.hasErrors('name')}"
+                  th:errors="*{name}"
+                >Lỗi tên gói</span>
+              </label>
+
+              <label class="meal-field" for="price">
+                Giá gói (đ) *
+                <input
+                  id="price"
+                  type="number"
+                  th:field="*{price}"
+                  min="0"
+                  step="1000"
+                  required
+                />
+                <span
+                  class="field-error"
+                  th:if="${#fields.hasErrors('price')}"
+                  th:errors="*{price}"
+                >Lỗi giá</span>
+              </label>
+
+              <label class="meal-field" for="numberOfDays">
+                Thời hạn (ngày) *
+                <input
+                  id="numberOfDays"
+                  type="number"
+                  th:field="*{numberOfDays}"
+                  min="1"
+                  max="365"
+                  required
+                />
+                <span
+                  class="field-error"
+                  th:if="${#fields.hasErrors('numberOfDays')}"
+                  th:errors="*{numberOfDays}"
+                >Lỗi thời hạn</span>
+              </label>
+
+              <label class="meal-field" for="availableFrom">
+                Ngày áp dụng trên thực đơn *
+                <input
+                  id="availableFrom"
+                  type="date"
+                  th:field="*{availableFrom}"
+                  required
+                />
+                <span
+                  class="field-error"
+                  th:if="${#fields.hasErrors('availableFrom')}"
+                  th:errors="*{availableFrom}"
+                >Lỗi ngày áp dụng</span>
+              </label>
+
+              <label class="meal-field full" for="description">
+                Mô tả
+                <textarea
+                  id="description"
+                  th:field="*{description}"
+                  maxlength="500"
+                  placeholder="Mô tả ngắn về gói ăn"
+                ></textarea>
+                <span
+                  class="field-error"
+                  th:if="${#fields.hasErrors('description')}"
+                  th:errors="*{description}"
+                >Lỗi mô tả</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="form-card">
+            <h2>Chọn món trong gói</h2>
+            <p class="form-lead">
+              Chọn các sản phẩm sẽ xuất hiện trong thực đơn gói ăn. Cần chọn ít nhất một món.
+            </p>
+
+            <div
+              class="product-grid"
+              th:if="${!#lists.isEmpty(productOptions)}"
+            >
+              <label class="product-option" th:each="product : ${productOptions}">
+                <input
+                  type="checkbox"
+                  th:field="*{productIds}"
+                  th:value="${product.id}"
+                />
+                <span>
+                  <b th:text="${product.name}">Tên món</b>
+                  <small
+                    th:if="${product.description != null}"
+                    th:text="${product.description}"
+                  >Mô tả</small>
+                  <strong
+                    class="price"
+                    th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + 'đ'"
+                  >49.000đ</strong>
+                </span>
+              </label>
+            </div>
+
+            <p
+              class="field-error"
+              th:if="${#fields.hasErrors('productIds')}"
+              th:errors="*{productIds}"
+            >Hãy chọn ít nhất một sản phẩm.</p>
+
+            <div
+              class="empty-products"
+              th:if="${#lists.isEmpty(productOptions)}"
+            >
+              Chưa có sản phẩm nào đang bán để thêm vào gói.
+            </div>
+
+            <div class="form-actions">
+              <a class="cancel-button" th:href="@{/admin/meal-plans}">Hủy</a>
+              <button
+                class="save-button"
+                type="submit"
+                th:disabled="${#lists.isEmpty(productOptions)}"
+                th:text="${submitLabel}"
+              >Thêm gói ăn</button>
+            </div>
+          </section>
+        </form>
+      </main>
+    </div>
+  </div>
+</body>
+</html>
