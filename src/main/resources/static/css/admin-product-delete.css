@@ -1,9 +1,140 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/CascadeStyleSheet.css to edit this template
-*/
-/* 
-    Created on : 28 thg 10, 2026, 00:06:08
-    Author     : Administrator
-*/
+* {
+    box-sizing: border-box;
+    font-family: "Be Vietnam Pro", Arial, sans-serif;
+}
 
+.delete-product-container {
+    max-width: 520px;
+    margin: 30px auto;
+}
+
+.delete-card {
+    background: var(--surface, #fffcf5);
+    border: 1px solid var(--gold-300, #dcc07e);
+    border-radius: 16px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 16px 40px rgba(35, 20, 13, 0.12);
+}
+
+.delete-icon {
+    font-size: 42px;
+    margin-bottom: 10px;
+    line-height: 1;
+}
+
+.delete-card h2 {
+    color: var(--lacquer, #3a2217);
+    font-size: 20px;
+    font-weight: 800;
+    margin: 0 0 8px;
+}
+
+.delete-warning {
+    color: var(--muted, #6e5d4f);
+    font-size: 14px;
+    margin: 0 0 20px;
+}
+
+.product-info-box {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--gold-50, #f7eed6);
+    border: 1px dashed var(--gold-300, #dcc07e);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 24px;
+    text-align: left;
+}
+
+.info-thumb img {
+    width: 65px;
+    height: 65px;
+    border-radius: 8px;
+    object-fit: cover;
+    border: 1px solid var(--line, #e6d8bc);
+}
+
+.info-thumb .no-img {
+    width: 65px;
+    height: 65px;
+    background: var(--line, #e6d8bc);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--muted, #6e5d4f);
+}
+
+.info-detail h3 {
+    margin: 0 0 4px;
+    color: var(--lacquer, #3a2217);
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.info-detail p {
+    margin: 3px 0;
+    font-size: 13px;
+    color: var(--lacquer, #3a2217);
+}
+
+.badge {
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.badge-success {
+    background: #def7ec;
+    color: #03543f;
+}
+
+.badge-danger {
+    background: #fde8e8;
+    color: #9b1c1c;
+}
+
+.delete-action-form {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.btn-danger {
+    background: var(--red, #9b2c1f);
+    color: #ffffff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-danger:hover {
+    background: #7a1f14;
+}
+
+.btn-secondary {
+    background: #e2e8f0;
+    color: #4a5568;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #cbd5e0;
+}
