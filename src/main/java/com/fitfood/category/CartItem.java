@@ -2,6 +2,7 @@ package com.fitfood.category;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import org.hibernate.annotations.Nationalized;
 
 @Entity
 @Table(name = "fitfood_cart_items")
@@ -24,6 +25,15 @@ public class CartItem {
 
     @Column(name = "unit_price", nullable = false, precision = 18, scale = 2)
     private BigDecimal unitPrice;
+
+    @Column(name = "meal_plan_name", length = 180)
+    private String mealPlanName;
+
+    // Ghi chú riêng của khách cho món ăn; NVARCHAR để lưu tiếng Việt có dấu.
+    @Nationalized
+    @Column(name = "food_note", length = 500)
+    private String foodNote;
+
 
     public CartItem() {
     }
@@ -67,4 +77,10 @@ public class CartItem {
     public void setUnitPrice(BigDecimal unitPrice) {
         this.unitPrice = unitPrice;
     }
+
+    public String getMealPlanName() { return mealPlanName; }
+    public void setMealPlanName(String mealPlanName) { this.mealPlanName = mealPlanName; }
+
+    public String getFoodNote() { return foodNote; }
+    public void setFoodNote(String foodNote) { this.foodNote = foodNote; }
 }

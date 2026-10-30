@@ -227,10 +227,13 @@
     if (!form) {
       form = document.createElement('form');
       form.method = 'POST';
+      form.acceptCharset = 'UTF-8';
       form.action = '/cart/add';
       form.style.display = 'none';
       document.body.appendChild(form);
     }
+    // Dù là form có sẵn hay form tạo động, luôn gửi dữ liệu bằng UTF-8.
+    form.acceptCharset = 'UTF-8';
 
     function setHidden(name, value) {
       var input = form.querySelector('input[name="' + name + '"]');
@@ -247,6 +250,10 @@
 
     setHidden('productId', data.id);
     setHidden('quantity', quantity);
+
+    // Gửi ghi chú món ăn bằng form UTF-8 để giữ nguyên tiếng Việt có dấu.
+    var foodNoteInput = document.getElementById('userFoodNote');
+    setHidden('foodNote', foodNoteInput ? foodNoteInput.value.trim() : '');
 
     // Nếu form chưa có CSRF token, lấy token có sẵn trên trang.
     var csrfInput = form.querySelector('input[name="_csrf"]');
