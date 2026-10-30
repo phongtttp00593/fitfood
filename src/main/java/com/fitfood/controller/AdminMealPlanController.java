@@ -81,6 +81,8 @@ public class AdminMealPlanController {
         form.setName(plan.name()); form.setDescription(plan.description()); form.setPrice(plan.price());
         form.setNumberOfDays(plan.numberOfDays()); form.setAvailableFrom(plan.availableFrom());
         form.setProductIds(jdbc.queryForList("SELECT product_id FROM dbo.fitfood_meal_plan_items WHERE meal_plan_id = ?", Long.class, mealPlanId));
+        model.addAttribute("productQuantities", jdbc.query("SELECT product_id, quantity FROM dbo.fitfood_meal_plan_items WHERE meal_plan_id = ?",
+                rs -> { java.util.Map<Long, Integer> values = new java.util.HashMap<>(); while (rs.next()) values.put(rs.getLong("product_id"), rs.getInt("quantity")); return values; }, mealPlanId));
         model.addAttribute("mealPlanForm", form); addProductOptions(model);
         model.addAttribute("formAction", "/admin/meal-plans/" + mealPlanId + "/edit");
         model.addAttribute("pageTitle", "Sửa gói ăn"); model.addAttribute("submitLabel", "Lưu thay đổi");
@@ -90,7 +92,8 @@ public class AdminMealPlanController {
     @PostMapping("/{mealPlanId}/edit")
     @Transactional
     public String update(@PathVariable Long mealPlanId, @Valid @ModelAttribute("mealPlanForm") MealPlanCreateForm form,
-            BindingResult errors, Model model, RedirectAttributes redirect) {
+            BindingResult errors, Model model, RedirectAttributes redirect,
+            @org.springframework.web.bind.annotation.RequestParam java.util.Map<String, String> requestParams) {
         findMealPlan(mealPlanId);
         Set<Long> selected = form.getProductIds() == null ? Set.of() : new LinkedHashSet<>(form.getProductIds());
         if (selected.isEmpty()) errors.rejectValue("productIds", "empty", "Hãy chọn ít nhất một sản phẩm cho gói.");
@@ -105,7 +108,7 @@ public class AdminMealPlanController {
         jdbc.update("UPDATE dbo.fitfood_meal_plans SET [name] = ?, [description] = ?, price = ?, number_of_days = ?, available_from = ? WHERE id = ?",
                 form.getName().strip(), form.getDescription() == null || form.getDescription().isBlank() ? null : form.getDescription().strip(),
                 form.getPrice(), form.getNumberOfDays(), form.getAvailableFrom(), mealPlanId);
-        syncProducts(mealPlanId, selected); redirect.addFlashAttribute("success", "Đã lưu thay đổi gói ăn.");
+        syncProductsWithQuantities(mealPlanId, selected, requestParams); redirect.addFlashAttribute("success", "Đã lưu thay đổi gói ăn.");
         return "redirect:/admin/meal-plans";
     }
 
@@ -136,7 +139,8 @@ public class AdminMealPlanController {
     @PostMapping
     @Transactional
     public String create(@Valid @ModelAttribute("mealPlanForm") MealPlanCreateForm form,
-            BindingResult errors, Model model, RedirectAttributes redirect) {
+            BindingResult errors, Model model, RedirectAttributes redirect,
+            @org.springframework.web.bind.annotation.RequestParam java.util.Map<String, String> requestParams) {
         Set<Long> selected = form.getProductIds() == null ? Set.of() : new LinkedHashSet<>(form.getProductIds());
         if (selected.isEmpty()) {
             errors.rejectValue("productIds", "empty", "Hãy chọn ít nhất một sản phẩm cho gói.");
@@ -159,8 +163,9 @@ public class AdminMealPlanController {
                 form.getDescription() == null || form.getDescription().isBlank() ? null : form.getDescription().strip(),
                 form.getPrice(), form.getNumberOfDays(), form.getAvailableFrom(), true));
         for (Long productId : selected) {
-            jdbc.update("INSERT INTO dbo.fitfood_meal_plan_items (meal_plan_id, product_id, quantity) VALUES (?, ?, 1)",
-                    saved.getId(), productId);
+            int quantity = readQuantity(requestParams, productId);
+            jdbc.update("INSERT INTO dbo.fitfood_meal_plan_items (meal_plan_id, product_id, quantity) VALUES (?, ?, ?)",
+                    saved.getId(), productId, quantity);
         }
         redirect.addFlashAttribute("success", "Đã thêm gói ăn. Gói đã xuất hiện trên thực đơn user.");
         return "redirect:/admin/meal-plans";
@@ -223,8 +228,9 @@ public class AdminMealPlanController {
                         "VALUES (?, ?, 1)", mealPlanId, addedProductId);
             }
         }
-        redirect.addFlashAttribute("mealPlanSuccess", "Đã cập nhật sản phẩm trong gói ăn.");
-        return redirectTo(mealPlanId);
+        redirect.addFlashAttribute("success", "Đã cập nhật sản phẩm trong gói ăn.");
+        // Lưu xong quay về danh sách gói ăn thay vì giữ Admin ở màn hình chi tiết.
+        return "redirect:/admin/meal-plans";
     }
 
     private void addProductOptions(Model model) {
@@ -232,6 +238,30 @@ public class AdminMealPlanController {
                 "SELECT id, name, description, price FROM dbo.fitfood_products WHERE active = 1 ORDER BY name",
                 (rs, rowNum) -> new MealProductOption(rs.getLong("id"), rs.getString("name"),
                         rs.getString("description"), rs.getBigDecimal("price"), true, false)));
+    }
+
+    private int readQuantity(java.util.Map<String, String> params, Long productId) {
+        String raw = params.get("quantity_" + productId);
+        if (raw == null || raw.isBlank()) return 1;
+        try { return Math.max(1, Math.min(99, Integer.parseInt(raw))); }
+        catch (NumberFormatException ex) { return 1; }
+    }
+
+    private void syncProductsWithQuantities(Long mealPlanId, Set<Long> selected, java.util.Map<String, String> params) {
+        Set<Long> existing = new HashSet<>(jdbc.queryForList(
+                "SELECT product_id FROM dbo.fitfood_meal_plan_items WHERE meal_plan_id = ?", Long.class, mealPlanId));
+        for (Long removedId : existing) if (!selected.contains(removedId)) {
+            jdbc.update("DELETE FROM dbo.fitfood_customer_meal_plan_items WHERE meal_plan_id = ? AND slot_product_id = ?", mealPlanId, removedId);
+            jdbc.update("DELETE FROM dbo.fitfood_meal_plan_items WHERE meal_plan_id = ? AND product_id = ?", mealPlanId, removedId);
+        }
+        for (Long productId : selected) {
+            int quantity = readQuantity(params, productId);
+            if (existing.contains(productId)) {
+                jdbc.update("UPDATE dbo.fitfood_meal_plan_items SET quantity = ? WHERE meal_plan_id = ? AND product_id = ?", quantity, mealPlanId, productId);
+            } else {
+                jdbc.update("INSERT INTO dbo.fitfood_meal_plan_items (meal_plan_id, product_id, quantity) VALUES (?, ?, ?)", mealPlanId, productId, quantity);
+            }
+        }
     }
 
     private void syncProducts(Long mealPlanId, Set<Long> selected) {

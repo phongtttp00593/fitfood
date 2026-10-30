@@ -7,9 +7,13 @@
   <title th:text="${pageTitle} + ' | FITFOOD Admin'">Thêm gói ăn | FITFOOD Admin</title>
 
   <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" th:href="@{/css/admin-theme.css}" />
 
   <style>
+    body.admin-body, body.admin-body * { font-family: "Be Vietnam Pro", sans-serif; }
     .form-page {
       max-width: 1100px;
       margin: 0 auto;
@@ -129,12 +133,8 @@
       line-height: 1.5;
     }
 
-    .product-option .price {
-      display: block;
-      margin-top: 8px;
-      color: #a53021;
-      font-weight: 700;
-    }
+    .product-quantity { display:flex; align-items:center; gap:8px; margin-top:12px; color:#746255; font-size:12px; font-weight:700; }
+    .product-quantity input { width:82px; min-height:36px; border:1px solid #dfc79f; border-radius:8px; padding:6px 8px; font:inherit; }
 
     .form-actions {
       display: flex;
@@ -335,7 +335,7 @@
           <section class="form-card">
             <h2>Chọn món trong gói</h2>
             <p class="form-lead">
-              Chọn các sản phẩm sẽ xuất hiện trong thực đơn gói ăn. Cần chọn ít nhất một món.
+              Chọn món có trong gói và số lượng tương ứng. Giá bán chỉ cần thiết lập ở cấp gói ăn; không hiển thị giá riêng từng món tại đây.
             </p>
 
             <div
@@ -354,10 +354,10 @@
                     th:if="${product.description != null}"
                     th:text="${product.description}"
                   >Mô tả</small>
-                  <strong
-                    class="price"
-                    th:text="${#numbers.formatDecimal(product.price, 0, 'COMMA', 0, 'POINT')} + 'đ'"
-                  >49.000đ</strong>
+                  <span class="product-quantity">
+                    Số lượng
+                    <input type="number" min="1" max="99" value="1" th:name="'quantity_' + ${product.id}" th:value="${productQuantities != null and productQuantities[product.id] != null ? productQuantities[product.id] : 1}" aria-label="Số lượng món" />
+                  </span>
                 </span>
               </label>
             </div>
