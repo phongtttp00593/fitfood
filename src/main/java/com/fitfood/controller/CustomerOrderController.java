@@ -1,3 +1,4 @@
+
 package com.fitfood.controller;
 
 import com.fitfood.auth.model.AppUser;
@@ -102,10 +103,14 @@ public class CustomerOrderController {
         String note = (orderNote == null || orderNote.isBlank()) ? null : orderNote.strip();
 
         if (name.isEmpty() || name.length() > 100
-                || phone.isEmpty() || phone.length() > 20
                 || address.isEmpty() || address.length() > 255) {
             redirect.addFlashAttribute("warningMessage",
-                    "Vui lòng nhập đầy đủ họ tên, số điện thoại và địa chỉ nhận hàng hợp lệ.");
+                    "Vui lòng nhập đầy đủ họ tên và địa chỉ nhận hàng hợp lệ.");
+            return "redirect:/cart";
+        }
+        if (!phone.matches("[0-9]{10}")) {
+            redirect.addFlashAttribute("warningMessage",
+                    "Số điện thoại phải gồm đúng 10 chữ số (0-9).");
             return "redirect:/cart";
         }
 

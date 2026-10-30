@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{v2/fragments/layout :: head('Giỏ hàng')}">
@@ -11,7 +12,7 @@
 <!-- POPUP THÔNG BÁO XÓA HIỆN ĐẠI (CONFIRM -> LOADING XOAY -> THÀNH CÔNG) -->
 <div id="deleteModalOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.55); backdrop-filter: blur(3px); align-items: center; justify-content: center; z-index: 999999;">
     <div style="background: #fff; width: 340px; max-width: 90%; border-radius: 16px; padding: 28px 24px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.15); animation: zoomIn 0.25s ease;">
-        
+
         <!-- TRẠNG THÁI 1: XÁC NHẬN HỎI XÓA -->
         <div id="deleteConfirmBox">
             <div style="width: 58px; height: 58px; background: #fff5f5; color: #e53e3e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto 16px;">
@@ -20,11 +21,11 @@
             <h3 style="margin: 0 0 8px; color: #2d3748; font-size: 1.2rem;">Xác nhận xóa món?</h3>
             <p style="color: #718096; font-size: 0.95rem; margin: 0 0 22px;">Món ăn này sẽ được gỡ khỏi giỏ hàng của bạn.</p>
             <div style="display: flex; gap: 10px; justify-content: center;">
-                <button type="button" onclick="closeDeleteModal()" 
+                <button type="button" onclick="closeDeleteModal()"
                         style="flex: 1; padding: 10px; border: 1px solid #e2e8f0; background: #edf2f7; color: #4a5568; border-radius: 8px; font-weight: 600; cursor: pointer;">
                     Hủy bỏ
                 </button>
-                <button type="button" onclick="executeDeleteProcess()" 
+                <button type="button" onclick="executeDeleteProcess()"
                         style="flex: 1; padding: 10px; border: none; background: #e53e3e; color: #fff; border-radius: 8px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(229,62,62,0.25);">
                     Đồng ý xóa
                 </button>
@@ -70,7 +71,11 @@
 
             <div style="margin-bottom: 12px;">
                 <label style="display: block; font-size: 0.88rem; font-weight: 600; color: #4a5568; margin-bottom: 5px;">Số điện thoại liên hệ *</label>
-                <input type="tel" name="receiverPhone" required maxlength="20"
+                <input type="tel" name="receiverPhone" required
+                       inputmode="numeric" minlength="10" maxlength="10"
+                       pattern="[0-9]{10}"
+                       title="Số điện thoại phải gồm đúng 10 chữ số"
+                       oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)"
                        th:value="${customerPhone}"
                        placeholder="VD: 0912345678"
                        style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e0; border-radius: 8px; font-size: 0.95rem; box-sizing: border-box;" />
@@ -249,7 +254,7 @@
 
             <div style="border-top: 1px solid #edf2f7; padding-top: 16px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                 <span style="font-size: 1.15rem; font-weight: 700; color: #2d3748;">Tổng cộng</span>
-                <strong id="cartFinalTotal" style="font-size: 1.35rem; font-weight: 700; color: #27ae60;" 
+                <strong id="cartFinalTotal" style="font-size: 1.35rem; font-weight: 700; color: #27ae60;"
                         th:text="${#numbers.formatDecimal(cartTotal + 15000, 0, 'COMMA', 0, 'POINT')} + 'đ'">
                     15.000đ
                 </strong>
