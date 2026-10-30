@@ -1,217 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Thêm sản phẩm - FITFOOD</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thêm món ăn mới | FITFOOD Admin</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" />
-
-    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
-    <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
-    <link rel="stylesheet" th:href="@{/css/admin-product-add.css}">
-
-    <style>
-        * {
-            box-sizing: border-box;
-            font-family: "Be Vietnam Pro", Arial, sans-serif;
-        }
-        body {
-            background: var(--surface, #fffcf5);
-            margin: 0;
-            padding: 18px 24px 30px;
-            color: var(--lacquer, #3a2217);
-        }
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-        }
-        .message.error {
-            background: #fdf2f2;
-            color: #9b1c1c;
-            border: 1px solid #f8b4b4;
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        .message.success {
-            background: #def7ec;
-            color: #03543f;
-            border: 1px solid #bcf0da;
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-bottom: 16px;
-            font-size: 13px;
-            font-weight: 600;
-        }
-        label {
-            display: block;
-            font-weight: 700;
-            font-size: 13px;
-            margin: 14px 0 6px;
-            color: var(--lacquer, #3a2217);
-        }
-        input[type="text"], input[type="number"], select, textarea {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--line, #e6d8bc);
-            border-radius: 8px;
-            font-size: 14px;
-            background: var(--paper, #fdfaf3);
-            color: var(--lacquer, #3a2217);
-            outline: none;
-            transition: 0.2s;
-        }
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--gold-300, #dcc07e);
-            box-shadow: 0 0 0 3px rgba(220, 192, 126, 0.25);
-            background: #ffffff;
-        }
-        .active-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 16px;
-        }
-        .active-row input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--lacquer, #3a2217);
-            cursor: pointer;
-        }
-        .active-row label {
-            margin: 0;
-            cursor: pointer;
-        }
-        #preview {
-            max-width: 100px;
-            max-height: 100px;
-            border-radius: 8px;
-            margin-top: 10px;
-            display: none;
-            object-fit: cover;
-            border: 1px solid var(--line, #e6d8bc);
-        }
-        .actions {
-            margin-top: 24px;
-            padding-top: 16px;
-            border-top: 1px solid var(--line, #e6d8bc);
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-        .btn.save {
-            background: var(--lacquer, #3a2217);
-            color: #ffffff;
-            border: none;
-            padding: 10px 24px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-        .btn.save:hover {
-            background: #503123;
-        }
-        .btn.cancel {
-            background: #e2e8f0;
-            color: #4a5568;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-        }
-        .btn.cancel:hover {
-            background: #cbd5e0;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/admin-product-add.css}" />
 </head>
 <body>
 
 <div class="container">
-    <div class="message error" th:if="${errorMessage != null}" th:text="${errorMessage}"></div>
-    <div id="productAddSuccess" class="message success" th:if="${productAddSuccess != null}" th:text="${productAddSuccess}"></div>
+    <div th:if="${successMessage}" class="message success" th:text="${successMessage}"></div>
+    <div th:if="${errorMessage}" class="message error" th:text="${errorMessage}"></div>
 
-    <!-- KHÔNG DÙNG target="_top" ĐỂ MỌI THAO TÁC NẰM GỌN TRONG POPUP -->
-    <form th:action="@{/admin/products/save}"
+    <form th:action="@{/admin/products/add}"
           th:object="${productForm}"
           method="post"
           enctype="multipart/form-data">
 
-        <label for="name">Tên sản phẩm *</label>
-        <input id="name" type="text" th:field="*{name}" maxlength="150" required placeholder="Nhập tên món ăn">
+        <label for="name">Tên sản phẩm (*)</label>
+        <input type="text" id="name" th:field="*{name}" required placeholder="Ví dụ: Cơm gà sốt tiêu đen" />
+        <div class="message error" style="margin-top:4px;" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
 
-        <label for="categoryId">Danh mục *</label>
+        <label for="categoryId">Danh mục (*)</label>
         <select id="categoryId" th:field="*{categoryId}" required>
             <option value="">-- Chọn danh mục --</option>
-            <option th:each="category : ${categories}" th:value="${category.id}" th:text="${category.name}"></option>
+            <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
         </select>
+        <div class="message error" style="margin-top:4px;" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></div>
 
-        <label for="price">Giá sản phẩm (VNĐ) *</label>
-        <input id="price" type="number" th:field="*{price}" min="0" step="1000" required placeholder="65000">
+        <label for="price">Giá bán (VNĐ) (*)</label>
+        <input type="number" id="price" th:field="*{price}" step="1000" min="0" required placeholder="Ví dụ: 65000" />
+        <div class="message error" style="margin-top:4px;" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
 
-        <label for="description">Mô tả</label>
-        <textarea id="description" th:field="*{description}" rows="3" placeholder="Mô tả thành phần, calo..."></textarea>
+        <label for="stock">Số lượng hiện có (*)</label>
+        <input type="number" id="stock" th:field="*{stock}" min="0" required placeholder="Ví dụ: 50" />
+        <div class="message error" style="margin-top:4px;" th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}"></div>
 
-        <label for="imageFile">Ảnh sản phẩm</label>
-        <input id="imageFile" type="file" name="imageFile" accept=".jpg,.jpeg,.png,.webp">
-        <img id="preview" alt="Ảnh xem trước">
+        <label for="description">Mô tả món ăn</label>
+        <textarea id="description" th:field="*{description}" placeholder="Mô tả thành phần, calo..."></textarea>
+
+        <label for="imageFile">Hình ảnh món ăn</label>
+        <input type="file" id="imageFile" th:field="*{imageFile}" accept="image/*" onchange="previewImage(this)" />
+        <img id="preview" alt="Xem trước hình ảnh" />
 
         <div class="active-row">
-            <input id="active" type="checkbox" th:field="*{active}">
-            <label for="active">Đang kinh doanh (Hiển thị thực đơn)</label>
+            <input type="checkbox" id="active" th:field="*{active}" />
+            <label for="active">Đang mở bán trên thực đơn</label>
         </div>
 
         <div class="actions">
-            <button type="button" class="btn cancel" id="btnCancelAdd">Hủy bỏ</button>
-            <button type="submit" class="btn save">Lưu sản phẩm</button>
+            <button type="button" class="btn cancel" onclick="closeModal()">Hủy bỏ</button>
+            <button type="submit" class="btn save">Lưu món ăn</button>
         </div>
     </form>
 </div>
 
-<script>
-    // Xem trước ảnh khi chọn
-    const input = document.getElementById('imageFile');
-    const preview = document.getElementById('preview');
-    let previewUrl = null;
-
-    input.addEventListener('change', function () {
-        const file = this.files && this.files[0];
-        if (previewUrl) {
-            URL.revokeObjectURL(previewUrl);
-            previewUrl = null;
-        }
-        if (!file) {
+<script th:inline="javascript">
+    function previewImage(input) {
+        const preview = document.getElementById('preview');
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        } else {
             preview.style.display = 'none';
-            return;
         }
-        previewUrl = URL.createObjectURL(file);
-        preview.src = previewUrl;
-        preview.style.display = 'block';
-    });
+    }
 
-    // Nút hủy bỏ -> Báo trang cha đóng modal
-    document.getElementById('btnCancelAdd').addEventListener('click', function() {
-        if (window.parent && window.parent !== window) {
+    function closeModal() {
+        if (window.parent) {
             window.parent.postMessage({ type: 'FITFOOD_CLOSE_MODAL' }, window.location.origin);
         }
-    });
-</script>
+    }
 
-<!-- TỰ ĐỘNG BÁO TRANG CHA KHI LƯU THÀNH CÔNG -->
-<script th:if="${productAdded}">
-    if (window.parent && window.parent !== window) {
+    /*<![CDATA[*/
+    var addedSuccess = /*[[${successMessage != null}]]*/ false;
+    if (addedSuccess && window.parent) {
         window.parent.postMessage({ type: 'FITFOOD_PRODUCT_ADDED' }, window.location.origin);
     }
+    /*]]>*/
 </script>
 
 </body>

@@ -124,6 +124,7 @@ textarea.form-control {
     border-top: 1px solid var(--line, #e6d8bc);
     display: flex;
     justify-content: flex-end;
+    gap: 12px;
 }
 
 .btn-primary {
@@ -140,4 +141,22 @@ textarea.form-control {
 
 .btn-primary:hover {
     background: #503123;
+}
+
+.btn-cancel {
+    background: #e2e8f0;
+    color: #4a5568;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+
+.btn-cancel:hover {
+    background: #cbd5e0;
 }
