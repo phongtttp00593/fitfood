@@ -8,6 +8,7 @@ import com.fitfood.category.Cart;
 import com.fitfood.category.CartItem;
 import com.fitfood.category.Product;
 import com.fitfood.category.ProductRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,15 +45,44 @@ public class CartController {
     @Autowired
     private JdbcTemplate jdbc;
 
+    @PostConstruct
+    public void ensureCartItemsSchema() {
+        try {
+            jdbc.execute("""
+                IF EXISTS (
+                    SELECT 1 FROM sys.key_constraints
+                    WHERE name = 'UQ_ff_cartitem_product'
+                      AND parent_object_id = OBJECT_ID(N'dbo.fitfood_cart_items')
+                )
+                BEGIN
+                    ALTER TABLE dbo.fitfood_cart_items DROP CONSTRAINT UQ_ff_cartitem_product;
+                END
+                """);
+            jdbc.execute("""
+                IF EXISTS (
+                    SELECT 1 FROM sys.columns c
+                    JOIN sys.types t ON c.user_type_id = t.user_type_id
+                    WHERE c.object_id = OBJECT_ID(N'dbo.fitfood_cart_items')
+                      AND c.name = 'meal_plan_name'
+                      AND t.name <> 'nvarchar'
+                )
+                BEGIN
+                    ALTER TABLE dbo.fitfood_cart_items ALTER COLUMN meal_plan_name NVARCHAR(180) NULL;
+                END
+                """);
+        } catch (Exception ignored) {
+        }
+    }
+
     // Xem giỏ hàng
     @GetMapping
     public String viewCart(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         if (userDetails == null) {
-            return "redirect:/login";
+            return "redirect:/dang-nhap";
         }
         AppUser user = appUserRepository.findByEmailIgnoreCase(userDetails.getUsername()).orElse(null);
         if (user == null) {
-            return "redirect:/login";
+            return "redirect:/dang-nhap";
         }
 
         Cart cart = cartRepository.findByUserId(user.getId()).orElse(null);
@@ -109,6 +139,23 @@ public class CartController {
             }
         }
         model.addAttribute("cartTotal", cartTotal);
+
+        // Lấy sẵn thông tin người nhận mặc định từ hồ sơ khách hàng
+        String defaultPhone = "";
+        String defaultAddress = "";
+        List<Map<String, Object>> profiles = jdbc.queryForList(
+                "SELECT phone, address FROM dbo.fitfood_customer_profiles WHERE user_id = ?",
+                user.getId());
+        if (!profiles.isEmpty()) {
+            Object p = profiles.get(0).get("phone");
+            Object a = profiles.get(0).get("address");
+            if (p != null) defaultPhone = p.toString();
+            if (a != null) defaultAddress = a.toString();
+        }
+        model.addAttribute("customerFullName", user.getFullName() == null ? "" : user.getFullName());
+        model.addAttribute("customerPhone", defaultPhone);
+        model.addAttribute("customerAddress", defaultAddress);
+
         return "v2/cart";
     }
 
@@ -120,7 +167,7 @@ public class CartController {
                             @RequestParam(value = "foodNote", required = false) String foodNote,
                             RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
-            return "redirect:/login";
+            return "redirect:/dang-nhap";
         }
         AppUser user = appUserRepository.findByEmailIgnoreCase(userDetails.getUsername()).orElse(null);
         Product product = productRepository.findById(productId).orElse(null);
@@ -132,7 +179,8 @@ public class CartController {
                 return cartRepository.save(newCart);
             });
 
-            Optional<CartItem> existingItem = cartItemRepository.findByCartIdAndProductId(cart.getId(), productId);
+            Optional<CartItem> existingItem = cartItemRepository
+                    .findFirstByCartIdAndProductIdAndMealPlanNameIsNullOrderByIdAsc(cart.getId(), productId);
             if (existingItem.isPresent()) {
                 CartItem item = existingItem.get();
                 item.setQuantity(item.getQuantity() + quantity);
@@ -159,9 +207,9 @@ public class CartController {
     public String addMealPlanToCart(@AuthenticationPrincipal UserDetails userDetails,
                                     @RequestParam("mealPlanId") Long mealPlanId,
                                     RedirectAttributes redirectAttributes) {
-        if (userDetails == null) return "redirect:/login";
+        if (userDetails == null) return "redirect:/dang-nhap";
         AppUser user = appUserRepository.findByEmailIgnoreCase(userDetails.getUsername()).orElse(null);
-        if (user == null) return "redirect:/login";
+        if (user == null) return "redirect:/dang-nhap";
 
         var plans = jdbc.query("SELECT id, name, price FROM dbo.fitfood_meal_plans WHERE id = ? AND active = 1",
                 (rs, rowNum) -> new Object[]{rs.getLong("id"), rs.getString("name"), rs.getBigDecimal("price")}, mealPlanId);
@@ -186,21 +234,27 @@ public class CartController {
         Cart cart = cartRepository.findByUserId(user.getId()).orElseGet(() -> {
             Cart created = new Cart(); created.setUser(user); return cartRepository.save(created);
         });
-        // Lưu gói ăn thành MỘT dòng trong giỏ, giống một sản phẩm thông thường.
-        // Dùng món đầu tiên làm tham chiếu sản phẩm do cấu trúc giỏ hiện tại yêu cầu product_id;
-        // giá và số lượng của dòng giỏ là giá gói và 1 gói.
         Product representativeProduct = productRepository.findById(dishes.get(0)[0]).orElse(null);
         if (representativeProduct == null) {
             redirectAttributes.addFlashAttribute("mealPlanError", "Không tìm thấy món tham chiếu của gói ăn.");
             return "redirect:/menu#goi-an";
         }
-        CartItem packageItem = new CartItem();
-        packageItem.setCart(cart);
-        packageItem.setProduct(representativeProduct);
-        packageItem.setQuantity(1);
-        packageItem.setUnitPrice(planPrice);
-        packageItem.setMealPlanName(planName);
-        cartItemRepository.save(packageItem);
+        Optional<CartItem> existingPlanItem = cartItemRepository
+                .findFirstByCartIdAndMealPlanNameOrderByIdAsc(cart.getId(), planName);
+        if (existingPlanItem.isPresent()) {
+            CartItem packageItem = existingPlanItem.get();
+            packageItem.setQuantity(packageItem.getQuantity() + 1);
+            packageItem.setUnitPrice(planPrice);
+            cartItemRepository.save(packageItem);
+        } else {
+            CartItem packageItem = new CartItem();
+            packageItem.setCart(cart);
+            packageItem.setProduct(representativeProduct);
+            packageItem.setQuantity(1);
+            packageItem.setUnitPrice(planPrice);
+            packageItem.setMealPlanName(planName);
+            cartItemRepository.save(packageItem);
+        }
         redirectAttributes.addFlashAttribute("successMessage", "Đã thêm gói “" + planName + "” vào giỏ hàng.");
         return "redirect:/cart";
     }
@@ -212,7 +266,7 @@ public class CartController {
                                  @RequestParam("change") int change,
                                  RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
-            return "redirect:/login";
+            return "redirect:/dang-nhap";
         }
 
         Optional<CartItem> optItem = cartItemRepository.findById(itemId);
@@ -235,7 +289,7 @@ public class CartController {
                              @RequestParam("itemId") Long itemId,
                              RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
-            return "redirect:/login";
+            return "redirect:/dang-nhap";
         }
         cartItemRepository.deleteById(itemId);
         redirectAttributes.addFlashAttribute("successMessage", "Đã xóa món khỏi giỏ hàng thành công!");

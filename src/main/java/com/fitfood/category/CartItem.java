@@ -26,6 +26,7 @@ public class CartItem {
     @Column(name = "unit_price", nullable = false, precision = 18, scale = 2)
     private BigDecimal unitPrice;
 
+    @Nationalized
     @Column(name = "meal_plan_name", length = 180)
     private String mealPlanName;
 
