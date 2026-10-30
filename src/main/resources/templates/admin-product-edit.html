@@ -1,81 +1,104 @@
-<!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Chỉnh Sửa Sản Phẩm</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chỉnh sửa sản phẩm | FITFOOD Admin</title>
 
-    <!-- Nhúng phông chữ Be Vietnam Pro của FITFOOD -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" />
-
-    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
-    <link rel="stylesheet" th:href="@{/css/admin-theme.css}">
-    <link rel="stylesheet" th:href="@{/css/admin-product-edit.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-product-edit.css}" />
 </head>
 <body>
-    <div class="edit-product-container">
-        <div th:if="${errorMessage}" class="text-error alert-box" th:text="${errorMessage}"></div>
 
-        <form th:action="@{/admin/products/edit/{id}(id=${productId})}" 
-              th:object="${productForm}" 
-              method="post" 
-              enctype="multipart/form-data" 
-              target="_top"
-              class="product-edit-form">
+<div class="edit-product-container">
+    <div th:if="${errorMessage}" class="alert-box" th:text="${errorMessage}"></div>
 
-            <div class="form-group">
-                <label for="name">Tên món ăn <span class="required">*</span></label>
-                <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="Nhập tên món ăn">
-                <div class="text-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+    <form th:action="@{/admin/products/edit/{id}(id=${productForm.id})}"
+          th:object="${productForm}"
+          method="post"
+          enctype="multipart/form-data">
+
+        <input type="hidden" th:field="*{id}">
+        <input type="hidden" th:field="*{imageUrl}">
+
+        <div class="form-group">
+            <label for="name">Tên món ăn <span class="required">*</span></label>
+            <input type="text" id="name" th:field="*{name}" class="form-control" required />
+            <div class="text-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="categoryId">Danh mục <span class="required">*</span></label>
+            <select id="categoryId" th:field="*{categoryId}" class="form-control" required>
+                <option value="">-- Chọn danh mục --</option>
+                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
+            </select>
+            <div class="text-error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-half">
+                <label for="price">Giá bán (VNĐ) <span class="required">*</span></label>
+                <input type="number" id="price" th:field="*{price}" step="1000" min="0" class="form-control" required />
+                <div class="text-error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
             </div>
 
-            <div class="form-row">
-                <div class="form-group col-half">
-                    <label for="categoryId">Danh mục <span class="required">*</span></label>
-                    <select id="categoryId" th:field="*{categoryId}" class="form-control">
-                        <option value="">-- Chọn danh mục --</option>
-                        <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
-                    </select>
-                    <div class="text-error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></div>
-                </div>
+            <div class="form-group col-half">
+                <label for="stock">Số lượng hiện có <span class="required">*</span></label>
+                <input type="number" id="stock" th:field="*{stock}" min="0" class="form-control" required />
+                <div class="text-error" th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}"></div>
+            </div>
+        </div>
 
-                <div class="form-group col-half">
-                    <label for="price">Giá bán (VNĐ) <span class="required">*</span></label>
-                    <input type="number" id="price" th:field="*{price}" step="1000" class="form-control" placeholder="65000">
-                    <div class="text-error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
-                </div>
+        <div class="form-group">
+            <label for="description">Mô tả món ăn</label>
+            <textarea id="description" th:field="*{description}" class="form-control" rows="3"></textarea>
+            <div class="text-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Hình ảnh hiện tại</label>
+            <div class="current-image-preview">
+                <img th:if="${productForm.imageUrl != null and !productForm.imageUrl.isEmpty()}"
+                     th:src="${productForm.imageUrl}" class="preview-img" alt="Product Image" />
+                <span th:unless="${productForm.imageUrl != null and !productForm.imageUrl.isEmpty()}"
+                      class="no-img-text">Chưa có ảnh</span>
             </div>
 
-            <div class="form-group">
-                <label for="description">Mô tả món ăn</label>
-                <textarea id="description" th:field="*{description}" rows="3" class="form-control" placeholder="Thành phần, calo, dinh dưỡng..."></textarea>
-            </div>
+            <label for="imageFile" style="margin-top: 10px;">Thay đổi hình ảnh</label>
+            <input type="file" id="imageFile" th:field="*{imageFile}" class="form-control file-input" accept="image/*" />
+            <div class="text-error" th:if="${#fields.hasErrors('imageFile')}" th:errors="*{imageFile}"></div>
+        </div>
 
-            <div class="form-group">
-                <label>Hình ảnh hiện tại</label>
-                <div class="current-image-preview">
-                    <img th:if="${currentImageUrl}" th:src="${currentImageUrl}" alt="Ảnh món ăn" class="preview-img">
-                    <span th:unless="${currentImageUrl}" class="no-img-text">Chưa có ảnh</span>
-                </div>
-            </div>
+        <div class="form-group checkbox-group">
+            <label class="switch-label">
+                <input type="checkbox" th:field="*{active}" />
+                <span>Đang mở bán trên thực đơn</span>
+            </label>
+        </div>
 
-            <div class="form-group">
-                <label for="imageFile">Chọn ảnh mới thay thế</label>
-                <input type="file" id="imageFile" name="imageFile" accept="image/*" class="form-control file-input">
-            </div>
+        <div class="form-actions">
+            <button type="button" class="btn-cancel" onclick="closeModal()">Hủy bỏ</button>
+            <button type="submit" class="btn-primary">Lưu thay đổi</button>
+        </div>
+    </form>
+</div>
 
-            <div class="form-group checkbox-group">
-                <label class="switch-label">
-                    <input type="checkbox" th:field="*{active}">
-                    <span>Đang kinh doanh (Hiển thị thực đơn)</span>
-                </label>
-            </div>
+<script th:inline="javascript">
+    function closeModal() {
+        if (window.parent) {
+            window.parent.postMessage({ type: 'FITFOOD_CLOSE_MODAL' }, window.location.origin);
+        }
+    }
 
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">Lưu Thay Đổi</button>
-            </div>
-        </form>
-    </div>
+    /*<![CDATA[*/
+    var updatedSuccess = /*[[${successMessage != null}]]*/ false;
+    if (updatedSuccess && window.parent) {
+        window.parent.postMessage({ type: 'FITFOOD_PRODUCT_UPDATED' }, window.location.origin);
+    }
+    /*]]>*/
+</script>
+
 </body>
 </html>

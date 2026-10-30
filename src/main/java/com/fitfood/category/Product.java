@@ -24,6 +24,9 @@ public class Product {
     @Column(name = "price", nullable = false, precision = 18, scale = 2)
     private BigDecimal price;
 
+    @Column(name = "stock", nullable = false)
+    private Integer stock = 0;
+
     @Column(name = "image_url")
     private String imageUrl;
 
@@ -40,6 +43,9 @@ public class Product {
     public void prePersist() {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
+        }
+        if (stock == null) {
+            stock = 0;
         }
     }
 
@@ -81,6 +87,14 @@ public class Product {
 
     public void setPrice(BigDecimal price) {
         this.price = price;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock != null ? stock : 0;
     }
 
     public String getImageUrl() {
