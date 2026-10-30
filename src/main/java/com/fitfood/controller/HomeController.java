@@ -56,9 +56,41 @@ public class HomeController {
         return "index";
     }
 
+    @GetMapping("/meal-plan/{id}")
+    public String mealPlanDetail(@org.springframework.web.bind.annotation.PathVariable("id") Long id, Model model) {
+        var plans = jdbc.query("SELECT id, name, description, price, number_of_days FROM dbo.fitfood_meal_plans WHERE id = ? AND active = 1",
+            (rs, rowNum) -> new MealPlanDetailView(rs.getLong("id"), rs.getString("name"), rs.getString("description"),
+                rs.getBigDecimal("price"), rs.getObject("number_of_days", Integer.class)), id);
+        if (plans.isEmpty()) return "redirect:/menu#goi-an";
+        model.addAttribute("mealPlan", plans.get(0));
+        model.addAttribute("dishes", jdbc.query("""
+            SELECT p.id, p.name, p.description, p.image_url, p.price, mpi.quantity
+            FROM dbo.fitfood_meal_plan_items mpi
+            JOIN dbo.fitfood_products p ON p.id = mpi.product_id
+            WHERE mpi.meal_plan_id = ? AND p.active = 1
+            ORDER BY p.name
+            """, (rs, rowNum) -> new MealPlanDetailDish(rs.getLong("id"), rs.getString("name"),
+                rs.getString("description"), rs.getString("image_url"), rs.getBigDecimal("price"), rs.getInt("quantity")), id));
+        return "v2/meal-plan-detail";
+    }
+
     @GetMapping("/menu")
     public String menu(Model model, Authentication authentication) {
         model.addAttribute("mealPlans", mealPlans.findByActiveTrueOrderByNameAsc());
+        // Món trong từng gói do Admin cấu hình; USER chỉ xem chi tiết và mua gói, không tự đổi món.
+        Map<Long, List<MealPlanDishView>> mealPlanDishes = new java.util.LinkedHashMap<>();
+        for (var plan : mealPlans.findByActiveTrueOrderByNameAsc()) {
+            List<MealPlanDishView> dishes = jdbc.query("""
+                SELECT p.name, p.description, p.image_url, mpi.quantity
+                FROM dbo.fitfood_meal_plan_items mpi
+                JOIN dbo.fitfood_products p ON p.id = mpi.product_id
+                WHERE mpi.meal_plan_id = ? AND p.active = 1
+                ORDER BY p.name
+                """, (rs, rowNum) -> new MealPlanDishView(rs.getString("name"),
+                    rs.getString("description"), rs.getString("image_url"), rs.getInt("quantity")), plan.getId());
+            mealPlanDishes.put(plan.getId(), dishes);
+        }
+        model.addAttribute("mealPlanDishes", mealPlanDishes);
         // Lấy món ăn đang bán từ SQL Server để thực đơn luôn đồng bộ với quản trị sản phẩm.
         model.addAttribute("menuProducts", jdbc.query("""
             SELECT id, name, description, price, image_url
@@ -135,6 +167,9 @@ public class HomeController {
 
     public record MenuPageProduct(Long id, String name, String description,
             BigDecimal price, String priceLabel, String imageUrl, String categoryName) { }
+    public record MealPlanDishView(String name, String description, String imageUrl, int quantity) { }
+    public record MealPlanDetailView(Long id, String name, String description, BigDecimal price, Integer numberOfDays) { }
+    public record MealPlanDetailDish(Long id, String name, String description, String imageUrl, BigDecimal price, int quantity) { }
 
     public record MenuProduct(Long id, String name, String description,
             BigDecimal price, String imageUrl) { }

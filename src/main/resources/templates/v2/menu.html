@@ -32,7 +32,9 @@
     </header>
 
     <style>
-      .meal-plans-area{padding:34px 0 18px;background:linear-gradient(180deg,#fffaf2 0%,#fff 100%)}
+      .meal-plans-area{padding:34px 0 18px;background:linear-gradient(180deg,#fffaf2 0%,#fff 100%);font-family:inherit;color:inherit}
+      .meal-plans-area,.meal-plans-area *{font-family:inherit;box-sizing:border-box}
+      .meal-plan-card{cursor:pointer}
       .meal-plans-wrap{max-width:1240px;margin:auto;padding:0 22px}
       .meal-plan-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;margin-bottom:22px}
       .meal-plan-kicker{display:inline-flex;align-items:center;gap:8px;color:#a65d24;font-weight:800;font-size:.78rem;letter-spacing:.12em;text-transform:uppercase}
@@ -49,8 +51,23 @@
       .meal-plan-meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:15px;border-top:1px solid #f0ece4}
       .meal-plan-price{font-size:1.28rem;font-weight:900;color:#a85e24;white-space:nowrap}
       .meal-plan-days{font-size:.8rem;color:#6e756d;background:#f5f5f0;padding:6px 9px;border-radius:999px}
-      .meal-plan-action{width:100%;margin-top:15px;border:0;border-radius:11px;padding:11px 14px;background:#2f6948;color:#fff;font-weight:800;cursor:pointer;transition:background .2s}
-      .meal-plan-action:hover{background:#245238}.meal-plan-action.secondary{background:#f6ead8;color:#87501f}.meal-plan-action.secondary:hover{background:#efddc0}
+      .meal-plan-action{width:100%;margin-top:15px;border:0;border-radius:11px;padding:11px 14px;background:#c62828;color:#fff;font-weight:800;cursor:pointer;transition:background .2s,transform .2s;box-shadow:0 5px 14px #c6282826}
+      .meal-plan-action:hover{background:#a91f1f;transform:translateY(-1px)}
+      .meal-plan-action.secondary{background:#f6ead8;color:#87501f}.meal-plan-action.secondary:hover{background:#efddc0}
+
+      .meal-plan-details{margin-top:14px;border:1px solid #e9e1d4;border-radius:12px;background:#fffdf9;overflow:hidden}
+      .meal-plan-details summary{list-style:none;cursor:pointer;padding:12px 13px;font-weight:800;color:#2f6948;display:flex;justify-content:space-between;align-items:center}
+      .meal-plan-details summary::-webkit-details-marker{display:none}
+      .meal-plan-details[open] summary{border-bottom:1px solid #eee6da;background:#f7f4e9}
+      .meal-plan-dish-list{padding:10px;display:grid;gap:9px;max-height:260px;overflow:auto}
+      .meal-plan-dish-row{display:flex;gap:10px;align-items:center;padding:8px;border-radius:10px;background:#fff}
+      .meal-plan-dish-row img{width:52px;height:52px;object-fit:cover;border-radius:9px;background:#f4eee3}
+      .meal-plan-dish-row strong{display:block;color:#2d3b30;font-size:.9rem}
+      .meal-plan-dish-row small{display:block;color:#a65d24;margin-top:3px}
+      .meal-plan-dish-row p{margin:4px 0 0;color:#72766e;font-size:.82rem}
+      .meal-plan-dish-empty{margin:5px;color:#8a5a25;font-size:.88rem}
+      .meal-plan-buy-form{margin-top:auto}
+      .meal-plan-action:disabled{background:#b9c2b9;cursor:not-allowed}
       .my-plan-panel{margin:25px 0 8px;padding:24px;border-radius:20px;background:#263d30;color:#fff;box-shadow:0 12px 28px #203b2b20}
       .my-plan-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}.my-plan-top h3{margin:0 0 5px;font-size:1.25rem}.my-plan-top p{margin:0;color:#d1dfd3;font-size:.9rem}
       .my-plan-badge{border:1px solid #a9c5ac;color:#e7f2e7;border-radius:999px;padding:7px 12px;font-size:.8rem;font-weight:800}
@@ -74,7 +91,7 @@
           </div>
         </div>
         <div class="meal-plan-grid" th:if="${!#lists.isEmpty(mealPlans)}">
-          <article class="meal-plan-card" th:each="plan : ${mealPlans}"
+          <article class="meal-plan-card" th:each="plan : ${mealPlans}" tabindex="0" role="link" th:attr="data-detail-url=@{/meal-plan/{id}(id=${plan.id})}" aria-label="Mở chi tiết gói ăn"
                    th:classappend="${selectedMealPlanId != null and selectedMealPlanId == plan.id} ? ' is-selected' : ''">
             <div class="meal-plan-icon">🍱</div>
             <h3 th:text="${plan.name}">Gói ăn cân bằng</h3>
@@ -84,37 +101,28 @@
               <span class="meal-plan-days" th:if="${plan.numberOfDays != null}" th:text="${plan.numberOfDays} + ' ngày'">7 ngày</span>
               <span class="meal-plan-days" th:if="${plan.numberOfDays == null}">Gói linh hoạt</span>
             </div>
-            <form th:if="${selectedMealPlanId == null or selectedMealPlanId != plan.id}" th:action="@{/tai-khoan/goi-an}" method="post">
+            <form th:action="@{/cart/add-meal-plan}" method="post" class="meal-plan-buy-form">
+              <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
               <input type="hidden" name="mealPlanId" th:value="${plan.id}" />
-              <button class="meal-plan-action" type="submit">Chọn gói này <span aria-hidden="true">→</span></button>
+              <button class="meal-plan-action" type="submit" th:disabled="${#lists.isEmpty(mealPlanDishes[plan.id])}">Thêm gói vào giỏ hàng <span aria-hidden="true">→</span></button>
             </form>
-            <div th:if="${selectedMealPlanId != null and selectedMealPlanId == plan.id}" class="meal-plan-action secondary" style="text-align:center;box-sizing:border-box">✓ Gói của bạn</div>
           </article>
         </div>
         <div th:if="${#lists.isEmpty(mealPlans)}" class="meal-plan-alert">Hiện chưa có gói ăn nào được mở bán. Vui lòng quay lại sau nhé.</div>
-        <section class="my-plan-panel" th:if="${selectedMealPlanId != null}">
-          <div class="my-plan-top">
-            <div><h3>✨ Gói ăn của bạn: <span th:text="${selectedMealPlanName}">Gói ăn</span></h3><p>Bạn có thể tùy chỉnh món trong từng suất nếu gói hỗ trợ đổi món.</p></div>
-            <span class="my-plan-badge">ĐÃ GÁN CHO TÀI KHOẢN</span>
-          </div>
-          <div class="my-plan-dishes" th:if="${!#lists.isEmpty(mealSlots)}">
-            <article class="my-plan-dish" th:each="slot : ${mealSlots}">
-              <label>SUẤT ĂN · <span th:text="${slot.quantity}">1</span> phần</label>
-              <strong th:text="${slot.selectedProductName}">Tên món ăn</strong>
-              <form th:action="@{/tai-khoan/goi-an/mon}" method="post">
-                <input type="hidden" name="mealPlanId" th:value="${selectedMealPlanId}" />
-                <input type="hidden" name="slotProductId" th:value="${slot.slotProductId}" />
-                <select name="productId" aria-label="Chọn món thay thế">
-                  <option th:each="dish : ${mealDishOptions}" th:value="${dish.id}" th:selected="${dish.id == slot.selectedProductId}" th:text="${dish.name + ' · ' + #numbers.formatDecimal(dish.price, 0, 'COMMA', 0, 'POINT') + ' đ'}">Món ăn</option>
-                </select>
-                <button type="submit">Lưu lựa chọn</button>
-              </form>
-            </article>
-          </div>
-          <p th:if="${#lists.isEmpty(mealSlots)}" style="color:#d1dfd3;margin:20px 0 0">Gói ăn này chưa được thêm món. Bạn hãy liên hệ quản lý để cập nhật thực đơn.</p>
-        </section>
       </div>
     </section>
+    <script>
+      document.querySelectorAll('.meal-plan-card').forEach(function(card){
+        const openDetail = function(){ const url = card.getAttribute('data-detail-url'); if(url) window.location.href = url; };
+        card.addEventListener('click', function(event){
+          if(event.target.closest('form,button,input,a,select,textarea')) return;
+          openDetail();
+        });
+        card.addEventListener('keydown', function(event){
+          if((event.key === 'Enter' || event.key === ' ') && !event.target.closest('form,button,input,a,select,textarea')) { event.preventDefault(); openDetail(); }
+        });
+      });
+    </script>
 
     <div class="container menu-layout" id="menuApp">
 

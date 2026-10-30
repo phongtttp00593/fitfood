@@ -215,6 +215,7 @@
 
                 <input type="text"
                        id="userFoodNote"
+                       name="foodNote"
                        maxlength="500"
                        placeholder="Ví dụ: Ít sốt, để riêng rau..."
                        style="width:100%;
@@ -227,6 +228,7 @@
 
             <!-- FORM THÊM GIỎ HÀNG -->
             <form id="addToCartForm"
+                  accept-charset="UTF-8"
                   th:action="@{/cart/add}"
                   method="post"
                   onsubmit="return prepareCartSubmit();">
