@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Token dùng cho các yêu cầu POST từ trang chi tiết món ăn. -->
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_parameter" th:content="${_csrf.parameterName}" />
     <meta name="description" content="FITFOOD — Ăn ngon, sống khỏe" />
 
     <title th:text="${product.name} + ' | FITFOOD'">
@@ -241,6 +244,21 @@
                          box-sizing:border-box;
                          font-size:13px;" />
             </div>
+
+            <!-- Form Thymleaf cấp CSRF token và URL đúng cho nút Thêm vào giỏ.
+                 JavaScript chỉ cập nhật dữ liệu rồi gửi form này. -->
+            <form id="addToCartForm"
+                  th:action="@{/cart/add}"
+                  method="post"
+                  accept-charset="UTF-8"
+                  hidden>
+                <input type="hidden"
+                       th:name="${_csrf.parameterName}"
+                       th:value="${_csrf.token}" />
+                <input type="hidden" name="productId" th:value="${product.id}" />
+                <input type="hidden" name="quantity" value="1" />
+                <input type="hidden" name="foodNote" value="" />
+            </form>
 
             <!-- SỐ LƯỢNG -->
             <div class="quantity-row"
