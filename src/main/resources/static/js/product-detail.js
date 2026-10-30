@@ -221,8 +221,10 @@
       }
     }
 
-    // Ưu tiên dùng form có sẵn trong trang nếu form gửi tới /cart/add.
-    var form = document.querySelector('form[action*="/cart/add"]');
+    // Trang v2 đã có sẵn form và CSRF do Thymeleaf tạo.
+    // Không tạo form mới khi đã có #addToCartForm.
+    var form = document.getElementById('addToCartForm') ||
+      document.querySelector('form[action*="/cart/add"]');
 
     if (!form) {
       form = document.createElement('form');
@@ -255,32 +257,26 @@
     var foodNoteInput = document.getElementById('userFoodNote');
     setHidden('foodNote', foodNoteInput ? foodNoteInput.value.trim() : '');
 
-    // Nếu form chưa có CSRF token, lấy token có sẵn trên trang.
-    var csrfInput = form.querySelector('input[name="_csrf"]');
-
-    if (!csrfInput) {
+    // CSRF của Spring Security bắt buộc cho POST /cart/add.
+    // Ưu tiên token có sẵn trong form, fallback sang token trong meta.
+    var csrfParameterMeta = document.querySelector('meta[name="_csrf_parameter"]');
+    var csrfParameter = csrfParameterMeta && csrfParameterMeta.content
+      ? csrfParameterMeta.content : '_csrf';
+    var csrfInput = form.querySelector('input[name="' + csrfParameter + '"]');
+    if (!csrfInput || !csrfInput.value) {
       var pageCsrfInput = document.querySelector(
-        'input[name="_csrf"]'
+        'input[name="' + csrfParameter + '"]'
       );
-
-      var csrfMeta = document.querySelector(
-        'meta[name="_csrf"]'
-      );
-
-      var csrfHeaderMeta = document.querySelector(
-        'meta[name="_csrf_header"]'
-      );
-
-      var csrfToken = pageCsrfInput
+      var csrfMeta = document.querySelector('meta[name="_csrf"]');
+      var csrfToken = pageCsrfInput && pageCsrfInput.value
         ? pageCsrfInput.value
-        : (csrfMeta ? csrfMeta.content : null);
+        : (csrfMeta ? csrfMeta.content : '');
 
       if (csrfToken) {
-        setHidden('_csrf', csrfToken);
-      } else if (csrfHeaderMeta) {
-        console.warn(
-          'Có thông tin CSRF header nhưng không tìm thấy token.'
-        );
+        setHidden(csrfParameter, csrfToken);
+      } else {
+        alert('Không lấy được mã bảo vệ phiên đăng nhập. Vui lòng tải lại trang rồi thử lại.');
+        return;
       }
     }
 
