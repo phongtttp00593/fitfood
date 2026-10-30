@@ -19,37 +19,87 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
-                .requestMatchers("/", "/menu", "/product", "/cart", "/dang-nhap",
-                    "/dang-ky", "/quen-mat-khau", "/dat-lai-mat-khau",
-                    "/403", "/css/**", "/images/**", "/js/**", "/favicon.ico", "/error")
-                    .permitAll()
-                .anyRequest().authenticated())
+    public SecurityFilterChain securityFilterChain(HttpSecurity http)
+            throws Exception {
+
+        http
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers("/admin", "/admin/**")
+                    .hasRole("ADMIN")
+
+                .requestMatchers(
+                    "/",
+                    "/menu",
+                    "/product",
+                    "/cart",
+                    "/dang-nhap",
+                    "/dang-ky",
+                    "/quen-mat-khau",
+                    "/dat-lai-mat-khau",
+                    "/403",
+                    "/css/**",
+                    "/images/**",
+                    "/js/**",
+                    "/favicon.ico",
+                    "/error"
+                ).permitAll()
+
+                .anyRequest().authenticated()
+            )
+
             .formLogin(form -> form
                 .loginPage("/dang-nhap")
                 .loginProcessingUrl("/dang-nhap")
                 .usernameParameter("email")
                 .passwordParameter("password")
+
                 .successHandler((request, response, authentication) -> {
-                    boolean admin = authentication.getAuthorities().stream()
-                            .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-                    response.sendRedirect(request.getContextPath() + (admin ? "/admin" : "/"));
+                    boolean admin = authentication.getAuthorities()
+                        .stream()
+                        .anyMatch(a ->
+                            a.getAuthority().equals("ROLE_ADMIN")
+                        );
+
+                    response.sendRedirect(
+                        request.getContextPath()
+                        + (admin ? "/admin" : "/")
+                    );
                 })
+
                 .failureUrl("/dang-nhap?error")
-                .permitAll())
+                .permitAll()
+            )
+
             .logout(logout -> logout
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/dang-nhap?logout")
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID")
-                .permitAll())
-            .headers(headers -> headers
-                .frameOptions(frame -> frame.sameOrigin()))
-            .exceptionHandling(ex -> ex.accessDeniedPage("/403"));
+                .permitAll()
+            )
 
-        // Giữ CSRF mặc định BẬT.
+            .headers(headers -> headers
+                .frameOptions(frame -> frame.sameOrigin())
+            )
+
+            // Không forward POST sang trang chỉ hỗ trợ GET
+            .exceptionHandling(ex -> ex
+                .accessDeniedHandler((request, response, exception) -> {
+
+                    String apiPrefix =
+                        request.getContextPath() + "/api/";
+
+                    if (request.getRequestURI().startsWith(apiPrefix)) {
+                        response.sendError(403);
+                    } else {
+                        response.sendRedirect(
+                            request.getContextPath() + "/403"
+                        );
+                    }
+                })
+            );
+
+        // CSRF vẫn được bật mặc định
         return http.build();
     }
 }
