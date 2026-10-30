@@ -23,7 +23,7 @@
         >
         <nav class="nav-menu">
           <a th:href="@{/}">Trang chủ</a><a th:href="@{/menu}">Thực đơn</a
-          ><a th:href="@{/cart}">Giỏ hàng</a>
+          ><a th:href="@{/cart}">Giỏ hàng</a><a th:href="@{/tai-khoan/don-hang}">Đơn hàng</a>
         </nav>
         <div class="nav-right">
           <a class="fit-account-back" th:href="@{/}">← Về trang chủ</a>
@@ -62,6 +62,7 @@
               <a th:href="@{/tai-khoan}" class="fit-profile-selected"
                 >👤 Thông tin của tôi</a
               >
+              <a th:href="@{/tai-khoan/don-hang}">📦 Đơn hàng &amp; Theo dõi</a>
               <a th:href="@{/menu}">🥗 Khám phá thực đơn</a>
               <a th:if="${isAdmin}" th:href="@{/admin}">⚙ Trang quản trị</a>
               <a th:href="@{/quen-mat-khau}">🔐 Đặt lại mật khẩu qua email</a>
@@ -96,7 +97,10 @@
               </div>
             </div>
             <div class="fit-profile-action-row">
-              <a class="fit-profile-main-button" th:href="@{/menu}"
+              <a class="fit-profile-main-button" th:href="@{/tai-khoan/don-hang}"
+                >📦 Đơn hàng của tôi →</a
+              >
+              <a class="fit-profile-secondary-button" th:href="@{/menu}"
                 >Xem thực đơn →</a
               >
               <a
@@ -118,4 +122,4 @@
     </footer>
   <script defer th:src="@{/js/site-motion.js}"></script>
 </body>
-</html>,
+</html>

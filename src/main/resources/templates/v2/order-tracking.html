@@ -1,0 +1,494 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{v2/fragments/layout :: head('Chi tiết đơn hàng ' + ${order.code})}"></head>
+<body>
+<div th:replace="~{v2/fragments/layout :: header('orders')}"></div>
+
+<style>
+  .tracking-wrap {
+    padding-bottom: 64px;
+  }
+  .tracking-alert {
+    padding: 14px 18px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+  .tracking-alert.ok {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #065f46;
+  }
+  .tracking-alert.err {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+  }
+  .tracking-top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 700;
+  }
+  .status-pill.pending { background: #fef3c7; color: #92400e; }
+  .status-pill.processing { background: #dbeafe; color: #1e40af; }
+  .status-pill.shipping { background: #e0e7ff; color: #3730a3; }
+  .status-pill.completed { background: #dcfce7; color: #166534; }
+  .status-pill.cancelled { background: #fee2e2; color: #991b1b; }
+
+  .timeline-card {
+    background: #fff;
+    border: 1px solid rgba(40, 32, 24, 0.1);
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 24px rgba(31, 24, 17, 0.04);
+  }
+  .stepper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+  @media (max-width: 720px) {
+    .stepper {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .step-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #faf7f2;
+    border: 1px solid rgba(40, 32, 24, 0.08);
+  }
+  .step-box.done {
+    background: #f0fdf4;
+    border-color: #86efac;
+  }
+  .step-box.active {
+    background: #fffbeb;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.16);
+  }
+  .step-dot {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 0.85rem;
+    background: #e5e0d5;
+    color: #57534e;
+    flex-shrink: 0;
+  }
+  .step-box.done .step-dot {
+    background: #16a34a;
+    color: #fff;
+  }
+  .step-box.active .step-dot {
+    background: #d97706;
+    color: #fff;
+  }
+  .step-title {
+    font-weight: 700;
+    font-size: 0.92rem;
+    color: #1c1917;
+  }
+  .step-desc {
+    font-size: 0.78rem;
+    color: #78716c;
+    margin-top: 2px;
+  }
+
+  .tracking-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 22px;
+  }
+  @media (max-width: 900px) {
+    .tracking-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .info-card {
+    background: #fff;
+    border: 1px solid rgba(40, 32, 24, 0.1);
+    border-radius: 18px;
+    padding: 22px 24px;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 24px rgba(31, 24, 17, 0.04);
+  }
+  .info-card h2 {
+    margin: 0 0 14px;
+    font-size: 1.12rem;
+  }
+  .items-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .items-table th,
+  .items-table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid rgba(40, 32, 24, 0.08);
+    text-align: left;
+    font-size: 0.93rem;
+  }
+  .items-table th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #78716c;
+  }
+  .items-table td.num,
+  .items-table th.num {
+    text-align: right;
+  }
+  .summary-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 1px dashed rgba(40, 32, 24, 0.15);
+  }
+  .summary-line {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.94rem;
+  }
+  .summary-line.total {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #9b2c1f;
+    padding-top: 8px;
+    border-top: 1px solid rgba(40, 32, 24, 0.1);
+  }
+  .meta-list {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+  }
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(40, 32, 24, 0.06);
+  }
+  .meta-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+  .meta-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #78716c;
+  }
+  .meta-value {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #1c1917;
+  }
+  .cancel-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 16, 12, 0.55);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 16px;
+  }
+  .cancel-modal-backdrop.open {
+    display: flex;
+  }
+  .cancel-modal {
+    background: #fff;
+    border-radius: 18px;
+    max-width: 460px;
+    width: 100%;
+    padding: 24px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+  }
+</style>
+
+<main id="main">
+  <header class="page-hero compact-title">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Đường dẫn">
+        <a th:href="@{/}">Trang chủ</a> <i>›</i>
+        <a th:href="@{/tai-khoan}">Tài khoản</a> <i>›</i>
+        <a th:href="@{/tai-khoan/don-hang}">Đơn hàng của tôi</a> <i>›</i>
+        <span aria-current="page" th:text="${order.code}">#1</span>
+      </nav>
+      <p class="eyebrow">Theo dõi hành trình đơn hàng</p>
+      <h1 th:text="'Đơn hàng ' + ${order.code}">Đơn hàng #1</h1>
+    </div>
+  </header>
+
+  <div class="container tracking-wrap">
+    <div th:if="${orderSuccess}" class="tracking-alert ok" th:text="${orderSuccess}"></div>
+    <div th:if="${orderError}" class="tracking-alert err" th:text="${orderError}"></div>
+
+    <div class="tracking-top-bar">
+      <a class="btn ghost" th:href="@{/tai-khoan/don-hang}">← Quay lại danh sách đơn hàng</a>
+      <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap">
+        <span class="status-pill"
+              th:classappend="${order.status == 'Chờ xác nhận' ? 'pending' : (order.status == 'Đang xử lý' ? 'processing' : (order.status == 'Đang giao' ? 'shipping' : (order.status == 'Hoàn thành' ? 'completed' : 'cancelled')))}"
+              th:text="${order.status}">
+          Chờ xác nhận
+        </span>
+        <button th:if="${order.canCancel}"
+                type="button"
+                class="btn outline"
+                style="border-color: #dc2626; color: #dc2626"
+                onclick="openCancelModal()">
+          ✕ Hủy đặt hàng
+        </button>
+      </div>
+    </div>
+
+    <!-- TIẾN TRÌNH TRẠNG THÁI ĐƠN HÀNG -->
+    <section class="timeline-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px">
+        <div>
+          <h2 style="margin: 0; font-size: 1.15rem">Trạng thái xử lý &amp; vận chuyển</h2>
+          <p class="muted" style="margin: 4px 0 0; font-size: 0.88rem">
+            Đặt lúc <strong th:text="${#temporals.format(order.placedAt, 'HH:mm - dd/MM/yyyy')}">10:00 - 30/10/2026</strong>
+          </p>
+        </div>
+        <span class="pill" th:text="'Giao hàng: ' + ${order.deliveryStatus}">Giao hàng: Chờ giao</span>
+      </div>
+
+      <div class="stepper" th:if="${order.progressStep > 0}">
+        <div class="step-box" th:classappend="${order.progressStep > 1 ? 'done' : (order.progressStep == 1 ? 'active' : '')}">
+          <span class="step-dot">1</span>
+          <div>
+            <div class="step-title">Chờ xác nhận</div>
+            <div class="step-desc" th:text="${#temporals.format(order.placedAt, 'HH:mm dd/MM/yyyy')}">Đã tiếp nhận đơn</div>
+          </div>
+        </div>
+        <div class="step-box" th:classappend="${order.progressStep > 2 ? 'done' : (order.progressStep == 2 ? 'active' : '')}">
+          <span class="step-dot">2</span>
+          <div>
+            <div class="step-title">Đang chuẩn bị bếp</div>
+            <div class="step-desc">Chế biến món ăn tươi mới</div>
+          </div>
+        </div>
+        <div class="step-box" th:classappend="${order.progressStep > 3 ? 'done' : (order.progressStep == 3 ? 'active' : '')}">
+          <span class="step-dot">3</span>
+          <div>
+            <div class="step-title">Đang giao hàng</div>
+            <div class="step-desc"
+                 th:text="${order.sentAt != null ? 'Xuất kho: ' + #temporals.format(order.sentAt, 'HH:mm dd/MM') : 'Shipper nhận đơn'}">
+              Shipper nhận đơn
+            </div>
+          </div>
+        </div>
+        <div class="step-box" th:classappend="${order.progressStep == 4 ? 'done' : ''}">
+          <span class="step-dot">4</span>
+          <div>
+            <div class="step-title">Hoàn thành</div>
+            <div class="step-desc"
+                 th:text="${order.deliveredAt != null ? 'Đã giao: ' + #temporals.format(order.deliveredAt, 'HH:mm dd/MM') : 'Giao tận tay khách'}">
+              Giao tận tay khách
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div th:if="${order.progressStep == 0}"
+           style="margin-top: 16px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 12px; padding: 14px 16px; color: #991b1b">
+        <strong>Đơn hàng này đã bị hủy.</strong>
+        <div style="font-size: 0.88rem; margin-top: 4px" th:if="${order.note != null and !order.note.isBlank()}" th:text="'Ghi chú / Lý do: ' + ${order.note}"></div>
+      </div>
+
+      <div th:if="${!order.canCancel and order.status != 'Đã hủy'}"
+           style="margin-top: 14px; font-size: 0.85rem; color: #78716c">
+        ℹ️ <span th:text="${order.cancelDisabledReason}">Đơn hàng đã chuyển sang bước xử lý nên không thể hủy trực tuyến.</span>
+      </div>
+    </section>
+
+    <div class="tracking-grid">
+      <!-- DANH SÁCH MÓN ĂN -->
+      <div>
+        <section class="info-card">
+          <h2>Danh sách món đã đặt (<span th:text="${#lists.size(order.items)}">0</span> món)</h2>
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th>Món ăn / Lộ trình</th>
+                <th class="num">Đơn giá</th>
+                <th class="num">SL</th>
+                <th class="num">Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="it : ${order.items}">
+                <td>
+                  <a th:if="${it.productId != null}"
+                     th:href="@{/menu/{id}(id=${it.productId})}"
+                     style="font-weight: 700; color: #1c1917; text-decoration: none"
+                     th:text="${it.productName}">Tên món</a>
+                  <strong th:if="${it.productId == null}" th:text="${it.productName}">Lộ trình ăn</strong>
+                </td>
+                <td class="num" th:text="${#numbers.formatInteger(it.unitPrice, 1, 'POINT')} + 'đ'">0đ</td>
+                <td class="num" th:text="'x' + ${it.quantity}">x1</td>
+                <td class="num"><strong th:text="${#numbers.formatInteger(it.lineTotal, 1, 'POINT')} + 'đ'">0đ</strong></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="summary-list">
+            <div class="summary-line">
+              <span class="muted">Tạm tính</span>
+              <strong th:text="${#numbers.formatInteger(order.subtotal, 1, 'POINT')} + 'đ'">0đ</strong>
+            </div>
+            <div class="summary-line" th:if="${order.discount > 0}">
+              <span class="muted">
+                Giảm giá khuyến mãi
+                <span th:if="${order.promotionCode != null}" th:text="'(' + ${order.promotionCode} + ')'"></span>
+              </span>
+              <strong style="color: #166534" th:text="'-' + ${#numbers.formatInteger(order.discount, 1, 'POINT')} + 'đ'">-0đ</strong>
+            </div>
+            <div class="summary-line">
+              <span class="muted">Phí giao hàng</span>
+              <strong th:text="${order.deliveryFee == 0 ? 'Miễn phí' : #numbers.formatInteger(order.deliveryFee, 1, 'POINT') + 'đ'}">Miễn phí</strong>
+            </div>
+            <div class="summary-line total">
+              <span>Tổng thanh toán</span>
+              <span th:text="${#numbers.formatInteger(order.total, 1, 'POINT')} + 'đ'">0đ</span>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- THÔNG TIN NHẬN HÀNG & THANH TOÁN -->
+      <div>
+        <section class="info-card">
+          <h2>Thông tin giao nhận</h2>
+          <div class="meta-list">
+            <div class="meta-item">
+              <span class="meta-label">Người nhận</span>
+              <span class="meta-value" th:text="${order.receiverName}">Khách hàng</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Số điện thoại</span>
+              <span class="meta-value" th:text="${order.receiverPhone}">0900000000</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Địa chỉ giao hàng</span>
+              <span class="meta-value" th:text="${order.deliveryAddress}">Hải Phòng</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Trạng thái vận chuyển</span>
+              <span class="meta-value" th:text="${order.deliveryStatus}">Chờ giao</span>
+            </div>
+            <div class="meta-item" th:if="${order.note != null and !order.note.isBlank()}">
+              <span class="meta-label">Ghi chú đơn hàng</span>
+              <span class="meta-value" th:text="${order.note}">Ghi chú</span>
+            </div>
+          </div>
+        </section>
+
+        <section class="info-card">
+          <h2>Thanh toán &amp; chứng từ</h2>
+          <div class="meta-list">
+            <div class="meta-item">
+              <span class="meta-label">Phương thức thanh toán</span>
+              <span class="meta-value" th:text="${order.paymentMethod}">COD (Tiền mặt khi nhận hàng)</span>
+            </div>
+            <div class="meta-item">
+              <span class="meta-label">Trạng thái thanh toán</span>
+              <span class="meta-value" th:text="${order.paymentStatus}">Chưa thanh toán</span>
+            </div>
+            <div class="meta-item" th:if="${order.transactionCode != null and !order.transactionCode.isBlank()}">
+              <span class="meta-label">Mã giao dịch</span>
+              <span class="meta-value" th:text="${order.transactionCode}">TXN</span>
+            </div>
+            <div class="meta-item" th:if="${order.paidAt != null}">
+              <span class="meta-label">Thời gian thanh toán</span>
+              <span class="meta-value" th:text="${#temporals.format(order.paidAt, 'HH:mm - dd/MM/yyyy')}">10:00</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- MODAL XÁC NHẬN HỦY ĐƠN HÀNG -->
+<div class="cancel-modal-backdrop" id="cancelOrderModal" role="dialog" aria-modal="true" th:if="${order.canCancel}">
+  <div class="cancel-modal">
+    <h3 style="margin: 0 0 6px; font-size: 1.2rem">Xác nhận hủy đơn hàng <span th:text="${order.code}">#1</span></h3>
+    <p class="muted" style="margin: 0 0 14px; font-size: 0.9rem">
+      Sau khi hủy, số lượng món ăn sẽ được hoàn lại kho và phiếu chờ giao sẽ được thu hồi.
+    </p>
+    <form method="post" th:action="@{/tai-khoan/don-hang/{id}/huy(id=${order.id})}">
+      <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+      <input type="hidden" name="returnTo" value="detail" />
+      <label class="field" style="display: block; margin-bottom: 14px">
+        <span style="display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.88rem">Lý do hủy đơn</span>
+        <select name="cancelReason" id="cancelReasonSelect" class="input" style="width: 100%; margin-bottom: 8px" onchange="syncCustomReason(this.value)">
+          <option value="Thay đổi món ăn / số lượng trong đơn">Thay đổi món ăn / số lượng trong đơn</option>
+          <option value="Thay đổi địa chỉ hoặc số điện thoại nhận hàng">Thay đổi địa chỉ hoặc số điện thoại nhận hàng</option>
+          <option value="Quên áp dụng mã khuyến mãi">Quên áp dụng mã khuyến mãi</option>
+          <option value="Chưa có nhu cầu đặt lúc này">Chưa có nhu cầu đặt lúc này</option>
+          <option value="OTHER">Lý do khác...</option>
+        </select>
+        <input type="text" id="cancelReasonCustom" class="input" placeholder="Nhập lý do hủy đơn..." style="width: 100%; display: none" />
+      </label>
+      <div style="display: flex; justify-content: flex-end; gap: 10px">
+        <button type="button" class="btn ghost" onclick="closeCancelModal()">Đóng</button>
+        <button type="submit" class="btn" style="background: #dc2626; border-color: #dc2626; color: #fff">Xác nhận hủy đơn</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script th:if="${order.canCancel}">
+  function openCancelModal() {
+    var modal = document.getElementById('cancelOrderModal');
+    if (modal) modal.classList.add('open');
+  }
+  function closeCancelModal() {
+    var modal = document.getElementById('cancelOrderModal');
+    if (modal) modal.classList.remove('open');
+  }
+  function syncCustomReason(val) {
+    var customInput = document.getElementById('cancelReasonCustom');
+    var selectEl = document.getElementById('cancelReasonSelect');
+    if (val === 'OTHER') {
+      customInput.style.display = 'block';
+      customInput.name = 'cancelReason';
+      selectEl.removeAttribute('name');
+      customInput.focus();
+    } else {
+      customInput.style.display = 'none';
+      customInput.removeAttribute('name');
+      selectEl.name = 'cancelReason';
+    }
+  }
+</script>
+
+<footer th:replace="~{v2/fragments/layout :: footer}"></footer>
+<th:block th:replace="~{v2/fragments/layout :: scripts}"></th:block>
+</body>
+</html>

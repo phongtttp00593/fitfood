@@ -118,6 +118,12 @@
                 </a>
 
                 <a th:if="${accountInfo != null}"
+                   th:href="@{/tai-khoan/don-hang}"
+                   th:attr="aria-current=${active == 'orders'} ? 'page'">
+                    Đơn hàng
+                </a>
+
+                <a th:if="${accountInfo != null}"
                    th:href="@{/tai-khoan}"
                    th:attr="aria-current=${active == 'account'} ? 'page'">
                     Tài khoản
@@ -196,6 +202,10 @@
 
                         <a th:href="@{/tai-khoan}">
                             Thông tin tài khoản
+                        </a>
+
+                        <a th:href="@{/tai-khoan/don-hang}">
+                            Đơn hàng của tôi
                         </a>
 
                         <a th:if="${isAdmin}"
@@ -346,6 +356,12 @@
                         </a>
                     </li>
 
+                    <li th:if="${accountInfo != null}">
+                        <a th:href="@{/tai-khoan/don-hang}">
+                            Theo dõi đơn hàng
+                        </a>
+                    </li>
+
                     <li th:if="${!isAdmin}">
                         <a th:href="@{/ho-tro}">
                             Chat hỗ trợ
@@ -362,6 +378,12 @@
                     <li>
                         <a th:href="@{/tai-khoan}">
                             Tài khoản của tôi
+                        </a>
+                    </li>
+
+                    <li th:if="${accountInfo != null}">
+                        <a th:href="@{/tai-khoan/don-hang}">
+                            Đơn hàng của tôi
                         </a>
                     </li>
 
