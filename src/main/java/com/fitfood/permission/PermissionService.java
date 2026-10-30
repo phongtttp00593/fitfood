@@ -58,7 +58,9 @@ public class PermissionService {
                 """, (rs, rowNum) -> {
                     String code = rs.getString("MaQuyenCode");
                     String status = switch (code) {
-                        case "DANG_NHAP", "QUEN_MAT_KHAU", "QUAN_LY_DANH_MUC", "QUAN_LY_KHACH_HANG" -> "Đã hoạt động";
+                        case "DANG_NHAP", "QUEN_MAT_KHAU", "QUAN_LY_DANH_MUC", "QUAN_LY_KHACH_HANG",
+                             "DAT_HANG", "XEM_LICH_SU_DON_HANG", "THEO_DOI_DON_HANG", "HUY_DON_HANG",
+                             "QUAN_LY_DON_HANG", "QUAN_LY_GIAO_HANG" -> "Đã hoạt động";
                         case "XEM_THUC_DON", "XEM_DANH_MUC", "XEM_CHI_TIET_SAN_PHAM",
                              "TIM_KIEM_SAN_PHAM", "QUAN_LY_SAN_PHAM", "XEM_BAO_CAO" -> "Giao diện mẫu";
                         default -> "Chưa triển khai";

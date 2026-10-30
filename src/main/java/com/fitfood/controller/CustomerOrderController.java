@@ -38,6 +38,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
  * Xử lý nghiệp vụ phía Khách hàng cho:
  * 1) Đặt hàng từ giỏ hàng (POST /cart/checkout)
  * 2) Xem lịch sử & Theo dõi trạng thái đơn hàng (GET /tai-khoan/don-hang, GET /tai-khoan/don-hang/{id})
+ * 3) Hủy đặt hàng khi đơn còn ở trạng thái "Chờ xác nhận" (POST /tai-khoan/don-hang/{id}/huy)
  */
 @Controller
 public class CustomerOrderController {
@@ -489,6 +490,128 @@ public class CustomerOrderController {
         return "v2/order-tracking";
     }
 
+    /**
+     * POST /tai-khoan/don-hang/{id}/huy
+     * Khách hàng hủy đặt hàng.
+     * Chỉ cho phép khi:
+     *  - Đơn hàng thuộc về khách đang đăng nhập
+     *  - Trạng thái đơn đang là "Chờ xác nhận"
+     *  - Phiếu giao chưa ở trạng thái "Đang giao" / "Đã giao"
+     *  - Đơn chưa thanh toán và chưa xuất hóa đơn
+     * Khi hủy:
+     *  - Cập nhật trạng thái đơn -> "Đã hủy" kèm lý do hủy
+     *  - Hoàn lại tồn kho (stock) cho các sản phẩm trong đơn
+     *  - Xóa phiếu giao "Chờ giao" (để không còn trong danh sách chờ giao của Admin)
+     */
+    @PostMapping("/tai-khoan/don-hang/{id}/huy")
+    @Transactional
+    public String cancelOrder(
+            @PathVariable("id") long orderId,
+            @RequestParam(value = "cancelReason", required = false) String cancelReason,
+            @RequestParam(value = "reason", required = false) String fallbackReason,
+            @RequestParam(value = "returnTo", defaultValue = "detail") String returnTo,
+            @AuthenticationPrincipal UserDetails userDetails,
+            RedirectAttributes redirect) {
+
+        AppUser user = getCurrentUser(userDetails);
+        if (user == null) {
+            return "redirect:/dang-nhap";
+        }
+
+        List<CancelCheckRow> checks = jdbc.query("""
+            SELECT o.status, o.note,
+                   (SELECT TOP 1 d.status FROM dbo.fitfood_deliveries d WHERE d.order_id = o.id) AS delivery_status,
+                   (SELECT COUNT(*) FROM dbo.fitfood_payments p WHERE p.order_id = o.id AND p.status = N'Đã thanh toán') AS paid_count,
+                   (SELECT COUNT(*) FROM dbo.fitfood_invoices i WHERE i.order_id = o.id) AS invoice_count
+            FROM dbo.fitfood_orders o WITH (UPDLOCK, HOLDLOCK)
+            WHERE o.id = ? AND o.user_id = ?
+            """, (rs, rowNum) -> new CancelCheckRow(
+                rs.getString("status"),
+                rs.getString("note"),
+                rs.getString("delivery_status"),
+                rs.getInt("paid_count"),
+                rs.getInt("invoice_count")
+        ), orderId, user.getId());
+
+        String targetUrl = "list".equalsIgnoreCase(returnTo)
+                ? "redirect:/tai-khoan/don-hang"
+                : "redirect:/tai-khoan/don-hang/" + orderId;
+
+        if (checks.isEmpty()) {
+            redirect.addFlashAttribute("orderError", "Không tìm thấy đơn hàng cần hủy.");
+            return "redirect:/tai-khoan/don-hang";
+        }
+
+        CancelCheckRow check = checks.get(0);
+        if ("Đã hủy".equalsIgnoreCase(check.status())) {
+            redirect.addFlashAttribute("orderError", "Đơn hàng #" + orderId + " đã được hủy trước đó.");
+            return targetUrl;
+        }
+        if (!"Chờ xác nhận".equals(check.status())) {
+            redirect.addFlashAttribute("orderError",
+                    "Không thể hủy: Đơn hàng #" + orderId + " đang ở trạng thái \"" + check.status()
+                            + "\" (bếp đang chuẩn bị hoặc đang giao).");
+            return targetUrl;
+        }
+        if (check.deliveryStatus() != null
+                && ("Đang giao".equals(check.deliveryStatus()) || "Đã giao".equals(check.deliveryStatus()))) {
+            redirect.addFlashAttribute("orderError",
+                    "Không thể hủy: Đơn hàng #" + orderId + " đã được bàn giao cho đơn vị vận chuyển.");
+            return targetUrl;
+        }
+        if (check.paidCount() > 0 || check.invoiceCount() > 0) {
+            redirect.addFlashAttribute("orderError",
+                    "Không thể tự hủy đơn đã thanh toán hoặc đã xuất hóa đơn. Vui lòng liên hệ Chat hỗ trợ.");
+            return targetUrl;
+        }
+
+        String effectiveReason = (cancelReason != null && !cancelReason.isBlank())
+                ? cancelReason
+                : fallbackReason;
+        String reason = (effectiveReason == null || effectiveReason.isBlank())
+                ? "Khách hàng yêu cầu hủy đơn"
+                : "Lý do hủy: " + effectiveReason.strip();
+        String updatedNote = (check.note() == null || check.note().isBlank())
+                ? reason
+                : check.note() + " | " + reason;
+        if (updatedNote.length() > 500) {
+            updatedNote = updatedNote.substring(0, 500);
+        }
+
+        jdbc.update("""
+            UPDATE dbo.fitfood_orders
+            SET status = N'Đã hủy', note = ?
+            WHERE id = ? AND user_id = ?
+            """, updatedNote, orderId, user.getId());
+
+        List<Map<String, Object>> orderItems = jdbc.queryForList("""
+            SELECT product_id, quantity, product_name
+            FROM dbo.fitfood_order_items
+            WHERE order_id = ?
+            """, orderId);
+        for (Map<String, Object> item : orderItems) {
+            Long productId = ((Number) item.get("product_id")).longValue();
+            int qty = ((Number) item.get("quantity")).intValue();
+            String productName = (String) item.get("product_name");
+            if (productName == null || !productName.startsWith("Gói ăn:")) {
+                jdbc.update("""
+                    UPDATE dbo.fitfood_products
+                    SET stock = COALESCE(stock, 0) + ?
+                    WHERE id = ?
+                    """, qty, productId);
+            }
+        }
+
+        jdbc.update("""
+            DELETE FROM dbo.fitfood_deliveries
+            WHERE order_id = ? AND status = N'Chờ giao'
+            """, orderId);
+
+        redirect.addFlashAttribute("orderSuccess",
+                "Đã hủy đơn hàng #" + orderId + " thành công.");
+        return targetUrl;
+    }
+
     private static boolean isCancellable(
             String orderStatus,
             String deliveryStatus,
@@ -518,6 +641,14 @@ public class CustomerOrderController {
             case "Đã hủy" -> -1;
             default -> 1;
         };
+    }
+
+    private record CancelCheckRow(
+            String status,
+            String note,
+            String deliveryStatus,
+            int paidCount,
+            int invoiceCount) {
     }
 
     public record OrderItemView(
