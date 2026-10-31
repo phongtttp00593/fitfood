@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin/products")
@@ -56,8 +55,7 @@ public class ProductAddController {
     public String processAdd(
             @Valid @ModelAttribute("productForm") ProductForm form,
             BindingResult bindingResult,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+            Model model) {
 
         if (bindingResult.hasErrors()) {
             addCategoriesToModel(model);
@@ -85,8 +83,11 @@ public class ProductAddController {
         }
 
         productRepository.save(product);
-        redirectAttributes.addFlashAttribute("successMessage", "Đã thêm món ăn thành công!");
-        return "redirect:/admin/products";
+
+        // KHÔNG redirect về /admin/products để tránh iframe tự tải lại cả trang admin vào popup
+        model.addAttribute("successMessage", "Đã thêm món ăn thành công!");
+        addCategoriesToModel(model);
+        return "admin-product-add";
     }
 
     private void addCategoriesToModel(Model model) {
