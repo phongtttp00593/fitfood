@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -20,6 +19,16 @@
     <link
       href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
       rel="stylesheet" />
+    <style>
+        .home-out-of-stock {
+            font-size: 11px;
+            font-weight: 700;
+            color: #9b1c1c;
+            background: #fde8e8;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+    </style>
 </head>
 
 <body>
@@ -381,12 +390,20 @@
                             0đ
                         </strong>
 
-                        <a class="mini-add"
+                        <!-- Nếu còn hàng: hiển thị icon mũi tên chuyển sang chi tiết -->
+                        <a th:if="${p.stock != null and p.stock > 0}"
+                           class="mini-add"
                            th:href="@{/product(id=${p.id})}"
                            aria-label="Xem chi tiết món ăn"
                            title="Xem món">
                             ➜
                         </a>
+
+                        <!-- Nếu hết hàng: hiển thị nhãn Đã hết sản phẩm -->
+                        <span th:unless="${p.stock != null and p.stock > 0}"
+                              class="home-out-of-stock">
+                            Đã hết sản phẩm
+                        </span>
                     </div>
                 </div>
             </article>
