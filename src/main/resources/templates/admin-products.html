@@ -276,7 +276,10 @@
             margin-bottom: 20px;
             border-radius: 8px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
         .admin-alert-success {
             background-color: #def7ec;
@@ -421,7 +424,8 @@
                 </button>
             </div>
 
-            <!-- Khối thông báo phản hồi thao tác -->
+            <!-- Khối thông báo phản hồi thao tác qua Thêm / Sửa / Xóa -->
+            <div id="dynamicAlert" class="admin-alert admin-alert-success" style="display: none;"></div>
             <div th:if="${successMessage}" class="admin-alert admin-alert-success" th:text="${successMessage}"></div>
             <div th:if="${warningMessage}" class="admin-alert admin-alert-warning" th:text="${warningMessage}"></div>
             <div th:if="${errorMessage}" class="admin-alert admin-alert-danger" th:text="${errorMessage}"></div>
@@ -731,6 +735,24 @@
         const cancelDeleteBtn = document.getElementById('cancelDeleteProduct');
         const deleteBackdrop = document.getElementById('closeDeleteProductBackdrop');
 
+        // Khối hiển thị thông báo động
+        const dynamicAlert = document.getElementById('dynamicAlert');
+
+        // Kiểm tra xem có thông báo lưu lại từ lúc reload hay không
+        const storedMsg = sessionStorage.getItem('FITFOOD_ADMIN_ALERT');
+        if (storedMsg && dynamicAlert) {
+            dynamicAlert.textContent = '✅ ' + storedMsg;
+            dynamicAlert.style.display = 'block';
+            sessionStorage.removeItem('FITFOOD_ADMIN_ALERT');
+
+            // Tự động mờ dần và ẩn sau 3.5 giây
+            setTimeout(function() {
+                dynamicAlert.style.transition = 'opacity 0.5s ease';
+                dynamicAlert.style.opacity = '0';
+                setTimeout(() => { dynamicAlert.style.display = 'none'; }, 500);
+            }, 3500);
+        }
+
         function openModal(modal) {
             modal.classList.add('is-open');
             modal.setAttribute('aria-hidden', 'false');
@@ -790,7 +812,7 @@
             }
         });
 
-        // Lắng nghe tín hiệu từ iframe con khi Thêm / Sửa thành công hoặc Hủy
+        // Lắng nghe tín hiệu từ iframe con khi Thêm / Sửa thành công
         window.addEventListener('message', function (event) {
             if (event.origin !== window.location.origin) {
                 return;
@@ -799,6 +821,12 @@
             if (event.data && (event.data.type === 'FITFOOD_PRODUCT_ADDED' || event.data.type === 'FITFOOD_PRODUCT_UPDATED')) {
                 closeModal(addModal, addFrame);
                 closeModal(editModal, editFrame);
+
+                // Lưu nội dung thông báo vào sessionStorage
+                const msg = event.data.message || (event.data.type === 'FITFOOD_PRODUCT_ADDED' ? 'Đã thêm món ăn thành công!' : 'Đã cập nhật món ăn thành công!');
+                sessionStorage.setItem('FITFOOD_ADMIN_ALERT', msg);
+
+                // Tải lại dữ liệu mới nhất
                 window.location.reload();
             }
 
