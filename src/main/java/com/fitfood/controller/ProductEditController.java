@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin/products")
@@ -45,11 +44,11 @@ public class ProductEditController {
     }
 
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String showEditForm(@PathVariable Long id, Model model) {
         Product product = productRepository.findById(id).orElse(null);
         if (product == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy món ăn!");
-            return "redirect:/admin/products";
+            model.addAttribute("errorMessage", "Không tìm thấy món ăn!");
+            return "admin-product-edit";
         }
 
         ProductForm form = new ProductForm();
@@ -72,13 +71,12 @@ public class ProductEditController {
             @PathVariable Long id,
             @Valid @ModelAttribute("productForm") ProductForm form,
             BindingResult bindingResult,
-            Model model,
-            RedirectAttributes redirectAttributes) {
+            Model model) {
 
         Product product = productRepository.findById(id).orElse(null);
         if (product == null) {
-            redirectAttributes.addFlashAttribute("errorMessage", "Không tìm thấy món ăn!");
-            return "redirect:/admin/products";
+            model.addAttribute("errorMessage", "Không tìm thấy món ăn!");
+            return "admin-product-edit";
         }
 
         if (bindingResult.hasErrors()) {
@@ -99,6 +97,7 @@ public class ProductEditController {
             try {
                 String filename = saveImage(file);
                 product.setImageUrl("/uploads/products/" + filename);
+                form.setImageUrl(product.getImageUrl());
             } catch (IOException e) {
                 bindingResult.rejectValue("imageFile", "upload.failed", "Không thể lưu tệp ảnh, vui lòng thử lại.");
                 form.setImageUrl(product.getImageUrl());
@@ -108,8 +107,11 @@ public class ProductEditController {
         }
 
         productRepository.save(product);
-        redirectAttributes.addFlashAttribute("successMessage", "Đã cập nhật món ăn thành công!");
-        return "redirect:/admin/products";
+
+        // Giữ nguyên trang form để JS gửi message đóng popup về trang cha, KHÔNG redirect
+        model.addAttribute("successMessage", "Đã cập nhật món ăn thành công!");
+        addCategoriesToModel(model);
+        return "admin-product-edit";
     }
 
     private void addCategoriesToModel(Model model) {
