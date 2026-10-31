@@ -82,7 +82,10 @@
     /*<![CDATA[*/
     var addedSuccess = /*[[${successMessage != null}]]*/ false;
     if (addedSuccess && window.parent) {
-        window.parent.postMessage({ type: 'FITFOOD_PRODUCT_ADDED' }, window.location.origin);
+        window.parent.postMessage({ 
+            type: 'FITFOOD_PRODUCT_ADDED',
+            message: 'Thêm món ăn mới thành công!'
+        }, window.location.origin);
     }
     /*]]>*/
 </script>
