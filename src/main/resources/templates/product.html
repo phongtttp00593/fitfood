@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -57,6 +56,19 @@
         .quantity-row button:disabled {
             opacity: .5;
             cursor: not-allowed;
+        }
+
+        .btn-out-of-stock {
+            width: 100%;
+            padding: 12px 20px;
+            background: #e2e8f0;
+            color: #64748b;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 14px;
+            cursor: not-allowed;
+            text-align: center;
         }
     </style>
 </head>
@@ -192,8 +204,9 @@
 
             <div class="detail-divider"></div>
 
-            <!-- KHU VỰC BIẾN THỂ -->
+            <!-- KHU VỰC BIẾN THỂ (Chỉ hiện khi còn hàng) -->
             <div id="dynamicVariantsContainer"
+                 th:if="${product.stock != null and product.stock > 0}"
                  style="background:#f8fafc;
                         border:1px solid #e2e8f0;
                         border-radius:12px;
@@ -209,8 +222,8 @@
                 </div>
             </div>
 
-            <!-- GHI CHÚ -->
-            <div style="margin-bottom:15px;">
+            <!-- GHI CHÚ (Chỉ hiện khi còn hàng) -->
+            <div th:if="${product.stock != null and product.stock > 0}" style="margin-bottom:15px;">
                 <label for="userFoodNote">Ghi chú cho bếp</label>
 
                 <input type="text"
@@ -226,8 +239,9 @@
                               font-size:13px;">
             </div>
 
-            <!-- FORM THÊM GIỎ HÀNG -->
+            <!-- FORM THÊM GIỎ HÀNG (Nếu còn hàng thì cho đặt) -->
             <form id="addToCartForm"
+                  th:if="${product.stock != null and product.stock > 0}"
                   accept-charset="UTF-8"
                   th:action="@{/cart/add}"
                   method="post"
@@ -271,7 +285,7 @@
                                id="quantityInput"
                                value="1"
                                min="1"
-                               max="99"
+                               th:max="${product.stock != null ? product.stock : 99}"
                                aria-label="Số lượng sản phẩm"
                                onchange="setCartQty(this.value)">
 
@@ -300,6 +314,13 @@
                     </button>
                 </div>
             </form>
+
+            <!-- NẾU HẾT HÀNG (stock <= 0 hoặc null): Khóa thao tác, giữ nguyên trang hiện tại -->
+            <div th:unless="${product.stock != null and product.stock > 0}" style="margin-top: 15px;">
+                <button type="button" class="btn-out-of-stock" disabled>
+                    🚫 Đã hết sản phẩm
+                </button>
+            </div>
 
             <div style="margin-top:12px;display:flex;
                         justify-content:space-between;align-items:center;">
@@ -386,6 +407,7 @@
     window.fitfoodProduct = {
         id: /*[[${product.id}]]*/ 0,
         basePrice: /*[[${product.price}]]*/ 0,
+        stock: /*[[${product.stock != null ? product.stock : 0}]]*/ 0,
         groups: /*[[${variantGroups}]]*/ []
     };
 </script>
@@ -394,60 +416,65 @@
     // Đồng bộ số lượng trên giao diện với form gửi đến server.
     function setCartQty(value) {
         let quantity = parseInt(value, 10);
+        const maxStock = (window.fitfoodProduct && window.fitfoodProduct.stock > 0) ? window.fitfoodProduct.stock : 99;
 
         if (isNaN(quantity)) {
             quantity = 1;
         }
 
-        quantity = Math.max(1, Math.min(99, quantity));
+        quantity = Math.max(1, Math.min(maxStock, quantity));
 
-        document.getElementById('quantityInput').value = quantity;
-        document.getElementById('cartQuantity').value = quantity;
+        const qtyInput = document.getElementById('quantityInput');
+        const cartQtyInput = document.getElementById('cartQuantity');
+        const decBtn = document.getElementById('decreaseQty');
+        const incBtn = document.getElementById('increaseQty');
 
-        document.getElementById('decreaseQty').disabled = quantity <= 1;
-        document.getElementById('increaseQty').disabled = quantity >= 99;
+        if (qtyInput) qtyInput.value = quantity;
+        if (cartQtyInput) cartQtyInput.value = quantity;
+
+        if (decBtn) decBtn.disabled = quantity <= 1;
+        if (incBtn) incBtn.disabled = quantity >= maxStock;
 
         updateDisplayedTotal();
     }
 
     function changeCartQty(amount) {
-        const current = parseInt(
-            document.getElementById('quantityInput').value, 10
-        ) || 1;
-
+        const qtyInput = document.getElementById('quantityInput');
+        const current = parseInt(qtyInput ? qtyInput.value : 1, 10) || 1;
         setCartQty(current + amount);
     }
 
-    // Cập nhật giá hiển thị theo giá gốc và số lượng.
-    // Server vẫn tự lấy giá từ database khi lưu giỏ hàng.
     function updateDisplayedTotal() {
         const product = window.fitfoodProduct || {};
         const price = Number(product.basePrice || 0);
-        const quantity = Number(
-            document.getElementById('quantityInput').value || 1
-        );
+        const qtyInput = document.getElementById('quantityInput');
+        const quantity = Number(qtyInput ? qtyInput.value : 1);
 
         const total = price * quantity;
+        const totalElem = document.getElementById('modalTotalPrice');
 
-        document.getElementById('modalTotalPrice').textContent =
-            new Intl.NumberFormat('vi-VN').format(total) + 'đ';
+        if (totalElem) {
+            totalElem.textContent = new Intl.NumberFormat('vi-VN').format(total) + 'đ';
+        }
     }
 
     function prepareCartSubmit() {
-        const quantity = parseInt(
-            document.getElementById('quantityInput').value, 10
-        );
+        const qtyInput = document.getElementById('quantityInput');
+        const quantity = parseInt(qtyInput ? qtyInput.value : 1, 10);
 
-        if (isNaN(quantity) || quantity < 1 || quantity > 99) {
-            alert('Vui lòng chọn số lượng từ 1 đến 99.');
+        if (isNaN(quantity) || quantity < 1) {
+            alert('Vui lòng chọn số lượng hợp lệ.');
             return false;
         }
 
-        document.getElementById('cartQuantity').value = quantity;
+        const cartQtyInput = document.getElementById('cartQuantity');
+        if (cartQtyInput) cartQtyInput.value = quantity;
 
         const button = document.getElementById('addToCartButton');
-        button.disabled = true;
-        button.textContent = 'Đang thêm vào giỏ hàng...';
+        if (button) {
+            button.disabled = true;
+            button.textContent = 'Đang thêm vào giỏ hàng...';
+        }
 
         return true;
     }
@@ -457,7 +484,6 @@
     });
 </script>
 
-<!-- Giữ file hiện có nếu nó dùng để hiển thị các nhóm biến thể -->
 <script defer th:src="@{/js/product-detail.js}"></script>
 <script defer th:src="@{/js/site-motion.js}"></script>
 
