@@ -95,7 +95,10 @@
     /*<![CDATA[*/
     var updatedSuccess = /*[[${successMessage != null}]]*/ false;
     if (updatedSuccess && window.parent) {
-        window.parent.postMessage({ type: 'FITFOOD_PRODUCT_UPDATED' }, window.location.origin);
+        window.parent.postMessage({ 
+            type: 'FITFOOD_PRODUCT_UPDATED',
+            message: 'Cập nhật món ăn thành công!'
+        }, window.location.origin);
     }
     /*]]>*/
 </script>
