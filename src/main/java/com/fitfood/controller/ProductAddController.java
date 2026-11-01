@@ -57,13 +57,20 @@ public class ProductAddController {
             BindingResult bindingResult,
             Model model) {
 
+        String trimmedName = form.getName() != null ? form.getName().trim() : "";
+
+        // Kiểm tra nếu tên sản phẩm đã có trong database
+        if (!trimmedName.isEmpty() && productRepository.existsByNameIgnoreCase(trimmedName)) {
+            bindingResult.rejectValue("name", "duplicate.name", "Sản phẩm này đã có trong danh sách!");
+        }
+
         if (bindingResult.hasErrors()) {
             addCategoriesToModel(model);
             return "admin-product-add";
         }
 
         Product product = new Product();
-        product.setName(form.getName().trim());
+        product.setName(trimmedName);
         product.setCategoryId(form.getCategoryId());
         product.setDescription(form.getDescription() != null ? form.getDescription().trim() : null);
         product.setPrice(form.getPrice());
@@ -84,7 +91,7 @@ public class ProductAddController {
 
         productRepository.save(product);
 
-        // KHÔNG redirect về /admin/products để tránh iframe tự tải lại cả trang admin vào popup
+        // Thành công: gửi successMessage để iframe gửi postMessage đóng popup và hiển thị thông báo
         model.addAttribute("successMessage", "Đã thêm món ăn thành công!");
         addCategoriesToModel(model);
         return "admin-product-add";
