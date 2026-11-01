@@ -108,8 +108,8 @@ public class ProductEditController {
 
         productRepository.save(product);
 
-        // Giữ nguyên trang form để JS gửi message đóng popup về trang cha, KHÔNG redirect
-        model.addAttribute("successMessage", "Đã cập nhật món ăn thành công!");
+        // Gửi successMessage để iframe kích hoạt thông báo và gửi tín hiệu ra ngoài
+        model.addAttribute("successMessage", "Đã cập nhật sản phẩm vào danh sách");
         addCategoriesToModel(model);
         return "admin-product-edit";
     }
