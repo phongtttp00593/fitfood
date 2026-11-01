@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết quả thanh toán VNPAY - FITFOOD</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
+    <style>
+        .vnpay-result{max-width:620px;margin:70px auto;padding:32px 24px;background:#fff;border:1px solid #e5e7eb;border-radius:18px;text-align:center;box-shadow:0 12px 35px rgba(0,0,0,.07)}
+        .vnpay-result h1{font-size:25px;margin:0 0 12px;color:#243247}.vnpay-result p{color:#596579;line-height:1.7}.vnpay-result a{display:inline-block;margin-top:16px;padding:11px 20px;background:#15965b;color:#fff;border-radius:9px;text-decoration:none;font-weight:700}
+        .vnpay-icon{font-size:48px;margin-bottom:12px}
+    </style>
+</head>
+<body>
+<main class="vnpay-result">
+    <div class="vnpay-icon" th:text="${success ? '✓' : '!' }">✓</div>
+    <h1>Kết quả thanh toán VNPAY</h1>
+    <p th:text="${message}">Đang kiểm tra kết quả thanh toán.</p>
+    <p th:if="${!validSignature}" style="color:#c53030;font-weight:700">Chữ ký phản hồi không hợp lệ. Không xem đây là giao dịch đã thanh toán.</p>
+    <p>Mã giao dịch FITFOOD: <strong th:text="${transactionRef}">-</strong></p>
+    <p>Trạng thái đơn hàng sẽ được cập nhật dựa trên thông báo IPN đã xác thực từ VNPAY, không dựa riêng vào trang này.</p>
+    <a th:if="${success}" th:href="@{/tai-khoan/don-hang}">Xem đơn hàng của tôi</a>
+    <a th:unless="${success}" th:href="@{/cart(recheckout=1)}">Quay lại nhập thông tin đặt hàng</a>
+</main>
+</body>
+</html>

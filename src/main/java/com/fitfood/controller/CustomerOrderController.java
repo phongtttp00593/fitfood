@@ -9,6 +9,8 @@ import com.fitfood.category.Cart;
 import com.fitfood.category.CartItem;
 import com.fitfood.promotion.Promotion;
 import com.fitfood.promotion.PromotionService;
+import com.fitfood.payment.VnpayService;
+import jakarta.servlet.http.HttpServletRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.PreparedStatement;
@@ -54,18 +56,21 @@ public class CustomerOrderController {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final PromotionService promotionService;
+    private final VnpayService vnpayService;
 
     public CustomerOrderController(
             JdbcTemplate jdbc,
             AppUserRepository userRepository,
             CartRepository cartRepository,
             CartItemRepository cartItemRepository,
-            PromotionService promotionService) {
+            PromotionService promotionService,
+            VnpayService vnpayService) {
         this.jdbc = jdbc;
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.promotionService = promotionService;
+        this.vnpayService = vnpayService;
     }
 
     private AppUser getCurrentUser(UserDetails userDetails) {
@@ -90,11 +95,16 @@ public class CustomerOrderController {
             @RequestParam(value = "paymentMethod", defaultValue = "COD") String paymentMethod,
             @RequestParam(value = "promotionCode", required = false) String promotionCode,
             @RequestParam(value = "orderNote", required = false) String orderNote,
+            HttpServletRequest request,
             RedirectAttributes redirect) {
 
         AppUser user = getCurrentUser(userDetails);
         if (user == null) {
             return "redirect:/dang-nhap";
+        }
+        if ("VNPAY".equalsIgnoreCase(paymentMethod) && !vnpayService.isConfigured()) {
+            redirect.addFlashAttribute("warningMessage", "VNPAY Sandbox chưa được cấu hình. Hãy điền VNPAY_TMN_CODE và VNPAY_HASH_SECRET trước khi thử thanh toán.");
+            return "redirect:/cart";
         }
 
         String name = receiverName == null ? "" : receiverName.strip();
@@ -248,14 +258,15 @@ public class CustomerOrderController {
             VALUES (?, ?, ?, ?, N'Chờ giao', ?)
             """, orderId, name, phone, address, finalNote);
 
-        String normalizedPaymentMethod = "BANK".equalsIgnoreCase(paymentMethod)
-                ? "Chuyển khoản ngân hàng"
-                : "Thanh toán khi nhận hàng (COD)";
+        boolean isVnpay = "VNPAY".equalsIgnoreCase(paymentMethod);
+        String normalizedPaymentMethod = isVnpay
+                ? "VNPAY" : "Thanh toán khi nhận hàng (COD)";
+        String vnpayTxnRef = isVnpay ? orderId + "_" + System.currentTimeMillis() : null;
         jdbc.update("""
             INSERT INTO dbo.fitfood_payments
-                (order_id, payment_method, amount, status)
-            VALUES (?, ?, ?, N'Chưa thanh toán')
-            """, orderId, normalizedPaymentMethod, finalTotal);
+                (order_id, payment_method, amount, status, transaction_code)
+            VALUES (?, ?, ?, N'Chưa thanh toán', ?)
+            """, orderId, normalizedPaymentMethod, finalTotal, vnpayTxnRef);
 
         jdbc.update("""
             IF EXISTS (SELECT 1 FROM dbo.fitfood_customer_profiles WHERE user_id = ?)
@@ -272,8 +283,21 @@ public class CustomerOrderController {
             END
             """, user.getId(), phone, address, user.getId(), user.getId(), phone, address);
 
-        jdbc.update("DELETE FROM dbo.fitfood_cart_items WHERE cart_id = ?", cart.getId());
+        // Giữ nguyên giỏ hàng khi chuyển sang VNPAY để khách có thể quay lại
+        // form checkout nếu hủy thanh toán trên cổng Sandbox.
+        if (!isVnpay) {
+            jdbc.update("DELETE FROM dbo.fitfood_cart_items WHERE cart_id = ?", cart.getId());
+        }
 
+        if (isVnpay) {
+            try {
+                String paymentUrl = vnpayService.createPaymentUrl(vnpayTxnRef, finalTotal, request);
+                return "redirect:" + paymentUrl;
+            } catch (RuntimeException ex) {
+                redirect.addFlashAttribute("warningMessage", "Không thể khởi tạo thanh toán VNPAY: " + ex.getMessage());
+                return "redirect:/cart?recheckout=1";
+            }
+        }
         redirect.addFlashAttribute("orderSuccess",
                 "Đặt hàng thành công! Mã đơn hàng của bạn là #" + orderId + ".");
         return "redirect:/tai-khoan/don-hang/" + orderId;
