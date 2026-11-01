@@ -27,6 +27,8 @@ public class SecurityConfig {
                 .requestMatchers("/admin", "/admin/**")
                     .hasRole("ADMIN")
 
+                .requestMatchers("/payment/vnpay/ipn", "/payment/vnpay/return").permitAll()
+
                 .requestMatchers(
                     "/",
                     "/menu",
@@ -99,7 +101,8 @@ public class SecurityConfig {
                 })
             );
 
-        // CSRF vẫn được bật mặc định
+        // IPN là callback server-to-server từ VNPAY, không có CSRF token của phiên trình duyệt.
+        http.csrf(csrf -> csrf.ignoringRequestMatchers("/payment/vnpay/ipn"));
         return http.build();
     }
 }

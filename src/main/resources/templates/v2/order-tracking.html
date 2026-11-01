@@ -332,6 +332,11 @@
          th:text="${orderSuccess}">
     </div>
 
+    <div th:if="${param.paymentSuccess != null and order.paymentStatus == 'Đã thanh toán'}"
+         class="tracking-alert ok">
+      Thanh toán VNPAY thành công! Đơn hàng của bạn đã được xác nhận thanh toán.
+    </div>
+
     <div th:if="${orderError}"
          class="tracking-alert err"
          th:text="${orderError}">
