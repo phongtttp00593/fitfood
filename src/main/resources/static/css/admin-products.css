@@ -1,0 +1,429 @@
+/* ===================================================
+   FITFOOD ADMIN - QUẢN LÝ SẢN PHẨM & POPUP MODAL
+   =================================================== */
+
+.product-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.product-modal.is-open {
+    display: flex;
+}
+
+.product-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(35, 20, 13, 0.72);
+    backdrop-filter: blur(4px);
+}
+
+.product-modal-dialog {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    width: min(820px, 100%);
+    height: min(850px, 92vh);
+    overflow: hidden;
+    background: var(--surface, #fffcf5);
+    border: 1px solid var(--gold-300, #dcc07e);
+    border-radius: 18px;
+    box-shadow: 0 24px 60px rgba(35, 20, 13, 0.3);
+    animation: productModalShow 0.2s ease-out;
+}
+
+.product-modal-dialog-sm {
+    width: min(500px, 100%);
+    height: auto;
+    max-height: 90vh;
+}
+
+.product-modal-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 16px 24px;
+    background: var(--surface, #fffcf5);
+    border-bottom: 1px solid var(--line, #e6d8bc);
+}
+
+.product-modal-heading {
+    margin: 0;
+    color: var(--lacquer, #3a2217);
+    font-family: "Be Vietnam Pro", Arial, sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.product-modal-subtitle {
+    margin: 5px 0 0;
+    color: var(--muted, #6e5d4f);
+    font-size: 12px;
+}
+
+.product-modal-close {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 1px solid var(--line-strong, #d6c29a);
+    border-radius: 50%;
+    background: var(--gold-50, #f7eed6);
+    color: var(--lacquer, #3a2217);
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.product-modal-close:hover {
+    background: var(--red, #9b2c1f);
+    border-color: var(--red, #9b2c1f);
+    color: #fff;
+}
+
+.product-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+#addProductFrame, 
+#editProductFrame {
+    display: block;
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    border: 0;
+    background: var(--paper, #f8f1e3);
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+.admin-food-cell img {
+    width: 54px;
+    height: 54px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.empty-products {
+    padding: 35px 15px;
+    text-align: center;
+    color: var(--muted, #6e5d4f);
+}
+
+.product-search-input {
+    width: 100%;
+    min-width: 180px;
+    padding: 10px 12px;
+    border: 0;
+    outline: none;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+}
+
+.table-filters .admin-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 240px;
+}
+
+.filter-select {
+    padding: 10px 12px;
+    border: 1px solid var(--line, #e6d8bc);
+    border-radius: 8px;
+    background: var(--surface, #fffcf5);
+    color: var(--lacquer, #3a2217);
+    font: inherit;
+}
+
+.product-row-hidden {
+    display: none;
+}
+
+.product-stt {
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+.table-actions button.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    border: 1px solid var(--line, #e6d8bc);
+    background: var(--surface, #fffcf5);
+    color: var(--lacquer, #3a2217);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.table-actions button.action-btn:hover {
+    background: var(--gold-50, #f7eed6);
+    border-color: var(--gold-300, #dcc07e);
+    color: var(--lacquer, #3a2217);
+}
+
+.table-actions button.action-btn.delete-icon:hover {
+    background: #fdf2f2;
+    border-color: #f8b4b4;
+    color: #9b2c1f;
+}
+
+.delete-confirm-box {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.delete-warning-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    line-height: 1;
+}
+
+.delete-confirm-text {
+    color: var(--muted, #6e5d4f);
+    font-size: 14px;
+    margin-bottom: 18px;
+}
+
+.delete-product-target {
+    background: var(--gold-50, #f7eed6);
+    border: 1px dashed var(--gold-300, #dcc07e);
+    border-radius: 10px;
+    padding: 14px;
+    margin-bottom: 24px;
+    color: var(--lacquer, #3a2217);
+    font-weight: 700;
+    font-size: 16px;
+}
+
+.delete-modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.btn-confirm-delete {
+    background: var(--red, #9b2c1f);
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-confirm-delete:hover {
+    background: #7a1f14;
+}
+
+.btn-cancel-modal {
+    background: #e2e8f0;
+    color: #4a5568;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-cancel-modal:hover {
+    background: #cbd5e0;
+}
+
+.admin-alert {
+    padding: 12px 18px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.admin-alert-success {
+    background-color: #def7ec;
+    color: #03543f;
+    border: 1px solid #bcf0da;
+}
+
+.admin-alert-warning {
+    background-color: #fef08a;
+    color: #713f12;
+    border: 1px solid #fde047;
+}
+
+.admin-alert-danger {
+    background-color: #fde8e8;
+    color: #9b1c1c;
+    border: 1px solid #f8b4b4;
+}
+
+@keyframes productModalShow {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.99);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* POPUP THÔNG BÁO XOAY LOADING + TÍCH XANH */
+.pro-toast-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(35, 20, 13, 0.45);
+    backdrop-filter: blur(5px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.25s ease;
+}
+
+.pro-toast-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.pro-toast-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 30px 36px;
+    width: min(340px, 90vw);
+    text-align: center;
+    box-shadow: 0 20px 45px rgba(35, 20, 13, 0.25);
+    border: 1px solid rgba(220, 192, 126, 0.4);
+    transform: scale(0.85);
+    transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.pro-toast-overlay.active .pro-toast-card {
+    transform: scale(1);
+}
+
+.pro-spinner {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 16px;
+    border: 4px solid #f1e6d0;
+    border-top: 4px solid #087e5e;
+    border-radius: 50%;
+    animation: proSpin 0.75s linear infinite;
+}
+
+@keyframes proSpin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.pro-success-icon {
+    display: none;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px;
+}
+
+.pro-checkmark {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: block;
+    stroke-width: 3;
+    stroke: #087e5e;
+    stroke-miterlimit: 10;
+    box-shadow: inset 0 0 0 #087e5e;
+    animation: proFill 0.4s ease-in-out 0.4s forwards, proScale 0.3s ease-in-out 0.9s both;
+}
+
+.pro-checkmark-circle {
+    stroke-dasharray: 166;
+    stroke-dashoffset: 166;
+    stroke-width: 3;
+    stroke-miterlimit: 10;
+    stroke: #087e5e;
+    fill: none;
+    animation: proStroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+}
+
+.pro-checkmark-check {
+    transform-origin: 50% 50%;
+    stroke-dasharray: 48;
+    stroke-dashoffset: 48;
+    stroke: #ffffff;
+    animation: proStrokeCheck 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.65s forwards;
+}
+
+@keyframes proStroke {
+    100% { stroke-dashoffset: 0; }
+}
+
+@keyframes proStrokeCheck {
+    100% { stroke-dashoffset: 0; }
+}
+
+@keyframes proFill {
+    100% { box-shadow: inset 0 0 0 32px #087e5e; }
+}
+
+@keyframes proScale {
+    0%, 100% { transform: none; }
+    50% { transform: scale3d(1.1, 1.1, 1); }
+}
+
+.pro-toast-text {
+    margin: 0;
+    color: var(--lacquer, #3a2217);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.5;
+    font-family: "Be Vietnam Pro", Arial, sans-serif;
+}
+
+@media (max-width: 600px) {
+    .product-modal {
+        padding: 8px;
+    }
+
+    .product-modal-dialog {
+        width: 100%;
+        height: 96vh;
+        border-radius: 12px;
+    }
+
+    .product-modal-header {
+        padding: 13px 16px;
+    }
+
+    .product-modal-heading {
+        font-size: 17px;
+    }
+}
