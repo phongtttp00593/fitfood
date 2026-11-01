@@ -843,17 +843,91 @@ SELECT COUNT(*) AS TongBang FROM sys.tables WHERE schema_id = SCHEMA_ID('dbo');
 GO
 SELECT id, [name], price, stock, active FROM dbo.fitfood_products ORDER BY id;
 GO
-PRINT N'HOAN THANH: DATABASE FITFOOD DA DUOC TAO MOI VA DONG BO HOAN CHINH VOI SPRING BOOT.';
+/* 10. KIEM TRA KET QUA KHOI TAO */
+
+SELECT COUNT(*) AS TongBang
+FROM sys.tables
+WHERE schema_id = SCHEMA_ID('dbo');
 GO
 
-USE FITFOOD;
+SELECT id, [name], price, stock, active
+FROM dbo.fitfood_products
+ORDER BY id;
 GO
 
-IF COL_LENGTH('dbo.fitfood_orders', 'inventory_released') IS NULL
-BEGIN
-    ALTER TABLE dbo.fitfood_orders
-    ADD inventory_released BIT NOT NULL
-        CONSTRAINT DF_fitfood_orders_inventory_released
-        DEFAULT (0);
-END;
+/* 11. DONG BO DU LIEU KHO AN TOAN */
+
+BEGIN TRY
+    BEGIN TRANSACTION;
+
+    -- Tao ban ghi kho con thieu.
+    INSERT INTO dbo.fitfood_inventory
+        (product_id, stock_quantity, reserved_quantity, reorder_level)
+    SELECT
+        p.id,
+        CASE
+            WHEN p.stock IS NULL OR p.stock < 0 THEN 0
+            ELSE p.stock
+        END,
+        0,
+        10
+    FROM dbo.fitfood_products p
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM dbo.fitfood_inventory i
+        WHERE i.product_id = p.id
+    );
+
+    -- Neu khong co hang dang giu, dong bo theo so ton nho hon.
+    UPDATE i
+    SET
+        i.stock_quantity = CASE
+            WHEN p.stock IS NULL THEN i.stock_quantity
+            WHEN p.stock < i.stock_quantity THEN p.stock
+            ELSE i.stock_quantity
+        END,
+        i.updated_at = SYSDATETIME()
+    FROM dbo.fitfood_inventory i
+    INNER JOIN dbo.fitfood_products p
+        ON p.id = i.product_id
+    WHERE i.reserved_quantity = 0
+      AND p.stock IS NOT NULL
+      AND i.stock_quantity <> p.stock;
+
+    -- Cap nhat lai ton kho trong bang san pham.
+    UPDATE p
+    SET p.stock = i.stock_quantity
+    FROM dbo.fitfood_products p
+    INNER JOIN dbo.fitfood_inventory i
+        ON i.product_id = p.id
+    WHERE i.reserved_quantity = 0
+      AND p.stock IS NOT NULL
+      AND p.stock <> i.stock_quantity;
+
+    COMMIT TRANSACTION;
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRANSACTION;
+
+    THROW;
+END CATCH;
+GO
+
+/* 12. KIEM TRA TON KHO SAU KHI DONG BO */
+
+SELECT
+    p.id,
+    p.name,
+    p.stock AS product_stock,
+    i.stock_quantity,
+    i.reserved_quantity,
+    i.stock_quantity - i.reserved_quantity AS available_stock
+FROM dbo.fitfood_products p
+LEFT JOIN dbo.fitfood_inventory i
+    ON i.product_id = p.id
+ORDER BY p.id;
+GO
+
+PRINT N'HOAN THANH: DATABASE FITFOOD DA DUOC TAO MOI, TAO DU LIEU MAU VA DONG BO KHO THANH CONG.';
 GO
