@@ -845,3 +845,15 @@ SELECT id, [name], price, stock, active FROM dbo.fitfood_products ORDER BY id;
 GO
 PRINT N'HOAN THANH: DATABASE FITFOOD DA DUOC TAO MOI VA DONG BO HOAN CHINH VOI SPRING BOOT.';
 GO
+
+USE FITFOOD;
+GO
+
+IF COL_LENGTH('dbo.fitfood_orders', 'inventory_released') IS NULL
+BEGIN
+    ALTER TABLE dbo.fitfood_orders
+    ADD inventory_released BIT NOT NULL
+        CONSTRAINT DF_fitfood_orders_inventory_released
+        DEFAULT (0);
+END;
+GO
