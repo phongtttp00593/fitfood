@@ -6,7 +6,7 @@
     <title>Giỏ hàng - FITFOOD</title>
 </head>
 
-<!-- ĐÃ SỬA: BỎ FONT SEG0E UI ĐỂ DÙNG FONT CHUNG CỦA FITFOOD -->
+<!-- SỬ DỤNG FONT CHỮ CHUNG CỦA FITFOOD -->
 <body style="background-color: #fcf9f2; margin: 0;">
 
 <div th:replace="~{v2/fragments/layout :: header('cart')}"></div>
@@ -154,20 +154,6 @@
                     </div>
                 </div>
 
-                <p id="checkoutAddressStatus" role="status" aria-live="polite"
-                   style="margin:6px 0 0;color:#718096;font-size:.79rem;">
-                    Chọn tỉnh/thành phố để tải danh sách phường, xã.
-                </p>
-
-                <p style="margin:6px 0 0;color:#718096;font-size:.72rem;">
-                    Dữ liệu hành chính theo hệ thống 34 tỉnh/thành sau 01/07/2025.
-                    Nguồn:
-                    <a href="https://provinces.open-api.vn/"
-                       target="_blank" rel="noopener noreferrer"
-                       style="color:#2b6cb0;">
-                        Province Open API
-                    </a>.
-                </p>
             </div>
 
             <!-- PHƯƠNG THỨC THANH TOÁN -->
@@ -696,7 +682,6 @@
                     targetForm.submit();
                 }
             }, 700);
-
         }, 800);
     }
 
