@@ -162,6 +162,7 @@ public class OrderController {
      * vẫn giữ nguyên bộ lọc/từ khóa đang xem (keyword, filter) để không bị mất vị trí tìm kiếm.
      */
     @PostMapping("/{id}/status")
+    @Transactional
     public String updateStatus(@PathVariable long id,
                                @RequestParam String status,
                                @RequestParam(defaultValue = "") String keyword,
@@ -181,7 +182,37 @@ public class OrderController {
                 // updated == 0 nghĩa là không có đơn hàng nào khớp id này (đã bị xoá / sai id).
                 redirect.addFlashAttribute(FLASH_ERROR, "Không tìm thấy đơn hàng cần cập nhật.");
             } else {
-                redirect.addFlashAttribute(FLASH_SUCCESS, "Đã cập nhật trạng thái đơn hàng.");
+                // Đồng bộ tự động sang phiếu giao hàng (fitfood_deliveries) nếu đơn có phiếu giao
+                if ("Đang giao".equals(status)) {
+                    jdbc.update("""
+                        UPDATE dbo.fitfood_deliveries
+                        SET status = N'Đang giao',
+                            sent_at = COALESCE(sent_at, SYSDATETIME())
+                        WHERE order_id = ? AND status <> N'Đã giao'
+                        """, id);
+                } else if ("Hoàn thành".equals(status)) {
+                    jdbc.update("""
+                        UPDATE dbo.fitfood_deliveries
+                        SET status = N'Đã giao',
+                            sent_at = COALESCE(sent_at, SYSDATETIME()),
+                            delivered_at = COALESCE(delivered_at, SYSDATETIME())
+                        WHERE order_id = ?
+                        """, id);
+                } else if ("Đã hủy".equals(status)) {
+                    jdbc.update("""
+                        UPDATE dbo.fitfood_deliveries
+                        SET status = N'Giao thất bại'
+                        WHERE order_id = ? AND status <> N'Đã giao'
+                        """, id);
+                } else if ("Đang xử lý".equals(status)) {
+                    jdbc.update("""
+                        UPDATE dbo.fitfood_deliveries
+                        SET status = N'Chờ giao',
+                            delivered_at = NULL
+                        WHERE order_id = ? AND status NOT IN (N'Đã giao', N'Giao thất bại')
+                        """, id);
+                }
+                redirect.addFlashAttribute(FLASH_SUCCESS, "Đã cập nhật trạng thái đơn hàng và đồng bộ giao hàng.");
             }
         }
         // addAttribute (khác addFlashAttribute): gắn vào QUERY STRING của URL redirect,
