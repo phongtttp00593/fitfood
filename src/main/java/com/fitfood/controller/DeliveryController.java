@@ -8,6 +8,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -128,6 +129,7 @@ public class DeliveryController {
      * Tạo phiếu giao hàng mới cho 1 đơn hàng (orderId), kèm thông tin người nhận.
      */
     @PostMapping
+    @Transactional
     public String create(@RequestParam long orderId,
                          @RequestParam String receiverName,
                          @RequestParam String receiverPhone,
@@ -171,7 +173,9 @@ public class DeliveryController {
                 redirect.addFlashAttribute(FLASH_ERROR,
                         "Không thể tạo phiếu: đơn hàng không tồn tại, đã hủy hoặc đã có phiếu giao.");
             } else {
-                redirect.addFlashAttribute(FLASH_SUCCESS, "Đã tạo phiếu giao hàng.");
+                // Tự động chuyển đơn hàng sang 'Đang xử lý' nếu đang ở 'Chờ xác nhận'
+                jdbc.update("UPDATE dbo.fitfood_orders SET status = N'Đang xử lý' WHERE id = ? AND status = N'Chờ xác nhận'", orderId);
+                redirect.addFlashAttribute(FLASH_SUCCESS, "Đã tạo phiếu giao hàng và chuyển trạng thái đơn hàng sang Đang xử lý.");
             }
         } catch (DataIntegrityViolationException ex) {
             // Lưới an toàn thứ 2: nếu 2 request chạy đúng lúc "lọt" qua điều kiện NOT EXISTS
@@ -190,6 +194,7 @@ public class DeliveryController {
      * Đây cũng là nơi tự động ghi nhận thời điểm "gửi đi" (sent_at) và "giao xong" (delivered_at).
      */
     @PostMapping("/{id}/update")
+    @Transactional
     public String update(@PathVariable long id,
                          @RequestParam String status,
                          @RequestParam String receiverName,
@@ -239,7 +244,21 @@ public class DeliveryController {
         if (updated == 0) {
             redirect.addFlashAttribute(FLASH_ERROR, "Không tìm thấy phiếu giao hàng cần cập nhật.");
         } else {
-            redirect.addFlashAttribute(FLASH_SUCCESS, "Đã cập nhật thông tin giao hàng.");
+            // Đồng bộ tự động sang trạng thái đơn hàng tổng (fitfood_orders)
+            Long orderId = jdbc.queryForObject(
+                    "SELECT order_id FROM dbo.fitfood_deliveries WHERE id = ?", Long.class, id);
+            if (orderId != null) {
+                if ("Đang giao".equals(status)) {
+                    jdbc.update("UPDATE dbo.fitfood_orders SET status = N'Đang giao' WHERE id = ? AND status <> N'Đã hủy'", orderId);
+                } else if ("Đã giao".equals(status)) {
+                    jdbc.update("UPDATE dbo.fitfood_orders SET status = N'Hoàn thành' WHERE id = ? AND status <> N'Đã hủy'", orderId);
+                } else if ("Giao thất bại".equals(status)) {
+                    jdbc.update("UPDATE dbo.fitfood_orders SET status = N'Đã hủy' WHERE id = ?", orderId);
+                } else if ("Chờ giao".equals(status)) {
+                    jdbc.update("UPDATE dbo.fitfood_orders SET status = N'Đang xử lý' WHERE id = ? AND status NOT IN (N'Đã hủy', N'Hoàn thành')", orderId);
+                }
+            }
+            redirect.addFlashAttribute(FLASH_SUCCESS, "Đã cập nhật thông tin giao hàng và đồng bộ sang đơn hàng.");
         }
         return REDIRECT_DELIVERIES;
     }
