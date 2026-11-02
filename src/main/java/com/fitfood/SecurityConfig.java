@@ -103,6 +103,23 @@ public class SecurityConfig {
 
         // IPN là callback server-to-server từ VNPAY, không có CSRF token của phiên trình duyệt.
         http.csrf(csrf -> csrf.ignoringRequestMatchers("/payment/vnpay/ipn"));
+
+        // Khoi tao CSRF token som truoc khi render view de tranh loi IllegalStateException commit response
+        http.addFilterAfter(new org.springframework.web.filter.OncePerRequestFilter() {
+            @Override
+            protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request,
+                                            jakarta.servlet.http.HttpServletResponse response,
+                                            jakarta.servlet.FilterChain filterChain)
+                    throws jakarta.servlet.ServletException, java.io.IOException {
+                org.springframework.security.web.csrf.CsrfToken csrfToken =
+                        (org.springframework.security.web.csrf.CsrfToken) request.getAttribute(
+                                org.springframework.security.web.csrf.CsrfToken.class.getName());
+                if (csrfToken != null) {
+                    csrfToken.getToken();
+                }
+                filterChain.doFilter(request, response);
+            }
+        }, org.springframework.security.web.csrf.CsrfFilter.class);
         return http.build();
     }
 }
