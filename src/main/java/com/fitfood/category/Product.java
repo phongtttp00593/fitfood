@@ -3,6 +3,7 @@ package com.fitfood.category;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import org.hibernate.annotations.Nationalized;
 
 @Entity
 @Table(name = "fitfood_products")
@@ -15,10 +16,12 @@ public class Product {
     @Column(name = "category_id", nullable = false)
     private Long categoryId;
 
+    @Nationalized
     @Column(name = "name", nullable = false, length = 150)
     private String name;
 
-    @Column(name = "description")
+    @Nationalized
+    @Column(name = "description", length = 500)
     private String description;
 
     @Column(name = "price", nullable = false, precision = 18, scale = 2)
