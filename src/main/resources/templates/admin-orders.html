@@ -82,6 +82,8 @@
                   <tr>
                     <th>MÃ ĐƠN</th>
                     <th>KHÁCH HÀNG</th>
+                    <th>ĐIỆN THOẠI</th>
+                    <th>ĐỊA CHỈ</th>
                     <th>NGÀY ĐẶT</th>
                     <th>SẢN PHẨM</th>
                     <th>TỔNG TIỀN</th>
@@ -96,6 +98,12 @@
                       <strong th:text="${order.customerName}">Tên khách hàng</strong>
                       <br />
                       <small th:text="${order.email}">email@example.com</small>
+                    </td>
+                    <td>
+                      <span style="font-weight: 600; color: #23140d;" th:text="${order.phone != null and !#strings.isEmpty(order.phone) ? order.phone : '—'}">0901234567</span>
+                    </td>
+                    <td style="max-width: 260px; font-size: 0.88rem; line-height: 1.4; word-break: break-word;">
+                      <span th:text="${order.address != null and !#strings.isEmpty(order.address) ? order.address : '—'}">Địa chỉ nhận hàng</span>
                     </td>
                     <td th:text="${order.placedAt != null ? #temporals.format(order.placedAt, 'dd/MM/yyyy HH:mm') : '—'}">14/10/2026</td>
                     <td th:text="${order.itemCount}">0</td>

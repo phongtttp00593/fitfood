@@ -85,10 +85,15 @@ public class OrderController {
         // "WHERE 1 = 1" là mẹo thường dùng để các đoạn "AND ..." phía dưới
         // có thể nối vào tự do mà không cần tự xử lý trường hợp "WHERE đầu tiên hay là AND".
         StringBuilder sql = new StringBuilder("""
-            SELECT o.id, o.placed_at, u.full_name, u.email, o.status, o.total,
+            SELECT o.id, o.placed_at, u.full_name, u.email,
+                   COALESCE(d.receiver_phone, cp.phone) AS phone,
+                   COALESCE(d.delivery_address, cp.address) AS address,
+                   o.status, o.total,
                    COUNT(oi.id) AS item_count
             FROM dbo.fitfood_orders AS o
             JOIN dbo.fitfood_users AS u ON u.id = o.user_id
+            LEFT JOIN dbo.fitfood_deliveries AS d ON d.order_id = o.id
+            LEFT JOIN dbo.fitfood_customer_profiles AS cp ON cp.user_id = u.id
             LEFT JOIN dbo.fitfood_order_items AS oi ON oi.order_id = o.id
             WHERE 1 = 1
             """);
@@ -103,6 +108,8 @@ public class OrderController {
         if (!normalizedKeyword.isEmpty()) {
             sql.append("""
                  AND (u.full_name LIKE ? OR u.email LIKE ?
+                      OR d.receiver_phone LIKE ? OR cp.phone LIKE ?
+                      OR d.delivery_address LIKE ? OR cp.address LIKE ?
                       OR CONVERT(VARCHAR(20), o.id) LIKE ?)
                 """);
             // "%keyword%" để LIKE tìm khớp ở bất kỳ vị trí nào trong chuỗi
@@ -110,10 +117,16 @@ public class OrderController {
             parameters.add(search);
             parameters.add(search);
             parameters.add(search);
+            parameters.add(search);
+            parameters.add(search);
+            parameters.add(search);
+            parameters.add(search);
         }
         // GROUP BY vì có COUNT(oi.id); ORDER BY đơn mới nhất lên trước.
         sql.append("""
-             GROUP BY o.id, o.placed_at, u.full_name, u.email, o.status, o.total
+             GROUP BY o.id, o.placed_at, u.full_name, u.email,
+                      d.receiver_phone, cp.phone, d.delivery_address, cp.address,
+                      o.status, o.total
              ORDER BY o.placed_at DESC, o.id DESC
             """);
 
@@ -128,6 +141,8 @@ public class OrderController {
                     placedAt == null ? null : placedAt.toLocalDateTime(),
                     rs.getString("full_name"),
                     rs.getString("email"),
+                    rs.getString("phone"),
+                    rs.getString("address"),
                     rs.getString("status"),
                     rs.getBigDecimal("total"),
                     rs.getInt("item_count"));
@@ -276,6 +291,7 @@ public class OrderController {
      * và tự gọi đúng accessor tương ứng, nên template HTML không cần thay đổi gì.
      */
     public record OrderRow(long id, LocalDateTime placedAt, String customerName,
-                           String email, String status, BigDecimal total, int itemCount) {
+                           String email, String phone, String address,
+                           String status, BigDecimal total, int itemCount) {
     }
 }
