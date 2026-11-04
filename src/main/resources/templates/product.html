@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -260,6 +260,16 @@
                        name="quantity"
                        value="1">
 
+                <input type="hidden"
+                       id="cartFoodNote"
+                       name="foodNote"
+                       value="">
+
+                <input type="hidden"
+                       id="cartVariantName"
+                       name="variantName"
+                       value="">
+
                 <div class="quantity-row"
                      style="display:flex;gap:15px;align-items:center;">
 
@@ -469,6 +479,36 @@
 
         const cartQtyInput = document.getElementById('cartQuantity');
         if (cartQtyInput) cartQtyInput.value = quantity;
+
+        // Đưa ghi chú vào form
+        const userFoodNote = document.getElementById('userFoodNote');
+        const cartFoodNote = document.getElementById('cartFoodNote');
+        if (userFoodNote && cartFoodNote) {
+            cartFoodNote.value = userFoodNote.value;
+        }
+
+        // Tự động gom tên biến thể đang được chọn
+        const selectedLabels = [];
+        const checkedRadios = document.querySelectorAll('#userVariantBody input[type="radio"]:checked, #userVariantBody input[type="checkbox"]:checked');
+        checkedRadios.forEach(input => {
+            let labelText = '';
+            if (input.nextElementSibling) {
+                labelText = input.nextElementSibling.textContent.trim();
+            } else if (input.parentElement) {
+                labelText = input.parentElement.textContent.trim();
+            }
+            if (labelText) {
+                labelText = labelText.replace(/\s*\([^\)]*\)/g, '').trim();
+                selectedLabels.push(labelText);
+            } else if (input.value) {
+                selectedLabels.push(input.value);
+            }
+        });
+
+        const variantNameInput = document.getElementById('cartVariantName');
+        if (variantNameInput) {
+            variantNameInput.value = selectedLabels.join(', ');
+        }
 
         const button = document.getElementById('addToCartButton');
         if (button) {

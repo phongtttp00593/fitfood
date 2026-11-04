@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -245,8 +244,7 @@
                          font-size:13px;" />
             </div>
 
-            <!-- Form Thymleaf cấp CSRF token và URL đúng cho nút Thêm vào giỏ.
-                 JavaScript chỉ cập nhật dữ liệu rồi gửi form này. -->
+            <!-- Form Thymleaf cấp CSRF token và URL đúng cho nút Thêm vào giỏ. -->
             <form id="addToCartForm"
                   th:action="@{/cart/add}"
                   method="post"
@@ -256,8 +254,9 @@
                        th:name="${_csrf.parameterName}"
                        th:value="${_csrf.token}" />
                 <input type="hidden" name="productId" th:value="${product.id}" />
-                <input type="hidden" name="quantity" value="1" />
-                <input type="hidden" name="foodNote" value="" />
+                <input type="hidden" id="cartQuantity" name="quantity" value="1" />
+                <input type="hidden" id="cartFoodNote" name="foodNote" value="" />
+                <input type="hidden" id="cartVariantName" name="variantName" value="" />
             </form>
 
             <!-- SỐ LƯỢNG -->
@@ -452,6 +451,60 @@
         basePrice: /*[[${product.price}]]*/ 0,
         groups: /*[[${variantGroups}]]*/ []
     };
+</script>
+
+<script>
+    let currentQty = 1;
+
+    function changeQty(amount) {
+        currentQty = Math.max(1, currentQty + amount);
+        const modalQty = document.getElementById('modalQty');
+        if (modalQty) modalQty.textContent = currentQty;
+        if (typeof updateTotalPrice === 'function') {
+            updateTotalPrice();
+        }
+    }
+
+    function addToCartWithVariants() {
+        const form = document.getElementById('addToCartForm');
+        if (!form) return;
+
+        // Cập nhật số lượng và ghi chú
+        const qtyInput = document.getElementById('cartQuantity');
+        if (qtyInput) qtyInput.value = currentQty;
+
+        const foodNoteInput = document.getElementById('userFoodNote');
+        const formNote = document.getElementById('cartFoodNote');
+        if (foodNoteInput && formNote) {
+            formNote.value = foodNoteInput.value;
+        }
+
+        // Tự động gom tên biến thể / lựa chọn đang được chọn
+        const selectedLabels = [];
+        const checkedRadios = document.querySelectorAll('#userVariantBody input[type="radio"]:checked, #userVariantBody input[type="checkbox"]:checked');
+        checkedRadios.forEach(input => {
+            let labelText = '';
+            if (input.nextElementSibling) {
+                labelText = input.nextElementSibling.textContent.trim();
+            } else if (input.parentElement) {
+                labelText = input.parentElement.textContent.trim();
+            }
+            if (labelText) {
+                // Loại bỏ phần giá tiền trong ngoặc nếu có (+10.000đ)
+                labelText = labelText.replace(/\s*\([^\)]*\)/g, '').trim();
+                selectedLabels.push(labelText);
+            } else if (input.value) {
+                selectedLabels.push(input.value);
+            }
+        });
+
+        const variantNameInput = document.getElementById('cartVariantName');
+        if (variantNameInput) {
+            variantNameInput.value = selectedLabels.join(', ');
+        }
+
+        form.submit();
+    }
 </script>
 
 <script defer th:src="@{/js/product-detail.js}"></script>
