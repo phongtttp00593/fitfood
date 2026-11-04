@@ -30,57 +30,37 @@ public class CartItem {
     @Column(name = "meal_plan_name", length = 180)
     private String mealPlanName;
 
-    // Ghi chú riêng của khách cho món ăn; NVARCHAR để lưu tiếng Việt có dấu.
+    @Nationalized
+    @Column(name = "variant_name", length = 200)
+    private String variantName;
+
     @Nationalized
     @Column(name = "food_note", length = 500)
     private String foodNote;
 
-
     public CartItem() {
     }
 
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Cart getCart() { return cart; }
+    public void setCart(Cart cart) { this.cart = cart; }
 
-    public Cart getCart() {
-        return cart;
-    }
+    public Product getProduct() { return product; }
+    public void setProduct(Product product) { this.product = product; }
 
-    public void setCart(Cart cart) {
-        this.cart = cart;
-    }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
 
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getUnitPrice() {
-        return unitPrice;
-    }
-
-    public void setUnitPrice(BigDecimal unitPrice) {
-        this.unitPrice = unitPrice;
-    }
+    public BigDecimal getUnitPrice() { return unitPrice; }
+    public void setUnitPrice(BigDecimal unitPrice) { this.unitPrice = unitPrice; }
 
     public String getMealPlanName() { return mealPlanName; }
     public void setMealPlanName(String mealPlanName) { this.mealPlanName = mealPlanName; }
+
+    public String getVariantName() { return variantName; }
+    public void setVariantName(String variantName) { this.variantName = variantName; }
 
     public String getFoodNote() { return foodNote; }
     public void setFoodNote(String foodNote) { this.foodNote = foodNote; }
