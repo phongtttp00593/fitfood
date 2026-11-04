@@ -1,4 +1,3 @@
-
 (function () {
   'use strict';
 
@@ -18,21 +17,13 @@
 
   function create(tag, cls, content) {
     var el = document.createElement(tag);
-
-    if (cls) {
-      el.className = cls;
-    }
-
-    if (content !== undefined) {
-      el.textContent = String(content);
-    }
-
+    if (cls) el.className = cls;
+    if (content !== undefined) el.textContent = String(content);
     return el;
   }
 
   function checkedInputs(groupId) {
     if (!variantBody) return [];
-
     return Array.from(
       variantBody.querySelectorAll('input[data-group-id]')
     ).filter(function (el) {
@@ -42,13 +33,10 @@
 
   function getExtraPrice() {
     if (!variantBody) return 0;
-
     var extra = 0;
-
     variantBody.querySelectorAll('input:checked').forEach(function (input) {
       extra += Number(input.dataset.price || 0);
     });
-
     return extra;
   }
 
@@ -60,35 +48,20 @@
     var totalElement = document.getElementById('modalTotalPrice');
     var quantityElement = document.getElementById('modalQty');
 
-    if (basePriceElement) {
-      basePriceElement.textContent = money(unit);
-    }
-
-    if (totalElement) {
-      totalElement.textContent = money(unit * quantity);
-    }
-
-    if (quantityElement) {
-      quantityElement.textContent = quantity;
-    }
+    if (basePriceElement) basePriceElement.textContent = money(unit);
+    if (totalElement) totalElement.textContent = money(unit * quantity);
+    if (quantityElement) quantityElement.textContent = quantity;
 
     var quantityInput = document.getElementById('quantityInput');
-
-    if (quantityInput) {
-      quantityInput.value = quantity;
-    }
+    if (quantityInput) quantityInput.value = quantity;
   }
 
   function buildVariants() {
     if (!variantBody) return;
-
     variantBody.replaceChildren();
 
     if (!groups.length) {
-      variantBody.appendChild(
-        create('p', '', 'Món ăn này chưa có tùy chọn bổ sung.')
-      );
-
+      variantBody.appendChild(create('p', '', 'Món ăn này chưa có tùy chọn bổ sung.'));
       calculate();
       return;
     }
@@ -102,30 +75,18 @@
       wrapper.style.marginBottom = '14px';
 
       var heading = create('div', '', group.group_name);
-      heading.style.cssText =
-        'font-weight:600;margin-bottom:7px;color:#334155';
-
-      heading.appendChild(
-        create(
-          'small',
-          '',
-          group.is_required ? ' (Bắt buộc)' : ' (Tùy chọn)'
-        )
-      );
-
+      heading.style.cssText = 'font-weight:600;margin-bottom:7px;color:#334155';
+      heading.appendChild(create('small', '', group.is_required ? ' (Bắt buộc)' : ' (Tùy chọn)'));
       wrapper.appendChild(heading);
 
       var defaults = options.filter(function (opt) {
         return opt.is_default === true || opt.is_default === 1;
       });
 
-      var max = group.allow_multiple
-        ? Math.max(1, Number(group.max_select) || 1)
-        : 1;
+      var max = group.allow_multiple ? Math.max(1, Number(group.max_select) || 1) : 1;
 
       options.forEach(function (opt, idx) {
         var label = create('label');
-
         label.style.cssText =
           'display:flex;justify-content:space-between;gap:10px;' +
           'align-items:center;padding:9px;background:#fff;' +
@@ -133,37 +94,28 @@
           'margin-bottom:6px;cursor:pointer';
 
         var left = create('span');
-
-        left.style.cssText =
-          'display:flex;align-items:center;gap:8px';
+        left.style.cssText = 'display:flex;align-items:center;gap:8px';
 
         var input = create('input');
-
         input.type = group.allow_multiple ? 'checkbox' : 'radio';
         input.name = 'variant_' + group.id;
         input.value = opt.id;
         input.dataset.groupId = String(group.id);
         input.dataset.price = String(opt.extra_price || 0);
+        input.dataset.optionName = String(opt.option_name || '');
 
-        var isDefault =
-          opt.is_default === true || opt.is_default === 1;
-
-        input.checked = isDefault ||
-          (!defaults.length && group.is_required && idx === 0);
+        var isDefault = opt.is_default === true || opt.is_default === 1;
+        input.checked = isDefault || (!defaults.length && group.is_required && idx === 0);
 
         if (group.allow_multiple && idx >= max && input.checked) {
           input.checked = false;
         }
 
         input.addEventListener('change', function () {
-          if (
-            group.allow_multiple &&
-            checkedInputs(group.id).length > max
-          ) {
+          if (group.allow_multiple && checkedInputs(group.id).length > max) {
             input.checked = false;
             alert('Chỉ được chọn tối đa ' + max + ' tùy chọn.');
           }
-
           calculate();
         });
 
@@ -171,7 +123,6 @@
         left.appendChild(create('span', '', opt.option_name));
 
         var price = Number(opt.extra_price || 0);
-
         var labelPrice = price === 0
           ? 'Miễn phí'
           : (price > 0 ? '+' : '-') + money(Math.abs(price));
@@ -185,9 +136,7 @@
       });
 
       if (!options.length) {
-        wrapper.appendChild(
-          create('p', '', 'Hiện chưa có tùy chọn khả dụng.')
-        );
+        wrapper.appendChild(create('p', '', 'Hiện chưa có tùy chọn khả dụng.'));
       }
 
       variantBody.appendChild(wrapper);
@@ -201,17 +150,14 @@
     calculate();
   };
 
-  // Gửi sản phẩm tới CartController để lưu vào database.
   window.addToCartWithVariants = function () {
     if (!data.id) {
       alert('Không xác định được sản phẩm.');
       return;
     }
 
-    // Kiểm tra các nhóm tùy chọn bắt buộc.
     for (var i = 0; i < groups.length; i++) {
       var group = groups[i];
-
       if (
         (group.is_required === true || group.is_required === 1) &&
         checkedInputs(group.id).length === 0
@@ -221,8 +167,6 @@
       }
     }
 
-    // Trang v2 đã có sẵn form và CSRF do Thymeleaf tạo.
-    // Không tạo form mới khi đã có #addToCartForm.
     var form = document.getElementById('addToCartForm') ||
       document.querySelector('form[action*="/cart/add"]');
 
@@ -234,39 +178,45 @@
       form.style.display = 'none';
       document.body.appendChild(form);
     }
-    // Dù là form có sẵn hay form tạo động, luôn gửi dữ liệu bằng UTF-8.
     form.acceptCharset = 'UTF-8';
 
     function setHidden(name, value) {
       var input = form.querySelector('input[name="' + name + '"]');
-
       if (!input) {
         input = document.createElement('input');
         input.type = 'hidden';
         input.name = name;
         form.appendChild(input);
       }
-
       input.value = String(value);
     }
 
     setHidden('productId', data.id);
     setHidden('quantity', quantity);
 
-    // Gửi ghi chú món ăn bằng form UTF-8 để giữ nguyên tiếng Việt có dấu.
     var foodNoteInput = document.getElementById('userFoodNote');
     setHidden('foodNote', foodNoteInput ? foodNoteInput.value.trim() : '');
 
-    // CSRF của Spring Security bắt buộc cho POST /cart/add.
-    // Ưu tiên token có sẵn trong form, fallback sang token trong meta.
+    // Thu thập tất cả các biến thể đã chọn để gửi lên server
+    var selectedVariantNames = [];
+    if (variantBody) {
+      variantBody.querySelectorAll('input:checked').forEach(function (input) {
+        var optName = input.dataset.optionName;
+        if (!optName && input.nextElementSibling) {
+          optName = input.nextElementSibling.textContent.trim();
+        }
+        if (optName) {
+          selectedVariantNames.push(optName);
+        }
+      });
+    }
+    setHidden('variantName', selectedVariantNames.join(', '));
+
     var csrfParameterMeta = document.querySelector('meta[name="_csrf_parameter"]');
-    var csrfParameter = csrfParameterMeta && csrfParameterMeta.content
-      ? csrfParameterMeta.content : '_csrf';
+    var csrfParameter = csrfParameterMeta && csrfParameterMeta.content ? csrfParameterMeta.content : '_csrf';
     var csrfInput = form.querySelector('input[name="' + csrfParameter + '"]');
     if (!csrfInput || !csrfInput.value) {
-      var pageCsrfInput = document.querySelector(
-        'input[name="' + csrfParameter + '"]'
-      );
+      var pageCsrfInput = document.querySelector('input[name="' + csrfParameter + '"]');
       var csrfMeta = document.querySelector('meta[name="_csrf"]');
       var csrfToken = pageCsrfInput && pageCsrfInput.value
         ? pageCsrfInput.value
@@ -280,7 +230,6 @@
       }
     }
 
-    // Không hiển thị thông báo thành công trước khi server xử lý.
     form.submit();
   };
 
