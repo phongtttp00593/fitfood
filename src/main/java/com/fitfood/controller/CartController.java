@@ -23,8 +23,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.*;
 
 @Controller
 @RequestMapping("/cart")
@@ -70,11 +73,20 @@ public class CartController {
                     ALTER TABLE dbo.fitfood_cart_items ALTER COLUMN meal_plan_name NVARCHAR(180) NULL;
                 END
                 """);
+            jdbc.execute("""
+                IF NOT EXISTS (
+                    SELECT 1 FROM sys.columns c
+                    WHERE c.object_id = OBJECT_ID(N'dbo.fitfood_cart_items')
+                      AND c.name = 'variant_name'
+                )
+                BEGIN
+                    ALTER TABLE dbo.fitfood_cart_items ADD variant_name NVARCHAR(200) NULL;
+                END
+                """);
         } catch (Exception ignored) {
         }
     }
 
-    // Xem giỏ hàng
     @GetMapping
     public String viewCart(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         if (userDetails == null) {
@@ -88,7 +100,6 @@ public class CartController {
         Cart cart = cartRepository.findByUserId(user.getId()).orElse(null);
         model.addAttribute("cart", cart);
 
-        // Nhóm các dòng món thuộc cùng một gói thành một thẻ gói trong giỏ hàng.
         List<CartItem> regularCartItems = new ArrayList<>();
         Map<String, Map<String, Object>> groupedPlans = new LinkedHashMap<>();
         if (cart != null && cart.getItems() != null) {
@@ -103,8 +114,8 @@ public class CartController {
                     value.put("name", key);
                     value.put("items", new ArrayList<CartItem>());
                     value.put("total", BigDecimal.ZERO);
-                    // Gói được hiển thị như một dòng giỏ hàng; ghi chú món lấy từ cấu hình gói.
-                    List<Map<String, Object>> notes = jdbc.query(
+                    
+                    var notes = jdbc.query(
                         "SELECT p.name, mpi.quantity, p.price " +
                         "FROM dbo.fitfood_meal_plans mp " +
                         "JOIN dbo.fitfood_meal_plan_items mpi ON mpi.meal_plan_id = mp.id " +
@@ -140,10 +151,9 @@ public class CartController {
         }
         model.addAttribute("cartTotal", cartTotal);
 
-        // Lấy sẵn thông tin người nhận mặc định từ hồ sơ khách hàng
         String defaultPhone = "";
         String defaultAddress = "";
-        List<Map<String, Object>> profiles = jdbc.queryForList(
+        var profiles = jdbc.queryForList(
                 "SELECT phone, address FROM dbo.fitfood_customer_profiles WHERE user_id = ?",
                 user.getId());
         if (!profiles.isEmpty()) {
@@ -159,11 +169,12 @@ public class CartController {
         return "v2/cart";
     }
 
-    // Thêm món ăn vào giỏ kèm thông báo thành công
     @PostMapping("/add")
     public String addToCart(@AuthenticationPrincipal UserDetails userDetails,
                             @RequestParam("productId") Long productId,
                             @RequestParam(value = "quantity", defaultValue = "1") int quantity,
+                            @RequestParam(value = "variantName", required = false) String variantName,
+                            @RequestParam(value = "unitPrice", required = false) BigDecimal unitPrice,
                             @RequestParam(value = "foodNote", required = false) String foodNote,
                             RedirectAttributes redirectAttributes) {
         if (userDetails == null) {
@@ -179,29 +190,52 @@ public class CartController {
                 return cartRepository.save(newCart);
             });
 
-            Optional<CartItem> existingItem = cartItemRepository
-                    .findFirstByCartIdAndProductIdAndMealPlanNameIsNullOrderByIdAsc(cart.getId(), productId);
-            if (existingItem.isPresent()) {
-                CartItem item = existingItem.get();
-                item.setQuantity(item.getQuantity() + quantity);
-                if (foodNote != null && !foodNote.isBlank()) item.setFoodNote(foodNote.trim());
-                cartItemRepository.save(item);
+            String cleanVariantName = (variantName != null && !variantName.isBlank()) ? variantName.trim() : null;
+
+            // Lấy giá đã tính kèm biến thể từ form, nếu không có thì lấy giá gốc
+            BigDecimal finalUnitPrice = (unitPrice != null && unitPrice.compareTo(BigDecimal.ZERO) > 0) 
+                                        ? unitPrice 
+                                        : product.getPrice();
+
+            // So sánh trùng cả món và cùng chuỗi biến thể
+            CartItem matchedItem = null;
+            if (cart.getItems() != null) {
+                for (CartItem item : cart.getItems()) {
+                    if (item.getMealPlanName() == null && item.getProduct().getId().equals(productId)) {
+                        boolean sameVariant = (cleanVariantName == null && (item.getVariantName() == null || item.getVariantName().isBlank()))
+                                           || (cleanVariantName != null && cleanVariantName.equalsIgnoreCase(item.getVariantName()));
+                        if (sameVariant) {
+                            matchedItem = item;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (matchedItem != null) {
+                matchedItem.setQuantity(matchedItem.getQuantity() + quantity);
+                matchedItem.setUnitPrice(finalUnitPrice);
+                if (foodNote != null && !foodNote.isBlank()) {
+                    matchedItem.setFoodNote(foodNote.trim());
+                }
+                cartItemRepository.save(matchedItem);
             } else {
                 CartItem newItem = new CartItem();
                 newItem.setCart(cart);
                 newItem.setProduct(product);
                 newItem.setQuantity(quantity);
-                newItem.setUnitPrice(product.getPrice());
-                if (foodNote != null && !foodNote.isBlank()) newItem.setFoodNote(foodNote.trim());
+                newItem.setUnitPrice(finalUnitPrice);
+                newItem.setVariantName(cleanVariantName);
+                if (foodNote != null && !foodNote.isBlank()) {
+                    newItem.setFoodNote(foodNote.trim());
+                }
                 cartItemRepository.save(newItem);
             }
             redirectAttributes.addFlashAttribute("successMessage", "Thêm món vào giỏ hàng thành công!");
         }
-        return "redirect:/menu";
+        return "redirect:/cart";
     }
 
-
-    /** Thêm cả gói ăn vào giỏ; món trong gói lấy từ cấu hình Admin, USER không tự chọn món. */
     @PostMapping("/add-meal-plan")
     @Transactional
     public String addMealPlanToCart(@AuthenticationPrincipal UserDetails userDetails,
@@ -259,7 +293,6 @@ public class CartController {
         return "redirect:/cart";
     }
 
-    // Tăng / giảm số lượng (+ / -)
     @PostMapping("/update-quantity")
     public String updateQuantity(@AuthenticationPrincipal UserDetails userDetails,
                                  @RequestParam("itemId") Long itemId,
@@ -283,7 +316,6 @@ public class CartController {
         return "redirect:/cart";
     }
 
-    // Xóa sản phẩm khỏi giỏ hàng kèm thông báo
     @PostMapping("/remove")
     public String removeItem(@AuthenticationPrincipal UserDetails userDetails,
                              @RequestParam("itemId") Long itemId,
