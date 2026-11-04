@@ -1,41 +1,30 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="FITFOOD — Ăn ngon, sống khỏe" />
-    <title>Trang chủ | FITFOOD</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FITFOOD — Ăn ngon, sống khỏe">
 
-    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
-    <link rel="stylesheet" th:href="@{/css/fitfood-auth.css}" />
-    <link rel="stylesheet" th:href="@{/css/fitfood-account.css}" />
-    <link rel="stylesheet" th:href="@{/css/site-theme.css}" />
-    <link rel="stylesheet" th:href="@{/css/support-chat.css}" />
+    <title>FITFOOD — Ăn ngon, sống khỏe</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossorigin="anonymous" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet" />
-    <style>
-        .home-out-of-stock {
-            font-size: 11px;
-            font-weight: 700;
-            color: #9b1c1c;
-            background: #fde8e8;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
+    <link rel="stylesheet" th:href="@{/css/fitfood-auth.css}">
+    <link rel="stylesheet" th:href="@{/css/fitfood-account.css}">
+    <link rel="stylesheet" th:href="@{/css/site-theme.css}">
+    <link rel="stylesheet" th:href="@{/css/support-chat.css}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
 </head>
 
 <body>
+
 <header class="site-header">
     <div class="nav-inner">
         <a href="/" class="site-brand">
-            <img src="/images/leaf.svg" alt="" />
+            <img th:src="@{/images/leaf.svg}" alt="">
             <span>FITFOOD</span>
         </a>
 
@@ -48,14 +37,6 @@
         </nav>
 
         <div class="nav-search">
-            <svg class="ic" width="17" height="17"
-                 viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="1.8"
-                 stroke-linecap="round" stroke-linejoin="round"
-                 aria-hidden="true">
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-4-4" />
-            </svg>
             <span>Tìm kiếm món ăn...</span>
             <kbd>⌘ K</kbd>
         </div>
@@ -87,26 +68,14 @@
                             Họ tên
                         </strong>
                         <small th:text="${accountInfo.email}">
-                            email@example.com
+                            email
                         </small>
                     </div>
 
-                    <a th:href="@{/tai-khoan}">
-                        👤 Thông tin tài khoản
-                    </a>
-
+                    <a th:href="@{/tai-khoan}">👤 Thông tin tài khoản</a>
                     <a th:if="${isAdmin}" th:href="@{/admin}">
                         ⚙ Trang quản trị
                     </a>
-
-                    <!-- Đăng xuất cho tài khoản USER -->
-                    <form th:if="${!isAdmin}"
-                          th:action="@{/logout}"
-                          method="post">
-                        <button type="submit">
-                            ↪ Đăng xuất
-                        </button>
-                    </form>
                 </div>
             </details>
         </div>
@@ -114,254 +83,82 @@
 </header>
 
 <main>
-    <section class="hero-section">
-        <div class="hero-grain"></div>
-
-        <div class="hero-inner">
-            <div class="hero-copy">
-                <div class="eyebrow">
-                    <svg class="ic" width="16" height="16"
-                         viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="1.8"
-                         stroke-linecap="round" stroke-linejoin="round"
-                         aria-hidden="true">
-                        <path d="M20 3C8 3 3 8 3 16a5 5 0 0 0 5 5c8 0 13-5 12-18ZM3 21 17 7"/>
-                    </svg>
-                    ĂN NGON <span>•</span>
-                    SỐNG KHỎE <span>•</span>
-                    MỖI NGÀY
-                </div>
-
-                <h1>
-                    Thực phẩm lành mạnh<br />
-                    cho một cuộc sống<br />
-                    <em>tốt đẹp hơn.</em>
-                </h1>
-
-                <p>
-                    Những bữa ăn tươi ngon, giàu dinh dưỡng
-                    được chế biến từ nguyên liệu sạch,
-                    giúp bạn khỏe mạnh mỗi ngày.
-                </p>
-
-                <div class="hero-cta">
-                    <a href="/menu" class="btn btn-primary">
-                        Khám phá thực đơn
-                        <svg class="ic" width="17" height="17"
-                             viewBox="0 0 24 24" fill="none"
-                             stroke="currentColor" stroke-width="1.8"
-                             stroke-linecap="round"
-                             stroke-linejoin="round"
-                             aria-hidden="true">
-                            <path d="M5 12h14m-6-6 6 6-6 6" />
-                        </svg>
-                    </a>
-
-                    <a class="hero-link" href="/#about">
-                        <span>▶</span>
-                        Tìm hiểu FITFOOD
-                    </a>
-                </div>
-
-                <div class="hero-social">
-                    <div class="small-avatars">
-                        <span>N</span>
-                        <span>H</span>
-                        <span>M</span>
-                        <span>T</span>
-                    </div>
-
-                    <p>
-                        <b>4.9 / 5.0</b>
-                        <small>
-                            <span class="stars">★★★★★</span>
-                            Được yêu thích bởi khách hàng (demo)
-                        </small>
-                    </p>
-                </div>
+    <section class="hero-block">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span>✦</span>
+                <span>BỮA ĂN HEALTHY CHO NGƯỜI BẬN RỘN</span>
             </div>
 
-            <div class="hero-visual">
-                <span class="blur-blob"></span>
+            <h1>Ăn ngon lành, sống trọn vẹn mỗi ngày.</h1>
 
-                <img class="hero-dish"
-                     src="/images/hero-bowl.jpg"
-                     alt="Bát salad ức gà, quả bơ và rau xanh" />
+            <p class="hero-desc">
+                Thực đơn cân bằng dinh dưỡng, tính toán calories chuẩn xác,
+                giao tận nơi mỗi ngày. Không cần nấu nướng, không lo tăng cân.
+            </p>
 
-                <div class="float-note top-note">
-                    <svg class="ic" width="20" height="20"
-                         viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="1.8"
-                         stroke-linecap="round"
-                         stroke-linejoin="round"
-                         aria-hidden="true">
-                        <path d="M20 3C8 3 3 8 3 16a5 5 0 0 0 5 5c8 0 13-5 12-18ZM3 21 17 7" />
-                    </svg>
+            <div class="hero-actions">
+                <a class="hero-btn-primary" href="/menu">
+                    Xem thực đơn tuần này →
+                </a>
+                <a class="hero-btn-ghost" href="/#about">
+                    Tìm hiểu thêm
+                </a>
+            </div>
 
-                    <span>
-                        <b>Tươi ngon</b>
-                        <small>Mỗi ngày</small>
-                    </span>
+            <div class="hero-stats">
+                <div>
+                    <strong>15K+</strong>
+                    <span>Khách hàng tin chọn</span>
                 </div>
-
-                <div class="float-note lower-note">
-                    <svg class="ic" width="21" height="21"
-                         viewBox="0 0 24 24" fill="none"
-                         stroke="currentColor" stroke-width="1.8"
-                         stroke-linecap="round"
-                         stroke-linejoin="round"
-                         aria-hidden="true">
-                        <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z" />
-                        <path d="m9 11 2 2 4-4" />
-                    </svg>
-
-                    <span>
-                        <b>100% Healthy</b>
-                        <small>Lựa chọn cân bằng</small>
-                    </span>
+                <div>
+                    <strong>120+</strong>
+                    <span>Món ăn đa dạng</span>
                 </div>
-
-                <span class="leaf-one">✦</span>
+                <div>
+                    <strong>4.9 ★</strong>
+                    <span>Đánh giá hài lòng</span>
+                </div>
             </div>
         </div>
 
-        <div class="hero-benefits" id="features">
-            <div>
-                <svg class="ic" width="21" height="21"
-                     viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1.8"
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     aria-hidden="true">
-                    <path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z" />
-                    <path d="m9 11 2 2 4-4" />
-                </svg>
-                <span>
-                    <b>100% tươi ngon</b>
-                    <small>Nguyên liệu chọn lọc</small>
-                </span>
-            </div>
-
-            <div>
-                <svg class="ic" width="21" height="21"
-                     viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1.8"
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     aria-hidden="true">
-                    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8l1.1 1.1L12 21l7.8-7.5 1.1-1.1a5.5 5.5 0 0 0-.1-7.8Z" />
-                </svg>
-                <span>
-                    <b>Dinh dưỡng cân bằng</b>
-                    <small>Tốt cho sức khỏe</small>
-                </span>
-            </div>
-
-            <div>
-                <svg class="ic" width="21" height="21"
-                     viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1.8"
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     aria-hidden="true">
-                    <path d="M3 5h12v12H3zM15 9h4l3 4v4h-7" />
-                    <circle cx="7" cy="19" r="2" />
-                    <circle cx="18" cy="19" r="2" />
-                </svg>
-                <span>
-                    <b>Giao hàng nhanh</b>
-                    <small>Tiện lợi mỗi ngày</small>
-                </span>
-            </div>
-
-            <div>
-                <svg class="ic" width="21" height="21"
-                     viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1.8"
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     aria-hidden="true">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M12 6v6l4 2" />
-                </svg>
-                <span>
-                    <b>Hỗ trợ tận tâm</b>
-                    <small>Luôn đồng hành</small>
-                </span>
+        <div class="hero-visual">
+            <div class="hero-image-wrap">
+                <img th:src="@{/images/hero-bowl.jpg}"
+                     alt="Bát ăn dinh dưỡng FITFOOD">
+                <div class="hero-chip chip-cal">🔥 ~450 kcal / bữa</div>
+                <div class="hero-chip chip-pro">💪 35g Protein</div>
             </div>
         </div>
     </section>
 
-    <section class="section-block" id="about">
-        <div class="section-head center">
-            <div class="section-kicker">
-                CHỌN ĐIỀU TỐT NHẤT CHO BẠN
-            </div>
-            <h2>Healthy không cần phức tạp</h2>
+    <div class="brand-bar">
+        <span>GIÀU PROTEIN</span>
+        <span>✦</span>
+        <span>CALORIES CHUẨN</span>
+        <span>✦</span>
+        <span>KHÔNG CHẤT BẢO QUẢN</span>
+        <span>✦</span>
+        <span>GIAO MỖI NGÀY</span>
+        <span>✦</span>
+        <span>NGUYÊN LIỆU TƯƠI</span>
+    </div>
+
+    <!-- MÓN NGON HÔM NAY -->
+    <section class="menu-preview">
+        <div class="section-head">
+            <div class="section-kicker">THỰC ĐƠN HÔM NAY</div>
+            <h2>Món ngon được yêu thích</h2>
             <p>
-                Chọn món bạn thích, chúng tôi chăm chút từng bữa ăn.
+                Mỗi món ăn là sự kết hợp hoàn hảo giữa hương vị thơm ngon
+                và hàm lượng dinh dưỡng khoa học.
             </p>
         </div>
 
-        <div class="category-strip">
-            <a href="/menu">
-                <span>🥗</span>
-                <h3>Salad tươi</h3>
-                <p>Nhẹ nhàng, đủ chất</p>
-            </a>
-
-            <a href="/menu">
-                <span>🍱</span>
-                <h3>Cơm dinh dưỡng</h3>
-                <p>Năng lượng cân bằng</p>
-            </a>
-
-            <a href="/menu">
-                <span>🐟</span>
-                <h3>Món cao cấp</h3>
-                <p>Chăm sóc cơ thể</p>
-            </a>
-
-            <a href="/menu">
-                <span>🥤</span>
-                <h3>Nước ép</h3>
-                <p>Thanh mát tự nhiên</p>
-            </a>
-        </div>
-    </section>
-
-    <section class="section-block" id="popular">
-        <div class="section-head split">
-            <div>
-                <div class="section-kicker">YÊU THÍCH NHẤT</div>
-                <h2>Những món ăn nổi bật</h2>
-                <p>
-                    Đơn giản, tươi ngon và phù hợp
-                    với nhịp sống hiện đại.
-                </p>
-            </div>
-
-            <a class="text-link" href="/menu">
-                Xem toàn bộ thực đơn
-                <svg class="ic" width="16" height="16"
-                     viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1.8"
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     aria-hidden="true">
-                    <path d="M5 12h14m-6-6 6 6-6 6" />
-                </svg>
-            </a>
-        </div>
-
-        <!-- SẢN PHẨM ĐỘNG TỪ DATABASE -->
+        <!-- SẢN PHẨM TỪ DATABASE -->
         <div class="food-grid">
-            <article class="food-card"
-                     th:each="p : ${featuredProducts}">
-
-                <a class="food-photo"
-                   th:href="@{/product(id=${p.id})}">
-
+            <article class="food-card" th:each="p : ${featuredProducts}">
+                <a class="food-photo" th:href="@{/product(id=${p.id})}">
                     <img loading="lazy"
                          th:src="${p.imageUrl}"
                          th:alt="${p.name}"
@@ -369,112 +166,102 @@
                 </a>
 
                 <div class="food-body">
-                    <div class="food-meta"
-                         th:text="${p.categoryName}">
-                        Danh mục
-                    </div>
+                    <div class="food-meta" th:text="${p.categoryName}">Danh mục</div>
 
                     <h3>
-                        <a th:href="@{/product(id=${p.id})}"
-                           th:text="${p.name}">
-                            Tên món
-                        </a>
+                        <a th:href="@{/product(id=${p.id})}" th:text="${p.name}">Tên món</a>
                     </h3>
 
-                    <p th:text="${p.description}">
-                        Mô tả món ăn
-                    </p>
+                    <p th:text="${p.description}">Mô tả món ăn</p>
 
                     <div class="food-bottom">
-                        <strong th:text="${p.priceLabel}">
-                            0đ
-                        </strong>
+                        <strong th:text="${p.priceLabel}">0đ</strong>
 
-                        <!-- Nếu còn hàng: hiển thị icon mũi tên chuyển sang chi tiết -->
-                        <a th:if="${p.stock != null and p.stock > 0}"
-                           class="mini-add"
-                           th:href="@{/product(id=${p.id})}"
-                           aria-label="Xem chi tiết món ăn"
-                           title="Xem món">
-                            ➜
-                        </a>
-
-                        <!-- Nếu hết hàng: hiển thị nhãn Đã hết sản phẩm -->
-                        <span th:unless="${p.stock != null and p.stock > 0}"
-                              class="home-out-of-stock">
-                            Đã hết sản phẩm
-                        </span>
+                        <button type="button"
+                                class="mini-add"
+                                style="border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;"
+                                th:data-id="${p.id}"
+                                th:data-name="${p.name}"
+                                th:data-price="${p.price}"
+                                onclick="openHomeQuickAddModal(this)"
+                                title="Thêm vào giỏ">
+                            +
+                        </button>
                     </div>
                 </div>
             </article>
         </div>
     </section>
+</main>
 
-    <section class="green-promo">
-        <div>
-            <div class="section-kicker">
-                BỮA ĂN TỐT · MỖI NGÀY
+<!-- HỘP THOẠI POPUP CHI TIẾT SẢN PHẨM & BIẾN THỂ TRANG CHỦ -->
+<div id="homeQuickAddModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); align-items: center; justify-content: center; z-index: 99999; padding: 16px; box-sizing: border-box;">
+    <div style="background: #ffffff; width: 450px; max-width: 95%; max-height: 85vh; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; text-align: left; font-family: inherit;">
+        
+        <!-- HEADER POPUP -->
+        <div style="display: flex; gap: 14px; padding: 16px 18px; border-bottom: 1px solid #f1f2f6; align-items: center; position: relative;">
+            <img id="homeModalProductImg" src="/images/hero-bowl.jpg" alt="" style="width: 80px; height: 80px; border-radius: 10px; object-fit: cover; border: 1px solid #e2e8f0; flex-shrink: 0;" />
+            <div style="flex: 1; min-width: 0; padding-right: 25px;">
+                <span id="homeModalCategoryBadge" style="display: inline-block; font-size: 11px; font-weight: 700; color: #166534; background: #dcfce7; padding: 2px 8px; border-radius: 6px; margin-bottom: 4px;">Danh mục</span>
+                <h3 id="homeModalName" style="margin: 0 0 4px; font-size: 1.1rem; color: #2c3e50; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Tên Món</h3>
+                <div style="color: #27ae60; font-size: 1.05rem; font-weight: 800;">
+                    <span id="homeModalUnitPriceDisplay">0</span> đ
+                </div>
             </div>
-
-            <h2>
-                Chăm sóc bản thân<br />
-                bắt đầu từ bữa ăn.
-            </h2>
-
-            <p>
-                Một lựa chọn lành mạnh mỗi ngày chính là
-                món quà cho sức khỏe lâu dài.
-            </p>
-
-            <a href="/menu" class="btn btn-light">
-                Xem thực đơn
-                <svg class="ic" width="17" height="17"
-                     viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1.8"
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     aria-hidden="true">
-                    <path d="M5 12h14m-6-6 6 6-6 6" />
-                </svg>
-            </a>
+            <button type="button" onclick="closeHomeQuickAddModal()" style="position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; border-radius: 50%; background: #f1f2f6; border: none; font-size: 18px; line-height: 1; cursor: pointer; color: #7f8c8d;">×</button>
         </div>
 
-        <img src="/images/chicken-salad.jpg"
-             alt="Salad dinh dưỡng" />
-    </section>
-</main>
+        <form th:action="@{/cart/add}" method="post" id="homeQuickAddToCartForm" style="display: flex; flex-direction: column; flex: 1; overflow: hidden; margin: 0;">
+            <input type="hidden" name="productId" id="homeModalProductId" />
+
+            <!-- NỘI DUNG CUỘN -->
+            <div style="padding: 16px 18px; overflow-y: auto; flex: 1;">
+                <div style="margin-bottom: 12px;">
+                    <strong style="font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Mô tả món ăn</strong>
+                    <p id="homeModalDescDisplay" style="font-size: 13px; color: #475569; line-height: 1.5; margin: 0;"></p>
+                </div>
+
+                <div id="homeModalVariantsArea" style="margin-top: 10px;"></div>
+
+                <div style="margin-top: 12px;">
+                    <label for="homeModalFoodNote" style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Ghi chú cho bếp:</label>
+                    <input type="text" id="homeModalFoodNote" name="foodNote" placeholder="Ví dụ: Ít cay, sốt để riêng, không hành..." 
+                           style="width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none;" />
+                </div>
+            </div>
+
+            <!-- FOOTER -->
+            <div style="padding: 12px 18px; border-top: 1px solid #f1f2f6; background: #fafafa; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
+                <div style="display: flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #fff;">
+                    <button type="button" onclick="modifyHomeQty(-1)" style="width: 36px; height: 36px; border: none; background: #fff; font-weight: bold; font-size: 18px; cursor: pointer;">−</button>
+                    <input type="number" id="homeModalQtyInput" name="quantity" value="1" min="1" readonly 
+                           style="width: 44px; height: 36px; text-align: center; font-size: 15px; font-weight: 700; border: none; outline: none; background: #fff;" />
+                    <button type="button" onclick="modifyHomeQty(1)" style="width: 36px; height: 36px; border: none; background: #fff; font-weight: bold; font-size: 18px; cursor: pointer;">+</button>
+                </div>
+
+                <button type="submit" style="flex: 1; background: #27ae60; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+                    <span>Thêm vào giỏ</span>
+                    <span id="homeModalTotalDisplay">0 đ</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 
 <footer id="footer" class="site-footer">
     <div class="footer-inner">
         <div class="footer-about">
             <a href="/" class="site-brand">
-                <img src="/images/leaf.svg" alt="" />
+                <img th:src="@{/images/leaf.svg}" alt="">
                 <span>FITFOOD</span>
             </a>
-
-            <p>
-                Ăn ngon, sống khỏe, mỗi ngày.
-                Những bữa ăn lành mạnh được chuẩn bị
-                bằng sự tận tâm.
-            </p>
-
-            <div class="footer-tag">
-                <svg class="ic" width="16" height="16"
-                     viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="1.8"
-                     stroke-linecap="round"
-                     stroke-linejoin="round"
-                     aria-hidden="true">
-                    <path d="M20 3C8 3 3 8 3 16a5 5 0 0 0 5 5c8 0 13-5 12-18ZM3 21 17 7" />
-                </svg>
-                Made fresh, made with care
-            </div>
+            <p>Ăn ngon, sống khỏe, mỗi ngày.</p>
+            <div class="footer-tag">Made fresh, made with care</div>
         </div>
 
         <div>
             <h4>Khám phá</h4>
             <a href="/menu">Thực đơn</a>
-            <a href="/menu">Món ăn nổi bật</a>
             <a href="/cart">Giỏ hàng</a>
         </div>
 
@@ -492,16 +279,171 @@
             <p>Giờ hoạt động: 8:00 – 21:00</p>
         </div>
     </div>
-
-    <div class="footer-copy">
-        © 2026 FITFOOD
-    </div>
+    <div class="footer-copy">© 2026 FITFOOD</div>
 </footer>
 
 <script defer th:src="@{/js/site-motion.js}"></script>
-
-<!-- CHAT HO TRO KHACH HANG -->
 <div th:replace="~{fragments/support-chat :: widget}"></div>
+
+<script>
+    let homeCurrentBasePrice = 0;
+
+    async function openHomeQuickAddModal(button) {
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+        const price = parseFloat(button.getAttribute('data-price')) || 0;
+
+        homeCurrentBasePrice = price;
+
+        const card = button.closest('.food-card') || button.closest('article');
+        let img = '/images/hero-bowl.jpg';
+        let desc = 'Món ăn dinh dưỡng chế biến tươi mới mỗi ngày.';
+        let category = 'Món ngon';
+
+        if (card) {
+            const imgEl = card.querySelector('img');
+            if (imgEl && imgEl.src) img = imgEl.src;
+            const descEl = card.querySelector('p');
+            if (descEl) desc = descEl.innerText.trim();
+            const metaEl = card.querySelector('.food-meta');
+            if (metaEl) category = metaEl.innerText.trim();
+        }
+
+        document.getElementById('homeModalProductId').value = id;
+        document.getElementById('homeModalName').innerText = name;
+        document.getElementById('homeModalDescDisplay').innerText = desc;
+        document.getElementById('homeModalUnitPriceDisplay').innerText = price.toLocaleString('vi-VN');
+        document.getElementById('homeModalCategoryBadge').innerText = category;
+        document.getElementById('homeModalProductImg').src = img;
+        document.getElementById('homeModalQtyInput').value = 1;
+        document.getElementById('homeModalFoodNote').value = '';
+
+        const container = document.getElementById('homeModalVariantsArea');
+        container.innerHTML = '<div style="font-size: 12px; color: #94a3b8; font-style: italic;">Đang tải tùy chọn món ăn...</div>';
+
+        try {
+            const resp = await fetch('/product?id=' + id);
+            const htmlText = await resp.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+
+            let scriptContent = '';
+            doc.querySelectorAll('script').forEach(s => {
+                if (s.textContent.includes('window.fitfoodProduct')) scriptContent = s.textContent;
+            });
+
+            let groups = [];
+            if (scriptContent) {
+                const match = scriptContent.match(/groups:\s*(\[.*?\])\s*\};/s);
+                if (match && match[1]) groups = JSON.parse(match[1]);
+            }
+            renderHomeVariants(groups);
+        } catch (e) {
+            container.innerHTML = '';
+        }
+
+        calculateHomeModalTotal();
+        document.getElementById('homeQuickAddModal').style.display = 'flex';
+    }
+
+    function renderHomeVariants(groups) {
+        const container = document.getElementById('homeModalVariantsArea');
+        container.innerHTML = '';
+        if (!groups || groups.length === 0) return;
+
+        groups.forEach(group => {
+            const box = document.createElement('div');
+            box.style.cssText = 'margin-bottom: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px;';
+
+            const title = document.createElement('div');
+            title.style.cssText = 'font-weight: 700; font-size: 12px; color: #1e293b; margin-bottom: 6px; display: flex; justify-content: space-between;';
+            title.innerHTML = `<span>⚙️ ${group.group_name}</span> <small style="color: #64748b;">${group.is_required ? '(Bắt buộc)' : '(Tùy chọn)'}</small>`;
+            box.appendChild(title);
+
+            const options = (group.options || []).filter(o => o.is_available === 1 || o.is_available === true);
+            const isMultiple = group.allow_multiple;
+            const maxSelect = isMultiple ? Math.max(1, Number(group.max_select) || 1) : 1;
+
+            options.forEach((opt, idx) => {
+                const label = document.createElement('label');
+                label.style.cssText = 'display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; margin-bottom: 5px; cursor: pointer; font-size: 12px;';
+
+                const input = document.createElement('input');
+                input.type = isMultiple ? 'checkbox' : 'radio';
+                input.name = 'home_variant_' + group.id;
+                input.value = opt.id;
+                input.dataset.price = opt.extra_price || 0;
+
+                if (opt.is_default || (!isMultiple && group.is_required && idx === 0)) {
+                    input.checked = true;
+                }
+
+                input.addEventListener('change', function () {
+                    if (isMultiple && box.querySelectorAll('input:checked').length > maxSelect) {
+                        input.checked = false;
+                        alert('Chỉ được chọn tối đa ' + maxSelect + ' tùy chọn.');
+                    }
+                    calculateHomeModalTotal();
+                });
+
+                const left = document.createElement('div');
+                left.style.display = 'flex';
+                left.style.alignItems = 'center';
+                left.style.gap = '6px';
+                left.appendChild(input);
+
+                const nameText = document.createElement('span');
+                nameText.innerText = opt.option_name;
+                left.appendChild(nameText);
+
+                const extra = Number(opt.extra_price || 0);
+                const right = document.createElement('strong');
+                right.style.color = '#27ae60';
+                right.innerText = extra > 0 ? ('+' + extra.toLocaleString('vi-VN') + ' đ') : '0 đ';
+
+                label.appendChild(left);
+                label.appendChild(right);
+                box.appendChild(label);
+            });
+
+            container.appendChild(box);
+        });
+    }
+
+    function closeHomeQuickAddModal() {
+        document.getElementById('homeQuickAddModal').style.display = 'none';
+    }
+
+    function modifyHomeQty(amount) {
+        const qtyInput = document.getElementById('homeModalQtyInput');
+        if (!qtyInput) return;
+        let current = parseInt(qtyInput.value) || 1;
+        current += amount;
+        if (current < 1) current = 1;
+        qtyInput.value = current;
+        calculateHomeModalTotal();
+    }
+
+    function calculateHomeModalTotal() {
+        const qtyInput = document.getElementById('homeModalQtyInput');
+        const totalDisplay = document.getElementById('homeModalTotalDisplay');
+        if (!qtyInput || !totalDisplay) return;
+
+        let extra = 0;
+        document.querySelectorAll('#homeModalVariantsArea input:checked').forEach(i => {
+            extra += parseFloat(i.dataset.price) || 0;
+        });
+
+        const qty = parseInt(qtyInput.value) || 1;
+        const total = (homeCurrentBasePrice + extra) * qty;
+        totalDisplay.innerText = total.toLocaleString('vi-VN') + ' đ';
+    }
+
+    window.addEventListener('click', function(event) {
+        const modal = document.getElementById('homeQuickAddModal');
+        if (event.target === modal) closeHomeQuickAddModal();
+    });
+</script>
 
 </body>
 </html>
