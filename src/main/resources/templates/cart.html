@@ -103,7 +103,14 @@
                 </thead>
                 <tbody>
                     <tr th:each="item : ${cart.items}">
-                        <td style="font-weight: 500;" th:text="${item.product.name}">Tên Món</td>
+                        <td style="font-weight: 500;">
+                            <span th:text="${item.product.name}">Tên Món</span>
+                            <!-- Hiển thị tên biến thể nếu có (theo trường variantName trong CartItem) -->
+                            <div th:if="${item.variantName != null and !#strings.isEmpty(item.variantName)}"
+                                 style="font-size: 0.85em; color: #7f8c8d; font-weight: normal; margin-top: 3px;"
+                                 th:text="'(' + ${item.variantName} + ')'">
+                            </div>
+                        </td>
                         <td th:text="${#numbers.formatDecimal(item.unitPrice, 0, 'COMMA', 0, 'POINT')} + ' đ'">0 đ</td>
                         
                         <!-- Cột tăng giảm số lượng -->
