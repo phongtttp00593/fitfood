@@ -263,14 +263,15 @@
                                     <span th:text="${item.product.name}">Tên món ăn</span>
                                 </div>
 
-                                <!-- HIỂN THỊ CÁC BIẾN THỂ ĐÃ CHỌN: SIZE, CARB, TOPPING DƯỚI DẠNG TAG -->
+                                <!-- HIỂN THỊ MỖI BIẾN THỂ 1 DÒNG RIÊNG BIỆT, ĐẸP MẮT -->
                                 <div th:if="${item.variantName != null and !#strings.isEmpty(item.variantName)}"
-                                     style="margin: 4px 0 3px; display: flex; flex-wrap: wrap; gap: 5px;">
-                                    <span th:each="opt : ${#strings.arraySplit(item.variantName, ' • ')}"
-                                          style="display: inline-block; background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; font-size: 0.78rem; font-weight: 600; padding: 2px 8px; border-radius: 5px;"
-                                          th:text="${opt}">
-                                        Size M
-                                    </span>
+                                     style="margin: 6px 0 6px; display: flex; flex-direction: column; gap: 3px;">
+                                    <div th:each="opt : ${#strings.arraySplit(item.variantName, '•')}"
+                                         th:if="${!#strings.isEmpty(#strings.trim(opt))}"
+                                         style="display: flex; align-items: center; gap: 6px; font-size: 0.83rem;">
+                                        <span style="display: inline-block; width: 5px; height: 5px; background: #16a34a; border-radius: 50%; flex-shrink: 0;"></span>
+                                        <span th:text="${#strings.trim(opt)}" style="color: #334155; font-weight: 500;">Size L - Tăng cơ (+100g ức gà)</span>
+                                    </div>
                                 </div>
 
                                 <div style="color: #718096; font-size: 0.9rem; margin-top: 2px;"
