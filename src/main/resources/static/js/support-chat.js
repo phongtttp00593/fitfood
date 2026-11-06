@@ -1,217 +1,584 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Other/javascript.js to edit this template
- */
-
 
 /*
- FITFOOD - CHAT HO TRO USER
- Gui tin nhan va lay lich su tu SQL Server.
-*/
-
+ * FITFOOD - Chat User
+ * Menu ba cham nam BEN CANH bong bong tin nhan.
+ */
 (function () {
     'use strict';
 
+    document.querySelectorAll('[data-support-chat]')
+        .forEach(initChat);
+
     function initChat(root) {
+        const isWidget = root.dataset.mode === 'widget';
 
-        var isWidget = root.dataset.mode === 'widget';
-
-        var panel = isWidget
+        const panel = isWidget
             ? root.querySelector('.ff-chat-panel')
             : root;
 
-        var toggle = root.querySelector('[data-chat-toggle]');
-        var closeButton = root.querySelector('[data-chat-close]');
-        var refresh = root.querySelector('[data-chat-refresh]');
-        var form = root.querySelector('[data-chat-form]');
-        var input = root.querySelector('[data-chat-input]');
-        var send = root.querySelector('[data-chat-send]');
-        var list = root.querySelector('[data-chat-messages]');
-        var status = root.querySelector('[data-chat-status]');
-        var error = root.querySelector('[data-chat-error]');
+        const toggle = root.querySelector('[data-chat-toggle]');
+        const close = root.querySelector('[data-chat-close]');
+        const refresh = root.querySelector('[data-chat-refresh]');
+        const form = root.querySelector('[data-chat-form]');
+        const input = root.querySelector('[data-chat-input]');
+        const send = root.querySelector('[data-chat-send]');
+        const list = root.querySelector('[data-chat-messages]');
+        const status = root.querySelector('[data-chat-status]');
+        const error = root.querySelector('[data-chat-error]');
 
-        var poller = null;
-        var loading = false;
-        var lastSnapshot = '';
+        if (!form || !input || !list || !panel) return;
 
-        if (!form || !input || !list) return;
+        let poller = null;
+        let busy = false;
+        let loading = false;
+        let snapshot = '';
+        let activeMenu = null;
 
-        // Hien thi thong bao loi
+        // CSS: dau ba cham va bubble cung mot hang
+        if (!document.getElementById('ff-chat-dropdown-style')) {
+            const style = document.createElement('style');
+            style.id = 'ff-chat-dropdown-style';
+
+            style.textContent = `
+                .ff-chat-message-line {
+                    display: flex;
+                    align-items: center;
+                    gap: 5px;
+                    max-width: 100%;
+                    min-width: 0;
+                }
+
+                .ff-chat-message.is-own .ff-chat-message-line {
+                    flex-direction: row-reverse;
+                }
+
+                .ff-chat-message-line .ff-chat-bubble {
+                    min-width: 0;
+                    overflow-wrap: anywhere;
+                }
+
+                .ff-chat-menu-wrap {
+                    position: relative;
+                    display: inline-flex;
+                    align-self: center;
+                    flex: 0 0 28px;
+                    z-index: 1;
+                }
+
+                .ff-chat-menu-wrap.is-open {
+                    z-index: 30;
+                }
+
+                .ff-chat-menu-trigger {
+                    display: grid;
+                    place-items: center;
+                    width: 28px;
+                    height: 28px;
+                    padding: 0;
+                    border: 0;
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #60766a;
+                    font-size: 22px;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .ff-chat-menu-trigger:hover,
+                .ff-chat-menu-trigger[aria-expanded="true"] {
+                    background: #e9f1eb;
+                    color: #14532d;
+                }
+
+                .ff-chat-menu-trigger:focus-visible,
+                .ff-chat-menu-dropdown button:focus-visible {
+                    outline: 2px solid #15803d;
+                    outline-offset: 2px;
+                }
+
+                .ff-chat-menu-dropdown {
+                    position: absolute;
+                    right: 0;
+                    bottom: calc(100% + 5px);
+                    min-width: 146px;
+                    padding: 5px;
+                    background: #fff;
+                    color: #1f2937;
+                    border: 1px solid #dce7df;
+                    border-radius: 10px;
+                    box-shadow: 0 8px 25px rgba(0,0,0,.16);
+                    z-index: 31;
+                }
+
+                .ff-chat-menu-dropdown[hidden] {
+                    display: none !important;
+                }
+
+                .ff-chat-menu-dropdown button {
+                    display: block;
+                    width: 100%;
+                    padding: 9px 10px;
+                    text-align: left;
+                    background: transparent;
+                    border: 0;
+                    border-radius: 6px;
+                    font: inherit;
+                    font-size: 13px;
+                    color: #243b2c;
+                    cursor: pointer;
+                }
+
+                .ff-chat-menu-dropdown button:hover {
+                    background: #edf7ef;
+                }
+
+                .ff-chat-menu-dropdown button.is-danger {
+                    color: #b42318;
+                }
+
+                .ff-chat-menu-dropdown button.is-danger:hover {
+                    background: #fff1ef;
+                }
+            `;
+
+            document.head.append(style);
+        }
+
+        function closeMenu() {
+            if (!activeMenu) return;
+
+            activeMenu.panel.hidden = true;
+
+            activeMenu.trigger.setAttribute(
+                'aria-expanded',
+                'false'
+            );
+
+            activeMenu.wrap.classList.remove('is-open');
+            activeMenu = null;
+        }
+
+        function toggleMenu(wrap, trigger, menu) {
+            const alreadyOpen =
+                activeMenu && activeMenu.panel === menu;
+
+            closeMenu();
+
+            if (alreadyOpen) return;
+
+            menu.hidden = false;
+            trigger.setAttribute('aria-expanded', 'true');
+            wrap.classList.add('is-open');
+
+            activeMenu = {
+                wrap,
+                trigger,
+                panel: menu
+            };
+        }
+
+        document.addEventListener('pointerdown', e => {
+            if (
+                activeMenu &&
+                !activeMenu.wrap.contains(e.target)
+            ) {
+                closeMenu();
+            }
+        });
+
         function setError(message) {
+            if (!error) return;
+
             error.textContent = message || '';
             error.hidden = !message;
         }
 
-        // Ve danh sach tin nhan
-        function draw(data) {
+        function make(tag, className, text) {
+            const element = document.createElement(tag);
 
-            var messages = Array.isArray(data.messages)
-                ? data.messages
-                : [];
-
-            var snapshot = JSON.stringify(messages);
-
-            status.textContent =
-                data.status || 'Chưa có cuộc trò chuyện';
-
-            if (snapshot === lastSnapshot) return;
-
-            lastSnapshot = snapshot;
-
-            list.replaceChildren();
-
-            // Chua co tin nhan
-            if (!messages.length) {
-
-                var intro = document.createElement('div');
-                intro.className = 'ff-chat-empty';
-
-                var heading = document.createElement('strong');
-                heading.textContent = 'Xin chào!';
-
-                var text = document.createElement('p');
-
-                text.textContent =
-                    'Hãy để lại câu hỏi. ' +
-                    'Bộ phận hỗ trợ sẽ đọc được tin nhắn ' +
-                    'khi hệ thống quản trị được hoàn thiện.';
-
-                intro.append(heading, text);
-                list.appendChild(intro);
-
-                return;
+            if (className) {
+                element.className = className;
             }
 
-            // Hien thi tung tin nhan
-            messages.forEach(function (item) {
+            if (text !== undefined) {
+                element.textContent = text;
+            }
 
-                var own = item.sender === 'USER';
-
-                var row = document.createElement('div');
-
-                row.className =
-                    'ff-chat-message ' +
-                    (own ? 'is-own' : 'is-staff');
-
-                var who = document.createElement('span');
-                who.className = 'ff-chat-sender';
-
-                who.textContent = own
-                    ? 'Bạn'
-                    : 'Nhân viên FITFOOD';
-
-                var body = document.createElement('div');
-                body.className = 'ff-chat-bubble';
-
-                // textContent de tranh chay HTML khong an toan
-                body.textContent = item.content || '';
-
-                var time = document.createElement('small');
-                time.className = 'ff-chat-time';
-
-                time.textContent = item.sentAt || '';
-
-                row.append(who, body, time);
-                list.appendChild(row);
-            });
-
-            list.scrollTop = list.scrollHeight;
+            return element;
         }
 
-        // Goi API
-        async function request(url, options) {
+        async function api(url, options = {}) {
+            const response = await fetch(url, {
+                credentials: 'same-origin',
+                cache: 'no-store',
+                ...options,
+                headers: {
+                    Accept: 'application/json',
+                    ...(options.headers || {})
+                }
+            });
 
-            var response = await fetch(
-                url,
-                Object.assign({
-                    credentials: 'same-origin',
-                    cache: 'no-store',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                }, options || {})
-            );
+            const type =
+                response.headers.get('content-type') || '';
 
             if (
-                response.redirected ||
                 response.status === 401 ||
-                response.status === 403
+                response.status === 403 ||
+                response.redirected
             ) {
                 throw new Error(
-                    'Phiên đăng nhập đã hết hạn. ' +
-                    'Hãy đăng nhập lại.'
+                    'Phiên đăng nhập hết hạn hoặc bạn không có quyền.'
                 );
             }
 
             if (!response.ok) {
-
                 if (response.status === 400) {
                     throw new Error(
                         'Tin nhắn phải có từ 1 đến 1000 ký tự.'
                     );
                 }
 
+                if (response.status === 404) {
+                    throw new Error(
+                        'Tin nhắn không tồn tại hoặc bạn không có quyền.'
+                    );
+                }
+
                 throw new Error(
-                    'Không thể kết nối hệ thống chat. ' +
-                    'Kiểm tra SQL và thử lại.'
+                    'Không thể xử lý yêu cầu. Kiểm tra kết nối và SQL Server.'
                 );
             }
 
-            return await response.json();
+            if (!type.includes('application/json')) {
+                throw new Error(
+                    'Máy chủ không trả về dữ liệu JSON.'
+                );
+            }
+
+            return response.json();
+        }
+
+        function post(url, body) {
+            const header =
+                root.dataset.csrfHeader || 'X-CSRF-TOKEN';
+
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+
+            headers[header] = root.dataset.csrf || '';
+
+            return api(url, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(body)
+            });
+        }
+
+        // Hien thi tin nhan
+        function draw(data) {
+            const messages = Array.isArray(data.messages)
+                ? data.messages
+                : [];
+
+            if (status) {
+                status.textContent =
+                    data.status || 'Chưa có cuộc trò chuyện';
+            }
+
+            const next = JSON.stringify(messages);
+
+            if (next === snapshot) return;
+
+            snapshot = next;
+
+            closeMenu();
+            list.replaceChildren();
+
+            if (!messages.length) {
+                const intro = make(
+                    'div',
+                    'ff-chat-empty'
+                );
+
+                intro.append(
+                    make('strong', '', 'Xin chào!'),
+                    make(
+                        'p',
+                        '',
+                        'Hãy để lại câu hỏi. FITFOOD sẽ phản hồi ngay khi có thể.'
+                    )
+                );
+
+                list.append(intro);
+                return;
+            }
+
+            messages.forEach(message => {
+                const own = message.sender === 'USER';
+                const recalled = !!message.recalled;
+
+                const row = make(
+                    'div',
+                    'ff-chat-message ' +
+                    (own ? 'is-own' : 'is-staff')
+                );
+
+                row.append(
+                    make(
+                        'span',
+                        'ff-chat-sender',
+                        own ? 'Bạn' : 'Nhân viên FITFOOD'
+                    )
+                );
+
+                const bubble = make(
+                    'div',
+                    'ff-chat-bubble',
+                    recalled
+                        ? 'Tin nhắn đã được thu hồi'
+                        : (message.content || '')
+                );
+
+                if (recalled) {
+                    bubble.style.fontStyle = 'italic';
+                }
+
+                // QUAN TRONG:
+                // Bubble va dau ba cham nam tren cung mot hang.
+                const messageLine = make(
+                    'div',
+                    'ff-chat-message-line'
+                );
+
+                messageLine.append(bubble);
+
+                // Chi hien menu cho tin cua User
+                if (
+                    own &&
+                    message.canManage &&
+                    !recalled
+                ) {
+                    const wrap = make(
+                        'div',
+                        'ff-chat-menu-wrap'
+                    );
+
+                    const trigger = make(
+                        'button',
+                        'ff-chat-menu-trigger',
+                        '⋮'
+                    );
+
+                    trigger.type = 'button';
+
+                    trigger.setAttribute(
+                        'aria-label',
+                        'Tùy chọn tin nhắn'
+                    );
+
+                    trigger.setAttribute(
+                        'title',
+                        'Tùy chọn tin nhắn'
+                    );
+
+                    trigger.setAttribute(
+                        'aria-haspopup',
+                        'menu'
+                    );
+
+                    trigger.setAttribute(
+                        'aria-expanded',
+                        'false'
+                    );
+
+                    const menu = make(
+                        'div',
+                        'ff-chat-menu-dropdown'
+                    );
+
+                    menu.hidden = true;
+                    menu.setAttribute('role', 'menu');
+
+                    const edit = make(
+                        'button',
+                        '',
+                        'Chỉnh sửa'
+                    );
+
+                    const recall = make(
+                        'button',
+                        'is-danger',
+                        'Thu hồi'
+                    );
+
+                    edit.type = 'button';
+                    recall.type = 'button';
+
+                    edit.setAttribute('role', 'menuitem');
+                    recall.setAttribute('role', 'menuitem');
+
+                    trigger.addEventListener(
+                        'click',
+                        e => {
+                            e.stopPropagation();
+
+                            toggleMenu(
+                                wrap,
+                                trigger,
+                                menu
+                            );
+                        }
+                    );
+
+                    edit.addEventListener(
+                        'click',
+                        () => {
+                            closeMenu();
+                            changeMessage(message, false);
+                        }
+                    );
+
+                    recall.addEventListener(
+                        'click',
+                        () => {
+                            closeMenu();
+                            changeMessage(message, true);
+                        }
+                    );
+
+                    menu.append(edit, recall);
+                    wrap.append(trigger, menu);
+
+                    // THEM MENU VAO CANH BUBBLE,
+                    // KHONG THEM VAO CUOI TIN NHAN.
+                    messageLine.append(wrap);
+                }
+
+                row.append(messageLine);
+
+                // Thoi gian van nam duoi tin nhan
+                row.append(
+                    make(
+                        'small',
+                        'ff-chat-time',
+                        (message.sentAt || '') +
+                        (
+                            message.edited && !recalled
+                                ? ' · Đã chỉnh sửa'
+                                : ''
+                        )
+                    )
+                );
+
+                list.append(row);
+            });
+
+            list.scrollTop = list.scrollHeight;
+        }
+
+        // CHINH SUA VA THU HOI
+        async function changeMessage(message, recall) {
+            if (busy) return;
+
+            let content = '';
+
+            if (recall) {
+                if (!window.confirm(
+                    'Bạn muốn thu hồi tin nhắn này?'
+                )) {
+                    return;
+                }
+            } else {
+                const changed = window.prompt(
+                    'Chỉnh sửa tin nhắn:',
+                    message.content || ''
+                );
+
+                if (changed === null) return;
+
+                content = changed.trim();
+
+                if (!content || content.length > 1000) {
+                    setError(
+                        'Tin nhắn phải có từ 1 đến 1000 ký tự.'
+                    );
+                    return;
+                }
+            }
+
+            busy = true;
+
+            try {
+                const path =
+                    '/api/support/messages/' +
+                    encodeURIComponent(message.id) +
+                    (recall ? '/recall' : '/edit');
+
+                const data = await post(
+                    path,
+                    recall ? {} : {content}
+                );
+
+                draw(data);
+                setError('');
+
+            } catch (e) {
+                setError(
+                    e.message ||
+                    'Không thể thay đổi tin nhắn.'
+                );
+            } finally {
+                busy = false;
+            }
         }
 
         // Tai lich su chat
-        async function load(silent) {
-
-            if (loading || (isWidget && panel.hidden)) {
+        async function load(silent = false) {
+            if (
+                loading ||
+                busy ||
+                (isWidget && panel.hidden)
+            ) {
                 return;
             }
 
             loading = true;
 
             try {
-
-                var data = await request(
-                    '/api/support/messages'
+                draw(
+                    await api('/api/support/messages')
                 );
-
-                draw(data);
 
                 if (!silent) {
                     setError('');
                 }
 
-            } catch (err) {
-
+            } catch (e) {
                 if (!silent) {
                     setError(
-                        err.message || 'Không thể tải tin nhắn.'
+                        e.message ||
+                        'Không tải được lịch sử chat.'
                     );
                 }
-
             } finally {
                 loading = false;
             }
         }
 
-        // Tu tai tin nhan moi moi 8 giay
         function startPolling() {
-
             if (poller) {
                 clearInterval(poller);
             }
 
-            poller = setInterval(function () {
-
+            poller = setInterval(() => {
                 if (!document.hidden) {
                     load(true);
                 }
-
             }, 8000);
         }
 
         function stopPolling() {
-
             if (poller) {
                 clearInterval(poller);
             }
@@ -219,10 +586,9 @@
             poller = null;
         }
 
-        // Mo / dong cua so chat
         if (toggle) {
-
-            toggle.addEventListener('click', function () {
+            toggle.addEventListener('click', () => {
+                closeMenu();
 
                 panel.hidden = !panel.hidden;
 
@@ -232,158 +598,131 @@
                 );
 
                 if (!panel.hidden) {
-
-                    load(false);
+                    load();
                     startPolling();
                     input.focus();
-
                 } else {
                     stopPolling();
                 }
             });
         }
 
-        // Nut dong chat
-        if (closeButton) {
+        if (close) {
+            close.addEventListener('click', () => {
+                closeMenu();
+                panel.hidden = true;
 
-            closeButton.addEventListener(
-                'click',
-                function () {
-
-                    panel.hidden = true;
-
+                if (toggle) {
                     toggle.setAttribute(
                         'aria-expanded',
                         'false'
                     );
 
-                    stopPolling();
                     toggle.focus();
                 }
-            );
-        }
-
-        // Dong chat bang Escape
-        root.addEventListener('keydown', function (event) {
-
-            if (
-                event.key === 'Escape' &&
-                isWidget &&
-                !panel.hidden
-            ) {
-
-                panel.hidden = true;
-
-                toggle.setAttribute(
-                    'aria-expanded',
-                    'false'
-                );
 
                 stopPolling();
-                toggle.focus();
-            }
-        });
-
-        // Tai lai thu cong
-        if (refresh) {
-
-            refresh.addEventListener('click', function () {
-                load(false);
             });
         }
 
-        // Gui tin nhan
-        form.addEventListener(
-            'submit',
-            async function (event) {
+        root.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && activeMenu) {
+                const trigger = activeMenu.trigger;
 
-                event.preventDefault();
+                closeMenu();
+                trigger.focus();
+                e.stopPropagation();
+                return;
+            }
 
-                var content = input.value.trim();
+            if (
+                e.key === 'Escape' &&
+                isWidget &&
+                !panel.hidden
+            ) {
+                closeMenu();
+                panel.hidden = true;
 
-                if (!content || content.length > 1000) {
-
-                    setError(
-                        'Vui lòng nhập từ 1 đến 1000 ký tự.'
+                if (toggle) {
+                    toggle.setAttribute(
+                        'aria-expanded',
+                        'false'
                     );
 
-                    return;
+                    toggle.focus();
                 }
 
-                setError('');
+                stopPolling();
+            }
+        });
+
+        if (refresh) {
+            refresh.addEventListener('click', () => load());
+        }
+
+        // Gui tin nhan User
+        form.addEventListener('submit', async e => {
+            e.preventDefault();
+
+            if (busy) return;
+
+            const content = input.value.trim();
+
+            if (!content || content.length > 1000) {
+                setError(
+                    'Vui lòng nhập từ 1 đến 1000 ký tự.'
+                );
+                return;
+            }
+
+            busy = true;
+
+            if (send) {
                 send.disabled = true;
+            }
 
-                var csrfHeader =
-                    root.dataset.csrfHeader ||
-                    'X-CSRF-TOKEN';
+            try {
+                const result = await post(
+                    '/api/support/messages',
+                    {content}
+                );
 
-                var headers = {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                };
+                input.value = '';
 
-                headers[csrfHeader] =
-                    root.dataset.csrf || '';
+                draw(result);
+                setError('');
 
-                try {
+            } catch (err) {
+                setError(
+                    err.message ||
+                    'Không gửi được tin nhắn.'
+                );
+            } finally {
+                busy = false;
 
-                    var data = await request(
-                        '/api/support/messages',
-                        {
-                            method: 'POST',
-                            headers: headers,
-                            body: JSON.stringify({
-                                content: content
-                            })
-                        }
-                    );
-
-                    input.value = '';
-
-                    draw(data);
-
-                } catch (err) {
-
-                    setError(
-                        err.message ||
-                        'Không gửi được tin nhắn.'
-                    );
-
-                } finally {
-
+                if (send) {
                     send.disabled = false;
-                    input.focus();
                 }
+
+                input.focus();
             }
-        );
+        });
 
-        // Enter: Gui | Shift + Enter: Xuong dong
-        input.addEventListener(
-            'keydown',
-            function (event) {
-
-                if (
-                    event.key === 'Enter' &&
-                    !event.shiftKey &&
-                    !event.isComposing
-                ) {
-
-                    event.preventDefault();
-                    form.requestSubmit();
-                }
+        // Enter gui, Shift + Enter xuong dong
+        input.addEventListener('keydown', e => {
+            if (
+                e.key === 'Enter' &&
+                !e.shiftKey &&
+                !e.isComposing
+            ) {
+                e.preventDefault();
+                form.requestSubmit();
             }
-        );
+        });
 
-        // Trang chat rieng luon tai lich su
         if (!isWidget) {
-            load(false);
+            load();
             startPolling();
         }
     }
-
-    document
-        .querySelectorAll('[data-support-chat]')
-        .forEach(initChat);
-
 })();
-

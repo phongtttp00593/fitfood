@@ -34,21 +34,21 @@ public class SupportChatService {
         this.jdbc = jdbc;
     }
 
-    // Du lieu cua mot tin nhan
     public record ChatMessage(
             long id,
             String sender,
             String content,
-            String sentAt
+            String sentAt,
+            boolean edited,
+            boolean recalled,
+            boolean canManage
     ) {}
 
-    // Du lieu lich su hoi thoai
     public record ChatHistory(
             String status,
             List<ChatMessage> messages
     ) {}
 
-    // Lay lich su chat cua User
     @Transactional(readOnly = true)
     public ChatHistory history(long userId) {
 
@@ -74,11 +74,10 @@ public class SupportChatService {
 
         return new ChatHistory(
                 status,
-                listMessages(ticketId)
+                listMessages(ticketId, userId)
         );
     }
 
-    // Gui tin nhan
     @Transactional
     public ChatHistory send(
             long userId,
@@ -88,17 +87,14 @@ public class SupportChatService {
                 ? ""
                 : rawContent.strip();
 
-        // Kiem tra noi dung tin nhan
         if (content.isEmpty()
                 || content.length() > MAX_MESSAGE_LENGTH) {
-
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Tin nhắn phải có từ 1 đến 1000 ký tự."
             );
         }
 
-        // Khoa dong user de tranh tao trung ticket
         List<Long> lockedUsers = jdbc.query(
                 """
                 SELECT id
@@ -119,7 +115,6 @@ public class SupportChatService {
 
         Long ticketId = findTicket(userId);
 
-        // Tin nhan dau tien thi tao ticket
         if (ticketId == null) {
 
             ticketId = jdbc.queryForObject(
@@ -137,7 +132,6 @@ public class SupportChatService {
 
         } else {
 
-            // Neu ticket da dong thi mo lai
             jdbc.update(
                     """
                     UPDATE dbo.fitfood_support_tickets
@@ -155,7 +149,6 @@ public class SupportChatService {
             );
         }
 
-        // Luu tin nhan vao SQL Server
         jdbc.update(
                 """
                 INSERT INTO dbo.fitfood_support_messages
@@ -184,11 +177,10 @@ public class SupportChatService {
 
         return new ChatHistory(
                 status,
-                listMessages(ticketId)
+                listMessages(ticketId, userId)
         );
     }
 
-    // Tim hoi thoai cua User
     private Long findTicket(long userId) {
 
         List<Long> ids = jdbc.query(
@@ -209,9 +201,9 @@ public class SupportChatService {
                 : ids.get(0);
     }
 
-    // Lay 100 tin nhan gan nhat
     private List<ChatMessage> listMessages(
-            long ticketId) {
+            long ticketId,
+            long userId) {
 
         List<ChatMessage> latest =
                 new ArrayList<>(
@@ -219,9 +211,12 @@ public class SupportChatService {
                         """
                         SELECT TOP (100)
                             id,
+                            sender_user_id,
                             sender_role,
                             content,
-                            created_at
+                            created_at,
+                            edited_at,
+                            is_recalled
                         FROM dbo.fitfood_support_messages
                         WHERE ticket_id = ?
                         ORDER BY id DESC
@@ -237,11 +232,29 @@ public class SupportChatService {
                                     : at.toLocalDateTime()
                                         .format(DATE_FORMAT);
 
+                            boolean recalled =
+                                    rs.getBoolean("is_recalled");
+
+                            String sender =
+                                    rs.getString("sender_role");
+
+                            boolean edited =
+                                    rs.getTimestamp("edited_at") != null
+                                    && !recalled;
+
+                            boolean canManage =
+                                    !recalled
+                                    && "USER".equals(sender)
+                                    && rs.getLong("sender_user_id") == userId;
+
                             return new ChatMessage(
                                     rs.getLong("id"),
-                                    rs.getString("sender_role"),
+                                    sender,
                                     rs.getString("content"),
-                                    time
+                                    time,
+                                    edited,
+                                    recalled,
+                                    canManage
                             );
                         },
                         ticketId

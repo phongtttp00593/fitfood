@@ -4,8 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
+
     <title>Chat hỗ trợ khách hàng | FITFOOD Admin</title>
 
     <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
@@ -29,7 +31,6 @@
         }
 
         .sc-heading p {
-            margin: 0;
             color: #7b6858;
             font-size: 14px;
         }
@@ -38,23 +39,22 @@
             display: grid;
             grid-template-columns: 330px minmax(0, 1fr);
             gap: 17px;
-            align-items: stretch;
         }
 
         .sc-card {
             background: #fffdf8;
             border: 1px solid #e6d8bc;
             border-radius: 16px;
-            box-shadow: 0 8px 30px #3a22170c;
             overflow: hidden;
+            box-shadow: 0 8px 30px #3a22170c;
         }
 
         .sc-left,
         .sc-right {
-            height: min(72vh, 730px);
-            min-height: 530px;
             display: flex;
             flex-direction: column;
+            height: min(72vh, 730px);
+            min-height: 530px;
         }
 
         .sc-left-title {
@@ -63,7 +63,7 @@
         }
 
         .sc-left-title h2 {
-            margin: 0 0 9px;
+            margin: 0 0 8px;
             font-size: 18px;
         }
 
@@ -75,7 +75,6 @@
 
         .sc-controls {
             display: grid;
-            grid-template-columns: 1fr;
             gap: 9px;
             margin-top: 12px;
         }
@@ -127,21 +126,17 @@
             gap: 6px;
         }
 
-        .sc-customer-line strong {
-            font-size: 13px;
-        }
-
         .sc-customer small {
             display: block;
-            color: #89796c;
             font-size: 11px;
+            color: #89796c;
             margin: 4px 0;
             overflow-wrap: anywhere;
         }
 
         .sc-preview {
-            font-size: 12px;
             color: #715f51;
+            font-size: 12px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -188,13 +183,18 @@
             overflow-wrap: anywhere;
         }
 
+        .sc-thread-actions {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
         .sc-small-btn {
             padding: 8px 11px;
             border: 1px solid #d8c49f;
             border-radius: 9px;
             background: #fffaf1;
             color: #683f24;
-            font-weight: 650;
             cursor: pointer;
             font: inherit;
             font-size: 12px;
@@ -205,16 +205,10 @@
             cursor: not-allowed;
         }
 
-        .sc-thread-actions {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 7px;
-        }
-
         .sc-messages {
             flex: 1;
             min-height: 0;
-            overflow-y: auto;
+            overflow: auto;
             background: #fffdf8;
             padding: 20px;
             display: flex;
@@ -236,10 +230,11 @@
         }
 
         .sc-msg small {
-            color: #8a8178;
             font-size: 11px;
+            color: #8a8178;
         }
 
+        /* BONG BONG TIN NHAN */
         .sc-bubble {
             padding: 10px 14px;
             background: #f3e8d8;
@@ -251,9 +246,116 @@
         }
 
         .sc-msg.from-admin .sc-bubble {
-            color: #fff;
+            color: white;
             background: #8f2f20;
             border-radius: 14px 14px 3px 14px;
+        }
+
+        .sc-bubble.is-recalled {
+            font-style: italic;
+            opacity: .8;
+        }
+
+        /* BUBBLE VA BA CHAM NAM CUNG MOT HANG */
+        .sc-message-line {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            max-width: 100%;
+            min-width: 0;
+        }
+
+        /* Tin nhan Admin nam ben phai, ba cham ben trai */
+        .sc-msg.from-admin .sc-message-line {
+            flex-direction: row-reverse;
+        }
+
+        .sc-message-line .sc-bubble {
+            min-width: 0;
+            overflow-wrap: anywhere;
+        }
+
+        /* MENU BA CHAM */
+        .sc-message-menu-wrap {
+            position: relative;
+            display: inline-flex;
+            align-self: center;
+            flex: 0 0 29px;
+            z-index: 1;
+        }
+
+        .sc-message-menu-wrap.is-open {
+            z-index: 30;
+        }
+
+        .sc-menu-trigger {
+            display: grid;
+            place-items: center;
+            width: 29px;
+            height: 29px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: transparent;
+            color: #76675d;
+            font-size: 23px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .sc-menu-trigger:hover,
+        .sc-menu-trigger[aria-expanded="true"] {
+            background: #f2e5d3;
+            color: #8f2f20;
+        }
+
+        .sc-menu-trigger:focus-visible,
+        .sc-menu-dropdown button:focus-visible {
+            outline: 2px solid #9b2c1f;
+            outline-offset: 2px;
+        }
+
+        .sc-menu-dropdown {
+            position: absolute;
+            right: 0;
+            bottom: calc(100% + 5px);
+            min-width: 150px;
+            padding: 5px;
+            background: #fffdf8;
+            border: 1px solid #e0cfb9;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px #3a22172b;
+            z-index: 31;
+        }
+
+        .sc-menu-dropdown[hidden] {
+            display: none !important;
+        }
+
+        .sc-menu-dropdown button {
+            display: block;
+            width: 100%;
+            padding: 9px 10px;
+            text-align: left;
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            color: #3a2217;
+            font: inherit;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .sc-menu-dropdown button:hover {
+            background: #f8f0e4;
+        }
+
+        .sc-menu-dropdown button.is-danger {
+            color: #b42318;
+        }
+
+        .sc-menu-dropdown button.is-danger:hover {
+            background: #fff1ef;
         }
 
         .sc-empty {
@@ -278,8 +380,8 @@
             flex: 1;
             min-width: 0;
             resize: vertical;
-            max-height: 130px;
             min-height: 45px;
+            max-height: 130px;
             border: 1px solid #d8c49f;
             border-radius: 10px;
             padding: 11px 13px;
@@ -324,7 +426,7 @@
 
         @media (max-width: 950px) {
             .sc-grid {
-                grid-template-columns: 280px minmax(0, 1fr);
+                grid-template-columns: 280px minmax(0,1fr);
             }
         }
 
@@ -339,8 +441,8 @@
             }
 
             .sc-right {
-                min-height: 500px;
                 height: 65vh;
+                min-height: 500px;
             }
 
             .sc-thread-head {
@@ -357,17 +459,15 @@
 <body class="admin-body">
 <div class="adm-layout">
 
-    <!-- SIDEBAR ADMIN HIỆN CÓ -->
     <aside class="adm-sidebar"
            th:replace="~{fragments/admin-sidebar :: sidebar('support')}">
     </aside>
 
     <div class="adm-main">
-
         <header class="adm-top">
+
             <div class="admin-breadcrumb">
-                FITFOOD
-                <span>/</span>
+                FITFOOD <span>/</span>
                 <b>Hỗ trợ khách hàng</b>
             </div>
 
@@ -375,15 +475,26 @@
                style="font-size:13px;color:#9b2c1f">
                 ← Tổng quan
             </a>
-        
-                    <div class="fit-admin-top-actions">
-                      <span class="fit-admin-top-label">Khu vực quản trị</span>
-                      <form class="fit-admin-logout" method="post" th:action="@{/logout}">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                        <button type="submit" aria-label="Đăng xuất khỏi trang quản trị"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg><span>Đăng xuất</span></button>
-                      </form>
-                    </div>
-                </header>
+
+            <div class="fit-admin-top-actions">
+                <span class="fit-admin-top-label">
+                    Khu vực quản trị
+                </span>
+
+                <form class="fit-admin-logout"
+                      method="post"
+                      th:action="@{/logout}">
+
+                    <input type="hidden"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}">
+
+                    <button type="submit">
+                        Đăng xuất
+                    </button>
+                </form>
+            </div>
+        </header>
 
         <main class="adm-content sc-wrap"
               id="supportAdminApp"
@@ -391,18 +502,15 @@
 
             <div class="sc-heading">
                 <h1>Chat hỗ trợ khách hàng</h1>
-
                 <p>
-                    Xem tin nhắn từ khách hàng, trả lời và đóng cuộc trò chuyện.
-                    Dữ liệu lấy trực tiếp từ SQL Server.
+                    Xem, trả lời, chỉnh sửa và thu hồi tin nhắn.
                 </p>
             </div>
 
             <div class="sc-grid">
 
-                <!-- DANH SÁCH KHÁCH HÀNG -->
-                <section class="sc-card sc-left"
-                         aria-label="Danh sách cuộc trò chuyện">
+                <!-- DANH SACH KHACH HANG -->
+                <section class="sc-card sc-left">
 
                     <div class="sc-left-title">
                         <h2>Hội thoại khách hàng</h2>
@@ -413,30 +521,18 @@
                         </span>
 
                         <div class="sc-controls">
+
                             <input id="supportSearch"
                                    type="search"
-                                   placeholder="Tìm tên, email, mã cuộc chat…"
-                                   aria-label="Tìm cuộc trò chuyện">
+                                   placeholder="Tìm tên, email, mã cuộc chat…">
 
-                            <select id="supportFilter"
-                                    aria-label="Lọc trạng thái">
-
-                                <option value="">
-                                    Tất cả trạng thái
-                                </option>
-
-                                <option value="Chờ xử lý">
-                                    Chờ xử lý
-                                </option>
-
-                                <option value="Đang xử lý">
-                                    Đang xử lý
-                                </option>
-
-                                <option value="Đã đóng">
-                                    Đã đóng
-                                </option>
+                            <select id="supportFilter">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="Chờ xử lý">Chờ xử lý</option>
+                                <option value="Đang xử lý">Đang xử lý</option>
+                                <option value="Đã đóng">Đã đóng</option>
                             </select>
+
                         </div>
                     </div>
 
@@ -445,9 +541,8 @@
                     </div>
                 </section>
 
-                <!-- KHUNG CHAT ADMIN -->
-                <section class="sc-card sc-right"
-                         aria-label="Nội dung cuộc trò chuyện">
+                <!-- CUA SO CHAT -->
+                <section class="sc-card sc-right">
 
                     <header class="sc-thread-head">
                         <div>
@@ -456,39 +551,38 @@
                             </h2>
 
                             <p id="supportCustomerEmail">
-                                Tin nhắn của khách hàng sẽ hiển thị tại đây.
+                                Tin nhắn khách hàng hiển thị tại đây.
                             </p>
                         </div>
 
                         <div class="sc-thread-actions">
-                            <button class="sc-small-btn"
-                                    id="supportRefresh"
-                                    type="button">
+
+                            <button type="button"
+                                    class="sc-small-btn"
+                                    id="supportRefresh">
                                 ↻ Làm mới
                             </button>
 
-                            <button class="sc-small-btn"
+                            <button type="button"
+                                    class="sc-small-btn"
                                     id="supportClose"
-                                    type="button"
                                     disabled>
                                 ✓ Đóng chat
                             </button>
+
                         </div>
                     </header>
 
-                    <!-- LỊCH SỬ TIN NHẮN -->
                     <div class="sc-messages"
                          id="supportMessages"
-                         aria-live="polite"
-                         aria-label="Lịch sử chat">
+                         aria-live="polite">
 
                         <div class="sc-empty">
-                            Chọn khách hàng ở danh sách bên trái
+                            Chọn khách hàng ở bên trái
                             để xem tin nhắn.
                         </div>
                     </div>
 
-                    <!-- FORM ADMIN TRẢ LỜI -->
                     <form class="sc-compose"
                           id="supportReplyForm">
 
@@ -496,7 +590,6 @@
                                   rows="2"
                                   maxlength="1000"
                                   placeholder="Nhập phản hồi cho khách hàng..."
-                                  aria-label="Phản hồi khách hàng"
                                   required
                                   disabled></textarea>
 
@@ -506,6 +599,7 @@
                                 disabled>
                             Gửi
                         </button>
+
                     </form>
 
                     <div class="sc-flash"
@@ -514,9 +608,9 @@
                     </div>
 
                     <div class="sc-note">
-                        Tin nhắn được tự cập nhật khoảng 8 giây/lần
-                        khi trang đang mở.
+                        Tin nhắn tự cập nhật khoảng 8 giây/lần.
                     </div>
+
                 </section>
             </div>
         </main>
@@ -532,53 +626,112 @@
 
     const base = root.dataset.apiBase;
 
-    const token =
-        document.querySelector('meta[name="_csrf"]')?.content || '';
+    const csrf =
+        document.querySelector('meta[name="_csrf"]')
+        ?.content || '';
 
     const csrfHeader =
-        document.querySelector('meta[name="_csrf_header"]')?.content
-        || 'X-CSRF-TOKEN';
+        document.querySelector('meta[name="_csrf_header"]')
+        ?.content || 'X-CSRF-TOKEN';
 
-    const $ = (id) => document.getElementById(id);
+    const el = id => document.getElementById(id);
 
-    const listEl = $('supportConversationList');
-    const messagesEl = $('supportMessages');
-    const searchEl = $('supportSearch');
-    const filterEl = $('supportFilter');
-    const replyEl = $('supportReply');
-    const sendEl = $('supportSend');
-    const closeEl = $('supportClose');
+    const list = el('supportConversationList');
+    const messages = el('supportMessages');
+    const search = el('supportSearch');
+    const filter = el('supportFilter');
+    const reply = el('supportReply');
+    const send = el('supportSend');
+    const close = el('supportClose');
 
     let conversations = [];
     let activeId = null;
-    let lastMessages = '';
-    let listBusy = false;
-    let threadBusy = false;
-    let sending = false;
-    let lastRenderedTicket = null;
+    let adminId = null;
+
+    let busy = false;
+    let listLoading = false;
+    let threadLoading = false;
+
+    let lastSnapshot = '';
+    let lastTicket = null;
+    let activeMenu = null;
+
+    // DONG MENU
+    function closeMenu() {
+        if (!activeMenu) return;
+
+        activeMenu.panel.hidden = true;
+
+        activeMenu.trigger.setAttribute(
+            'aria-expanded',
+            'false'
+        );
+
+        activeMenu.wrap.classList.remove('is-open');
+        activeMenu = null;
+    }
+
+    // MO MENU
+    function toggleMenu(wrap, trigger, panel) {
+        const wasOpen =
+            activeMenu && activeMenu.panel === panel;
+
+        closeMenu();
+
+        if (wasOpen) return;
+
+        panel.hidden = false;
+
+        trigger.setAttribute(
+            'aria-expanded',
+            'true'
+        );
+
+        wrap.classList.add('is-open');
+
+        activeMenu = {
+            wrap,
+            trigger,
+            panel
+        };
+    }
+
+    // BAM RA NGOAI
+    document.addEventListener('pointerdown', e => {
+        if (
+            activeMenu &&
+            !activeMenu.wrap.contains(e.target)
+        ) {
+            closeMenu();
+        }
+    });
+
+    // ESC DONG MENU
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape' && activeMenu) {
+            const trigger = activeMenu.trigger;
+
+            closeMenu();
+            trigger.focus();
+        }
+    });
 
     function error(message) {
-        $('supportError').textContent = message || '';
+        el('supportError').textContent = message || '';
     }
 
-    function make(tag, className, text) {
-        const el = document.createElement(tag);
+    function make(tag, cls, value) {
+        const node = document.createElement(tag);
 
-        if (className) {
-            el.className = className;
+        if (cls) {
+            node.className = cls;
         }
 
-        if (text != null) {
-            el.textContent = text;
+        if (value !== undefined) {
+            node.textContent = value;
         }
 
-        return el;
-    }
-
-    function showEmpty(parent, message) {
-        parent.replaceChildren(
-            make('div', 'sc-empty', message)
-        );
+        return node;
     }
 
     async function api(url, options = {}) {
@@ -587,7 +740,7 @@
             cache: 'no-store',
             ...options,
             headers: {
-                'Accept': 'application/json',
+                Accept: 'application/json',
                 ...(options.headers || {})
             }
         });
@@ -595,46 +748,52 @@
         const type =
             response.headers.get('content-type') || '';
 
-        if (!response.ok ||
-            !type.includes('application/json')) {
+        if (
+            response.status === 401 ||
+            response.status === 403 ||
+            response.redirected
+        ) {
+            throw new Error(
+                'Phiên đăng nhập hoặc quyền Admin không hợp lệ.'
+            );
+        }
 
+        if (!response.ok) {
             if (response.status === 400) {
                 throw new Error(
                     'Tin nhắn phải có từ 1 đến 1000 ký tự.'
                 );
             }
 
-            if (response.status === 401 ||
-                response.status === 403 ||
-                response.redirected) {
-
-                throw new Error(
-                    'Phiên đăng nhập hoặc quyền Admin không hợp lệ. ' +
-                    'Hãy đăng nhập lại.'
-                );
-            }
-
             if (response.status === 404) {
                 throw new Error(
-                    'Cuộc chat không còn tồn tại.'
+                    'Tin nhắn hoặc cuộc chat không tồn tại, ' +
+                    'hoặc bạn không có quyền.'
                 );
             }
 
             throw new Error(
-                'Không tải được dữ liệu. ' +
-                'Kiểm tra kết nối và bảng SQL chat.'
+                'Không kết nối được hệ thống chat. ' +
+                'Hãy kiểm tra SQL Server.'
+            );
+        }
+
+        if (!type.includes('application/json')) {
+            throw new Error(
+                'Máy chủ không trả về JSON.'
             );
         }
 
         return response.json();
     }
 
+    // POST KEM CSRF
     function post(url, body) {
         const headers = {
             'Content-Type': 'application/json'
         };
 
-        headers[csrfHeader] = token;
+        headers[csrfHeader] = csrf;
 
         return api(url, {
             method: 'POST',
@@ -644,24 +803,26 @@
     }
 
     function statusClass(status) {
-        return status === 'Đã đóng'
-            ? 'is-closed'
-            : status === 'Đang xử lý'
-                ? 'is-active'
-                : '';
+        if (status === 'Đã đóng') {
+            return ' is-closed';
+        }
+
+        if (status === 'Đang xử lý') {
+            return ' is-active';
+        }
+
+        return '';
     }
 
-    // HIỂN THỊ DANH SÁCH HỘI THOẠI
+    // HIEN THI DANH SACH HOI THOAI
     function renderList() {
-
-        const query = searchEl.value
+        const keyword = search.value
             .toLocaleLowerCase('vi-VN')
             .trim();
 
-        const status = filterEl.value;
+        const status = filter.value;
 
-        const filtered = conversations.filter(c => {
-
+        const rows = conversations.filter(c => {
             const text = [
                 c.id,
                 c.customerName,
@@ -669,30 +830,30 @@
                 c.preview
             ].join(' ').toLocaleLowerCase('vi-VN');
 
-            return (!status || c.status === status)
-                && (!query || text.includes(query));
+            return (
+                (!status || c.status === status) &&
+                (!keyword || text.includes(keyword))
+            );
         });
 
-        $('supportCount').textContent =
-            filtered.length + ' / ' +
-            conversations.length +
-            ' cuộc chat (tối đa 200 gần nhất)';
+        el('supportCount').textContent =
+            rows.length + ' / ' +
+            conversations.length + ' cuộc chat';
 
-        const scrollPos = listEl.scrollTop;
+        const scroll = list.scrollTop;
+        list.replaceChildren();
 
-        listEl.replaceChildren();
-
-        if (!filtered.length) {
-            showEmpty(
-                listEl,
-                'Chưa có hội thoại phù hợp. ' +
-                'Khách hàng cần gửi tin nhắn trước.'
+        if (!rows.length) {
+            list.append(
+                make(
+                    'div',
+                    'sc-empty',
+                    'Chưa có hội thoại phù hợp.'
+                )
             );
-            return;
         }
 
-        filtered.forEach(c => {
-
+        rows.forEach(c => {
             const button = make(
                 'button',
                 'sc-customer' +
@@ -710,20 +871,21 @@
                 make(
                     'strong',
                     '',
-                    c.customerName || ('Khách #' + c.id)
+                    c.customerName || 'Khách #' + c.id
                 )
             );
 
             line.append(
                 make(
                     'span',
-                    'sc-status ' + statusClass(c.status),
-                    c.status
+                    'sc-status' + statusClass(c.status),
+                    c.status || ''
                 )
             );
 
+            button.append(line);
+
             button.append(
-                line,
                 make('small', '', c.customerEmail || '')
             );
 
@@ -740,24 +902,26 @@
             );
 
             button.addEventListener('click', () => {
+                closeMenu();
+
                 activeId = c.id;
-                lastMessages = '';
+                lastSnapshot = '';
+
                 renderList();
-                loadThread(false);
+                loadThread();
             });
 
-            listEl.append(button);
+            list.append(button);
         });
 
-        listEl.scrollTop = scrollPos;
+        list.scrollTop = scroll;
     }
 
-    // TẢI DANH SÁCH HỘI THOẠI
+    // TAI DANH SACH HOI THOAI
     async function loadList(silent = false) {
+        if (listLoading) return;
 
-        if (listBusy) return;
-
-        listBusy = true;
+        listLoading = true;
 
         try {
             const result = await api(base);
@@ -773,121 +937,311 @@
             }
 
         } catch (e) {
-
             if (!silent) {
                 error(e.message);
             }
-
         } finally {
-            listBusy = false;
+            listLoading = false;
         }
     }
 
-    // HIỂN THỊ TIN NHẮN
+    // HIEN THI TIN NHAN
     function renderThread(data) {
-
         const c = data.conversation;
 
-        if (lastRenderedTicket !== c.id) {
-            messagesEl.dataset.loaded = '';
-            lastRenderedTicket = c.id;
+        if (lastTicket !== c.id) {
+            messages.dataset.loaded = '';
+            lastTicket = c.id;
         }
 
-        $('supportCustomerName').textContent =
-            c.customerName || ('Khách #' + c.id);
+        el('supportCustomerName').textContent =
+            c.customerName || 'Khách #' + c.id;
 
-        $('supportCustomerEmail').textContent =
-            (c.customerEmail || '') + ' · ' + c.status;
+        el('supportCustomerEmail').textContent =
+            (c.customerEmail || '') +
+            ' · ' +
+            (c.status || '');
 
-        closeEl.disabled = c.status === 'Đã đóng';
-        replyEl.disabled = false;
-        sendEl.disabled = false;
+        close.disabled = c.status === 'Đã đóng';
+        reply.disabled = false;
+        send.disabled = false;
 
-        const messages = Array.isArray(data.messages)
+        const rows = Array.isArray(data.messages)
             ? data.messages
             : [];
 
-        const snapshot = JSON.stringify(messages);
+        const next = JSON.stringify(rows);
 
-        if (snapshot === lastMessages) return;
+        if (next === lastSnapshot) return;
 
-        lastMessages = snapshot;
+        lastSnapshot = next;
+        closeMenu();
 
         const nearBottom =
-            messagesEl.scrollHeight -
-            messagesEl.scrollTop -
-            messagesEl.clientHeight < 90;
+            messages.scrollHeight -
+            messages.scrollTop -
+            messages.clientHeight < 90;
 
-        messagesEl.replaceChildren();
+        messages.replaceChildren();
 
-        if (!messages.length) {
-            showEmpty(
-                messagesEl,
-                'Chưa có tin nhắn trong cuộc trò chuyện.'
+        if (!rows.length) {
+            messages.append(
+                make(
+                    'div',
+                    'sc-empty',
+                    'Chưa có tin nhắn.'
+                )
             );
-            return;
         }
 
-        messages.forEach(m => {
-
-            const admin = m.sender === 'ADMIN';
+        rows.forEach(m => {
+            const own = m.sender === 'ADMIN';
+            const recalled = !!m.recalled;
 
             const row = make(
                 'div',
-                'sc-msg' + (admin ? ' from-admin' : '')
+                'sc-msg' + (own ? ' from-admin' : '')
             );
 
             row.append(
                 make(
                     'small',
                     '',
-                    admin
+                    own
                         ? 'Quản trị viên FITFOOD'
-                        : c.customerName
+                        : (c.customerName || 'Khách hàng')
                 )
             );
 
-            row.append(
-                make(
+            // BUBBLE VA MENU CUNG HANG NGANG
+            const messageLine = make(
+                'div',
+                'sc-message-line'
+            );
+
+            const bubble = make(
+                'div',
+                'sc-bubble' +
+                (recalled ? ' is-recalled' : ''),
+                recalled
+                    ? 'Tin nhắn đã được thu hồi'
+                    : (m.content || '')
+            );
+
+            messageLine.append(bubble);
+
+            // Chi tin nhan cua Admin dang dang nhap
+            // moi co dau ba cham.
+            if (
+                own &&
+                m.canManage &&
+                !recalled &&
+                Number(m.senderId) === Number(adminId)
+            ) {
+                const wrap = make(
                     'div',
-                    'sc-bubble',
-                    m.content || ''
-                )
-            );
+                    'sc-message-menu-wrap'
+                );
 
+                const trigger = make(
+                    'button',
+                    'sc-menu-trigger',
+                    '⋮'
+                );
+
+                trigger.type = 'button';
+
+                trigger.setAttribute(
+                    'aria-label',
+                    'Tùy chọn tin nhắn'
+                );
+
+                trigger.setAttribute(
+                    'title',
+                    'Tùy chọn tin nhắn'
+                );
+
+                trigger.setAttribute(
+                    'aria-haspopup',
+                    'menu'
+                );
+
+                trigger.setAttribute(
+                    'aria-expanded',
+                    'false'
+                );
+
+                const menu = make(
+                    'div',
+                    'sc-menu-dropdown'
+                );
+
+                menu.hidden = true;
+                menu.setAttribute('role', 'menu');
+
+                const edit = make(
+                    'button',
+                    '',
+                    'Chỉnh sửa'
+                );
+
+                const recall = make(
+                    'button',
+                    'is-danger',
+                    'Thu hồi'
+                );
+
+                edit.type = 'button';
+                recall.type = 'button';
+
+                edit.setAttribute(
+                    'role',
+                    'menuitem'
+                );
+
+                recall.setAttribute(
+                    'role',
+                    'menuitem'
+                );
+
+                trigger.addEventListener('click', e => {
+                    e.stopPropagation();
+
+                    toggleMenu(
+                        wrap,
+                        trigger,
+                        menu
+                    );
+                });
+
+                edit.addEventListener('click', () => {
+                    closeMenu();
+                    changeMessage(m, false);
+                });
+
+                recall.addEventListener('click', () => {
+                    closeMenu();
+                    changeMessage(m, true);
+                });
+
+                menu.append(edit, recall);
+                wrap.append(trigger, menu);
+
+                // QUAN TRONG:
+                // Gan ba cham vao canh bong bong tin nhan.
+                messageLine.append(wrap);
+            }
+
+            row.append(messageLine);
+
+            // Thoi gian van o ben duoi
             row.append(
                 make(
                     'small',
                     '',
-                    m.sentAt || ''
+                    (m.sentAt || '') +
+                    (
+                        m.edited && !recalled
+                            ? ' · Đã chỉnh sửa'
+                            : ''
+                    )
                 )
             );
 
-            messagesEl.append(row);
+            messages.append(row);
         });
 
-        if (nearBottom || !messagesEl.dataset.loaded) {
-            messagesEl.scrollTop = messagesEl.scrollHeight;
+        if (
+            nearBottom ||
+            !messages.dataset.loaded
+        ) {
+            messages.scrollTop =
+                messages.scrollHeight;
         }
 
-        messagesEl.dataset.loaded = 'true';
+        messages.dataset.loaded = 'true';
     }
 
-    // TẢI LỊCH SỬ HỘI THOẠI
-    async function loadThread(silent = false) {
+    // CHINH SUA VA THU HOI
+    async function changeMessage(message, recall) {
+        if (busy || activeId == null) return;
 
-        if (threadBusy || activeId == null) {
+        let content = '';
+
+        if (recall) {
+            if (!window.confirm(
+                'Bạn muốn thu hồi tin nhắn này?'
+            )) {
+                return;
+            }
+        } else {
+            const changed = window.prompt(
+                'Chỉnh sửa tin nhắn:',
+                message.content || ''
+            );
+
+            if (changed === null) return;
+
+            content = changed.trim();
+
+            if (!content || content.length > 1000) {
+                error(
+                    'Tin nhắn phải có từ 1 đến 1000 ký tự.'
+                );
+                return;
+            }
+        }
+
+        busy = true;
+        const requestedId = activeId;
+
+        try {
+            const data = await post(
+                base +
+                '/' + encodeURIComponent(requestedId) +
+                '/messages/' +
+                encodeURIComponent(message.id) +
+                (recall ? '/recall' : '/edit'),
+                recall ? {} : {content}
+            );
+
+            if (requestedId === activeId) {
+                lastSnapshot = '';
+                renderThread(data);
+            }
+
+            await loadList(true);
+            error('');
+
+        } catch (e) {
+            error(
+                e.message ||
+                'Không thể thay đổi tin nhắn.'
+            );
+        } finally {
+            busy = false;
+        }
+    }
+
+    // TAI LICH SU CHAT
+    async function loadThread(silent = false) {
+        if (
+            threadLoading ||
+            busy ||
+            activeId == null
+        ) {
             return;
         }
 
-        threadBusy = true;
+        threadLoading = true;
 
         const requestedId = activeId;
 
         try {
-
             const data = await api(
-                base + '/' + encodeURIComponent(requestedId)
+                base +
+                '/' +
+                encodeURIComponent(requestedId)
             );
 
             if (requestedId === activeId) {
@@ -899,33 +1253,30 @@
             }
 
         } catch (e) {
-
             if (!silent) {
                 error(e.message);
             }
-
         } finally {
+            threadLoading = false;
 
-            threadBusy = false;
-
-            if (requestedId !== activeId && activeId != null) {
+            if (
+                requestedId !== activeId &&
+                activeId != null
+            ) {
                 loadThread(false);
             }
         }
     }
 
-    // ADMIN GỬI PHẢN HỒI
-    $('supportReplyForm').addEventListener(
+    // GUI TIN NHAN ADMIN
+    el('supportReplyForm').addEventListener(
         'submit',
-        async function (event) {
+        async e => {
+            e.preventDefault();
 
-            event.preventDefault();
+            if (busy || activeId == null) return;
 
-            if (sending || activeId == null) {
-                return;
-            }
-
-            const content = replyEl.value.trim();
+            const content = reply.value.trim();
 
             if (!content || content.length > 1000) {
                 error(
@@ -934,111 +1285,134 @@
                 return;
             }
 
-            sending = true;
-            sendEl.disabled = true;
-            error('');
+            busy = true;
+            send.disabled = true;
 
             try {
+                const requestedId = activeId;
 
                 const data = await post(
-                    base + '/' + activeId + '/reply',
-                    { content }
+                    base +
+                    '/' +
+                    encodeURIComponent(requestedId) +
+                    '/reply',
+                    {content}
                 );
 
-                replyEl.value = '';
-                lastMessages = '';
+                reply.value = '';
 
-                renderThread(data);
+                if (requestedId === activeId) {
+                    lastSnapshot = '';
+                    renderThread(data);
+                }
+
                 await loadList(true);
+                error('');
 
-            } catch (e) {
-
-                error(e.message);
+            } catch (err) {
+                error(err.message);
 
             } finally {
-
-                sending = false;
-                sendEl.disabled = false;
-                replyEl.focus();
+                busy = false;
+                send.disabled = false;
+                reply.focus();
             }
         }
     );
 
-    // ĐÓNG HỘI THOẠI
-    closeEl.addEventListener('click', async function () {
-
-        if (activeId == null ||
-            !confirm(
-                'Đánh dấu cuộc trò chuyện này đã đóng?'
-            )) {
+    // DONG CUOC TRO CHUYEN
+    close.addEventListener('click', async () => {
+        if (
+            busy ||
+            activeId == null ||
+            !window.confirm(
+                'Đóng cuộc trò chuyện này?'
+            )
+        ) {
             return;
         }
 
-        closeEl.disabled = true;
-        error('');
+        busy = true;
+        close.disabled = true;
 
         try {
+            const requestedId = activeId;
 
             const data = await post(
-                base + '/' + activeId + '/close',
+                base +
+                '/' +
+                encodeURIComponent(requestedId) +
+                '/close',
                 {}
             );
 
-            renderThread(data);
+            if (requestedId === activeId) {
+                renderThread(data);
+            }
 
             await loadList(true);
+            error('');
 
-        } catch (e) {
+        } catch (err) {
+            error(err.message);
+            close.disabled = false;
 
-            error(e.message);
-            closeEl.disabled = false;
+        } finally {
+            busy = false;
         }
     });
 
-    // LÀM MỚI THỦ CÔNG
-    $('supportRefresh').addEventListener(
+    // LAM MOI
+    el('supportRefresh').addEventListener(
         'click',
-        async function () {
-
-            error('');
-
-            await loadList(false);
-            await loadThread(false);
+        async () => {
+            await loadList();
+            await loadThread();
         }
     );
 
-    // TÌM KIẾM VÀ LỌC
-    searchEl.addEventListener('input', renderList);
-    filterEl.addEventListener('change', renderList);
+    search.addEventListener(
+        'input',
+        renderList
+    );
 
-    // ENTER GỬI, SHIFT + ENTER XUỐNG DÒNG
-    replyEl.addEventListener('keydown', function (event) {
+    filter.addEventListener(
+        'change',
+        renderList
+    );
 
-        if (event.key === 'Enter' &&
-            !event.shiftKey &&
-            !event.isComposing) {
-
-            event.preventDefault();
-
-            $('supportReplyForm').requestSubmit();
+    reply.addEventListener('keydown', e => {
+        if (
+            e.key === 'Enter' &&
+            !e.shiftKey &&
+            !e.isComposing
+        ) {
+            e.preventDefault();
+            el('supportReplyForm').requestSubmit();
         }
     });
 
-    // TẢI DỮ LIỆU BAN ĐẦU
-    loadList(false);
+    // LAY ID ADMIN
+    api(
+        base.replace(/\/conversations$/, '/me')
+    )
+    .then(me => {
+        adminId = me.id;
+        loadList();
+    })
+    .catch(e => {
+        error(e.message);
+    });
 
-    // KIỂM TRA TIN NHẮN MỚI SAU MỖI 8 GIÂY
-    setInterval(function () {
-
-        if (!document.hidden) {
+    // TU DONG CAP NHAT CHAT
+    setInterval(() => {
+        if (!document.hidden && !busy) {
             loadList(true);
             loadThread(true);
         }
-
     }, 8000);
 
 })();
 </script>
-
 </body>
 </html>
