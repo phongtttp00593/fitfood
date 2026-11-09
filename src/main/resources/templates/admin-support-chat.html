@@ -16,441 +16,495 @@
 
     <style>
         .sc-wrap {
-            max-width: 1370px;
-            margin: 0 auto;
+            max-width:1370px;
+            margin:0 auto;
         }
-
         .sc-heading {
-            margin: 6px 0 22px;
+            margin:6px 0 22px;
         }
-
         .sc-heading h1 {
-            font-size: 29px;
-            margin: 6px 0;
-            color: #3a2217;
+            font-size:29px;
+            margin:6px 0;
+            color:#3a2217;
         }
-
         .sc-heading p {
-            color: #7b6858;
-            font-size: 14px;
+            color:#7b6858;
+            font-size:14px;
         }
-
         .sc-grid {
-            display: grid;
-            grid-template-columns: 330px minmax(0, 1fr);
-            gap: 17px;
+            display:grid;
+            grid-template-columns:330px minmax(0,1fr);
+            gap:17px;
         }
-
         .sc-card {
-            background: #fffdf8;
-            border: 1px solid #e6d8bc;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 8px 30px #3a22170c;
+            background:#fffdf8;
+            border:1px solid #e6d8bc;
+            border-radius:16px;
+            overflow:hidden;
+            box-shadow:0 8px 30px #3a22170c;
         }
-
-        .sc-left,
-        .sc-right {
-            display: flex;
-            flex-direction: column;
-            height: min(72vh, 730px);
-            min-height: 530px;
+        .sc-left,.sc-right {
+            display:flex;
+            flex-direction:column;
+            height:min(72vh,730px);
+            min-height:530px;
         }
-
         .sc-left-title {
-            padding: 17px;
-            border-bottom: 1px solid #eee0c8;
+            padding:17px;
+            border-bottom:1px solid #eee0c8;
         }
-
         .sc-left-title h2 {
-            margin: 0 0 8px;
-            font-size: 18px;
+            margin:0 0 8px;
+            font-size:18px;
         }
-
         .sc-counter {
-            color: #8c4637;
-            font-size: 12px;
-            font-weight: 700;
+            color:#8c4637;
+            font-size:12px;
+            font-weight:700;
         }
-
         .sc-controls {
-            display: grid;
-            gap: 9px;
-            margin-top: 12px;
+            display:grid;
+            gap:9px;
+            margin-top:12px;
         }
-
-        .sc-controls input,
-        .sc-controls select {
-            width: 100%;
-            border: 1px solid #decfb8;
-            border-radius: 9px;
-            padding: 10px;
-            font: inherit;
-            background: #fff;
+        .sc-controls input,.sc-controls select {
+            width:100%;
+            border:1px solid #decfb8;
+            border-radius:9px;
+            padding:10px;
+            font:inherit;
+            background:#fff;
         }
-
         .sc-list {
-            flex: 1;
-            overflow: auto;
-            padding: 9px;
-            min-height: 0;
+            flex:1;
+            overflow:auto;
+            padding:9px;
+            min-height:0;
         }
-
         .sc-customer {
-            width: 100%;
-            background: transparent;
-            border: 1px solid transparent;
-            border-radius: 11px;
-            padding: 13px;
-            display: block;
-            text-align: left;
-            font: inherit;
-            cursor: pointer;
-            color: #3a2217;
-            margin-bottom: 5px;
+            width:100%;
+            background:transparent;
+            border:1px solid transparent;
+            border-radius:11px;
+            padding:13px;
+            display:block;
+            text-align:left;
+            font:inherit;
+            cursor:pointer;
+            color:#3a2217;
+            margin-bottom:5px;
         }
-
         .sc-customer:hover {
-            background: #f8f1e3;
+            background:#f8f1e3;
         }
-
         .sc-customer.is-active {
-            background: #f6e8d5;
-            border-color: #dcbf94;
+            background:#f6e8d5;
+            border-color:#dcbf94;
         }
-
         .sc-customer-line {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 6px;
+            display:flex;
+            justify-content:space-between;
+            align-items:flex-start;
+            gap:6px;
         }
-
         .sc-customer small {
-            display: block;
-            font-size: 11px;
-            color: #89796c;
-            margin: 4px 0;
-            overflow-wrap: anywhere;
+            display:block;
+            font-size:11px;
+            color:#89796c;
+            margin:4px 0;
+            overflow-wrap:anywhere;
         }
-
         .sc-preview {
-            color: #715f51;
-            font-size: 12px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            color:#715f51;
+            font-size:12px;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
         }
-
         .sc-status {
-            flex: none;
-            border-radius: 30px;
-            padding: 4px 7px;
-            font-size: 10px;
-            background: #f4e7d6;
-            color: #814023;
+            flex:none;
+            border-radius:30px;
+            padding:4px 7px;
+            font-size:10px;
+            background:#f4e7d6;
+            color:#814023;
         }
-
         .sc-status.is-closed {
-            background: #edf1ed;
-            color: #5a6c5b;
+            background:#edf1ed;
+            color:#5a6c5b;
         }
-
         .sc-status.is-active {
-            background: #e6efe9;
-            color: #226447;
+            background:#e6efe9;
+            color:#226447;
         }
-
         .sc-thread-head {
-            padding: 17px 19px;
-            background: #fbf7ef;
-            border-bottom: 1px solid #e6d8bc;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
+            padding:17px 19px;
+            background:#fbf7ef;
+            border-bottom:1px solid #e6d8bc;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap:12px;
         }
-
         .sc-thread-head h2 {
-            margin: 0;
-            font-size: 17px;
+            margin:0;
+            font-size:17px;
         }
-
         .sc-thread-head p {
-            color: #7d7066;
-            margin: 5px 0 0;
-            font-size: 12px;
-            overflow-wrap: anywhere;
+            color:#7d7066;
+            margin:5px 0 0;
+            font-size:12px;
+            overflow-wrap:anywhere;
         }
-
         .sc-thread-actions {
-            display: flex;
-            gap: 7px;
-            flex-wrap: wrap;
+            display:flex;
+            gap:7px;
+            flex-wrap:wrap;
         }
-
         .sc-small-btn {
-            padding: 8px 11px;
-            border: 1px solid #d8c49f;
-            border-radius: 9px;
-            background: #fffaf1;
-            color: #683f24;
-            cursor: pointer;
-            font: inherit;
-            font-size: 12px;
+            padding:8px 11px;
+            border:1px solid #d8c49f;
+            border-radius:9px;
+            background:#fffaf1;
+            color:#683f24;
+            cursor:pointer;
+            font:inherit;
+            font-size:12px;
         }
-
         .sc-small-btn:disabled {
-            opacity: .5;
-            cursor: not-allowed;
+            opacity:.5;
+            cursor:not-allowed;
         }
-
         .sc-messages {
-            flex: 1;
-            min-height: 0;
-            overflow: auto;
-            background: #fffdf8;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 13px;
+            flex:1;
+            min-height:0;
+            overflow:auto;
+            background:#fffdf8;
+            padding:20px;
+            display:flex;
+            flex-direction:column;
+            gap:13px;
         }
-
         .sc-msg {
-            max-width: 78%;
-            align-self: flex-start;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
+            max-width:78%;
+            align-self:flex-start;
+            display:flex;
+            flex-direction:column;
+            gap:5px;
         }
-
         .sc-msg.from-admin {
-            align-self: flex-end;
-            align-items: flex-end;
+            align-self:flex-end;
+            align-items:flex-end;
         }
-
         .sc-msg small {
-            font-size: 11px;
-            color: #8a8178;
+            font-size:11px;
+            color:#8a8178;
         }
-
-        /* BONG BONG TIN NHAN */
         .sc-bubble {
-            padding: 10px 14px;
-            background: #f3e8d8;
-            border-radius: 14px 14px 14px 3px;
-            white-space: pre-wrap;
-            overflow-wrap: anywhere;
-            font-size: 14px;
-            line-height: 1.6;
+            padding:10px 14px;
+            background:#f3e8d8;
+            border-radius:14px 14px 14px 3px;
+            white-space:pre-wrap;
+            overflow-wrap:anywhere;
+            font-size:14px;
+            line-height:1.6;
         }
-
         .sc-msg.from-admin .sc-bubble {
-            color: white;
-            background: #8f2f20;
-            border-radius: 14px 14px 3px 14px;
+            color:white;
+            background:#8f2f20;
+            border-radius:14px 14px 3px 14px;
         }
-
         .sc-bubble.is-recalled {
-            font-style: italic;
-            opacity: .8;
+            font-style:italic;
+            opacity:.8;
+        }
+        .sc-empty {
+            padding:35px 16px;
+            text-align:center;
+            margin:auto;
+            color:#8a7361;
+            font-size:14px;
+            line-height:1.7;
+        }
+        .sc-compose {
+            display:flex;
+            gap:10px;
+            padding:14px;
+            border-top:1px solid #eadbc5;
+            background:#fbf7ef;
+            align-items:flex-end;
+        }
+        .sc-compose textarea {
+            flex:1;
+            min-width:0;
+            resize:vertical;
+            min-height:45px;
+            max-height:130px;
+            border:1px solid #d8c49f;
+            border-radius:10px;
+            padding:11px 13px;
+            font:inherit;
+            font-size:13px;
+        }
+        .sc-send {
+            background:#9b2c1f;
+            color:white;
+            border:0;
+            border-radius:10px;
+            padding:12px 18px;
+            font:inherit;
+            font-weight:700;
+            cursor:pointer;
+        }
+        .sc-send:disabled {
+            opacity:.55;
+            cursor:not-allowed;
         }
 
-        /* BUBBLE VA BA CHAM NAM CUNG MOT HANG */
+        /* TIN NHAN VA DAU BA CHAM NGANG HANG */
         .sc-message-line {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            max-width: 100%;
-            min-width: 0;
+            display:flex;
+            align-items:center;
+            gap:5px;
+            max-width:100%;
+            min-width:0;
         }
-
-        /* Tin nhan Admin nam ben phai, ba cham ben trai */
         .sc-msg.from-admin .sc-message-line {
-            flex-direction: row-reverse;
+            flex-direction:row-reverse;
         }
-
         .sc-message-line .sc-bubble {
-            min-width: 0;
-            overflow-wrap: anywhere;
+            min-width:0;
+            overflow-wrap:anywhere;
         }
-
-        /* MENU BA CHAM */
         .sc-message-menu-wrap {
-            position: relative;
-            display: inline-flex;
-            align-self: center;
-            flex: 0 0 29px;
-            z-index: 1;
+            position:relative;
+            display:inline-flex;
+            align-self:center;
+            flex:0 0 29px;
+            z-index:1;
         }
-
         .sc-message-menu-wrap.is-open {
-            z-index: 30;
+            z-index:30;
         }
-
         .sc-menu-trigger {
-            display: grid;
-            place-items: center;
-            width: 29px;
-            height: 29px;
-            padding: 0;
-            border: 0;
-            border-radius: 50%;
-            background: transparent;
-            color: #76675d;
-            font-size: 23px;
-            line-height: 1;
-            cursor: pointer;
+            display:grid;
+            place-items:center;
+            width:29px;
+            height:29px;
+            padding:0;
+            border:0;
+            border-radius:50%;
+            background:transparent;
+            color:#76675d;
+            font-size:23px;
+            line-height:1;
+            cursor:pointer;
         }
-
         .sc-menu-trigger:hover,
         .sc-menu-trigger[aria-expanded="true"] {
-            background: #f2e5d3;
-            color: #8f2f20;
+            background:#f2e5d3;
+            color:#8f2f20;
         }
-
         .sc-menu-trigger:focus-visible,
         .sc-menu-dropdown button:focus-visible {
-            outline: 2px solid #9b2c1f;
-            outline-offset: 2px;
+            outline:2px solid #9b2c1f;
+            outline-offset:2px;
         }
-
         .sc-menu-dropdown {
-            position: absolute;
-            right: 0;
-            bottom: calc(100% + 5px);
-            min-width: 150px;
-            padding: 5px;
-            background: #fffdf8;
-            border: 1px solid #e0cfb9;
-            border-radius: 10px;
-            box-shadow: 0 10px 25px #3a22172b;
-            z-index: 31;
+            position:absolute;
+            right:0;
+            bottom:calc(100% + 5px);
+            min-width:150px;
+            padding:5px;
+            background:#fffdf8;
+            border:1px solid #e0cfb9;
+            border-radius:10px;
+            box-shadow:0 10px 25px #3a22172b;
+            z-index:31;
         }
-
         .sc-menu-dropdown[hidden] {
-            display: none !important;
+            display:none!important;
         }
-
         .sc-menu-dropdown button {
-            display: block;
-            width: 100%;
-            padding: 9px 10px;
-            text-align: left;
-            border: 0;
-            border-radius: 6px;
-            background: transparent;
-            color: #3a2217;
-            font: inherit;
-            font-size: 13px;
-            cursor: pointer;
+            display:block;
+            width:100%;
+            padding:9px 10px;
+            text-align:left;
+            border:0;
+            border-radius:6px;
+            background:transparent;
+            color:#3a2217;
+            font:inherit;
+            font-size:13px;
+            cursor:pointer;
         }
-
         .sc-menu-dropdown button:hover {
-            background: #f8f0e4;
+            background:#f8f0e4;
         }
-
         .sc-menu-dropdown button.is-danger {
-            color: #b42318;
+            color:#b42318;
         }
-
         .sc-menu-dropdown button.is-danger:hover {
-            background: #fff1ef;
+            background:#fff1ef;
         }
-
-        .sc-empty {
-            padding: 35px 16px;
-            text-align: center;
-            margin: auto;
-            color: #8a7361;
-            font-size: 14px;
-            line-height: 1.7;
-        }
-
-        .sc-compose {
-            display: flex;
-            gap: 10px;
-            padding: 14px;
-            border-top: 1px solid #eadbc5;
-            background: #fbf7ef;
-            align-items: flex-end;
-        }
-
-        .sc-compose textarea {
-            flex: 1;
-            min-width: 0;
-            resize: vertical;
-            min-height: 45px;
-            max-height: 130px;
-            border: 1px solid #d8c49f;
-            border-radius: 10px;
-            padding: 11px 13px;
-            font: inherit;
-            font-size: 13px;
-        }
-
-        .sc-send {
-            background: #9b2c1f;
-            color: white;
-            border: 0;
-            border-radius: 10px;
-            padding: 12px 18px;
-            font: inherit;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .sc-send:disabled {
-            opacity: .55;
-            cursor: not-allowed;
-        }
-
         .sc-flash {
-            padding: 9px 14px;
-            background: #fff0e9;
-            color: #9c3428;
-            border-top: 1px solid #f0d5c7;
-            font-size: 12px;
+            padding:9px 14px;
+            background:#fff0e9;
+            color:#9c3428;
+            border-top:1px solid #f0d5c7;
+            font-size:12px;
         }
-
         .sc-flash:empty {
-            display: none;
+            display:none;
         }
-
         .sc-note {
-            padding: 9px 16px;
-            color: #8c7866;
-            font-size: 11px;
-            background: #fffaf2;
+            padding:9px 16px;
+            color:#8c7866;
+            font-size:11px;
+            background:#fffaf2;
         }
 
-        @media (max-width: 950px) {
-            .sc-grid {
-                grid-template-columns: 280px minmax(0,1fr);
-            }
+        /* THANH CHINH SUA TIN NHAN ADMIN */
+        .sc-edit-bar {
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            padding:12px 16px;
+            background:#fff4e8;
+            border-top:1px solid #e5d2b8;
+            border-left:4px solid #9b2c1f;
+            color:#4f3024;
+        }
+        .sc-edit-bar[hidden] {
+            display:none!important;
+        }
+        .sc-edit-title {
+            font-size:13px;
+            font-weight:700;
+            margin-bottom:4px;
+        }
+        .sc-edit-preview {
+            max-width:480px;
+            font-size:12px;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            color:#755946;
+        }
+        .sc-edit-cancel {
+            flex:none;
+            padding:7px 12px;
+            background:#fffdf8;
+            border:1px solid #d8b99e;
+            border-radius:9px;
+            color:#8f2f20;
+            cursor:pointer;
+            font:inherit;
+            font-size:12px;
         }
 
-        @media (max-width: 680px) {
-            .sc-grid {
-                grid-template-columns: 1fr;
-            }
+        /* MODAL THU HOI ADMIN */
+        .sc-recall-overlay {
+            position:fixed;
+            inset:0;
+            z-index:5000;
+            background:#241510a8;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:20px;
+        }
+        .sc-recall-overlay[hidden] {
+            display:none!important;
+        }
+        .sc-recall-dialog {
+            width:min(420px,100%);
+            padding:25px;
+            background:#fffdf8;
+            border:1px solid #e0cfb9;
+            border-radius:18px;
+            box-shadow:0 24px 70px #20120d66;
+            color:#3a2217;
+            font-family:inherit;
+        }
+        .sc-recall-icon {
+            width:48px;
+            height:48px;
+            border-radius:50%;
+            background:#fbe8df;
+            color:#a93123;
+            display:grid;
+            place-items:center;
+            font-size:25px;
+            margin-bottom:13px;
+        }
+        .sc-recall-dialog h2 {
+            font-size:20px;
+            margin:0 0 9px;
+            color:#3a2217;
+        }
+        .sc-recall-dialog p {
+            font-size:14px;
+            line-height:1.65;
+            color:#715f51;
+            margin:0 0 21px;
+        }
+        .sc-recall-actions {
+            display:flex;
+            justify-content:flex-end;
+            gap:10px;
+        }
+        .sc-recall-actions button {
+            border-radius:9px;
+            padding:10px 17px;
+            font:inherit;
+            font-weight:700;
+            cursor:pointer;
+        }
+        .sc-recall-cancel {
+            background:#fffaf1;
+            color:#71482e;
+            border:1px solid #d8c49f;
+        }
+        .sc-recall-confirm {
+            background:#9b2c1f;
+            color:#fff;
+            border:1px solid #9b2c1f;
+        }
+        .sc-recall-actions button:disabled {
+            opacity:.55;
+            cursor:wait;
+        }
+        .sc-menu-trigger:focus-visible,
+        .sc-edit-cancel:focus-visible,
+        .sc-recall-actions button:focus-visible {
+            outline:2px solid #9b2c1f;
+            outline-offset:2px;
+        }
 
+        @media(max-width:950px) {
+            .sc-grid {
+                grid-template-columns:280px minmax(0,1fr);
+            }
+        }
+        @media(max-width:680px) {
+            .sc-grid {
+                grid-template-columns:1fr;
+            }
             .sc-left {
-                height: 320px;
-                min-height: 0;
+                height:320px;
+                min-height:0;
             }
-
             .sc-right {
-                height: 65vh;
-                min-height: 500px;
+                height:65vh;
+                min-height:500px;
             }
-
             .sc-thread-head {
-                flex-wrap: wrap;
+                flex-wrap:wrap;
             }
-
             .sc-heading h1 {
-                font-size: 23px;
+                font-size:23px;
             }
         }
     </style>
@@ -458,7 +512,6 @@
 
 <body class="admin-body">
 <div class="adm-layout">
-
     <aside class="adm-sidebar"
            th:replace="~{fragments/admin-sidebar :: sidebar('support')}">
     </aside>
@@ -509,9 +562,8 @@
 
             <div class="sc-grid">
 
-                <!-- DANH SACH KHACH HANG -->
+                <!-- DANH SACH HOI THOAI -->
                 <section class="sc-card sc-left">
-
                     <div class="sc-left-title">
                         <h2>Hội thoại khách hàng</h2>
 
@@ -521,27 +573,32 @@
                         </span>
 
                         <div class="sc-controls">
-
                             <input id="supportSearch"
                                    type="search"
                                    placeholder="Tìm tên, email, mã cuộc chat…">
 
                             <select id="supportFilter">
-                                <option value="">Tất cả trạng thái</option>
-                                <option value="Chờ xử lý">Chờ xử lý</option>
-                                <option value="Đang xử lý">Đang xử lý</option>
-                                <option value="Đã đóng">Đã đóng</option>
+                                <option value="">
+                                    Tất cả trạng thái
+                                </option>
+                                <option value="Chờ xử lý">
+                                    Chờ xử lý
+                                </option>
+                                <option value="Đang xử lý">
+                                    Đang xử lý
+                                </option>
+                                <option value="Đã đóng">
+                                    Đã đóng
+                                </option>
                             </select>
-
                         </div>
                     </div>
 
                     <div class="sc-list"
-                         id="supportConversationList">
-                    </div>
+                         id="supportConversationList"></div>
                 </section>
 
-                <!-- CUA SO CHAT -->
+                <!-- CUA SO CHAT ADMIN -->
                 <section class="sc-card sc-right">
 
                     <header class="sc-thread-head">
@@ -549,40 +606,56 @@
                             <h2 id="supportCustomerName">
                                 Chọn một cuộc trò chuyện
                             </h2>
-
                             <p id="supportCustomerEmail">
                                 Tin nhắn khách hàng hiển thị tại đây.
                             </p>
                         </div>
 
                         <div class="sc-thread-actions">
-
-                            <button type="button"
-                                    class="sc-small-btn"
-                                    id="supportRefresh">
+                            <button class="sc-small-btn"
+                                    id="supportRefresh"
+                                    type="button">
                                 ↻ Làm mới
                             </button>
 
-                            <button type="button"
-                                    class="sc-small-btn"
+                            <button class="sc-small-btn"
                                     id="supportClose"
+                                    type="button"
                                     disabled>
                                 ✓ Đóng chat
                             </button>
-
                         </div>
                     </header>
 
                     <div class="sc-messages"
                          id="supportMessages"
                          aria-live="polite">
-
                         <div class="sc-empty">
                             Chọn khách hàng ở bên trái
                             để xem tin nhắn.
                         </div>
                     </div>
 
+                    <!-- THANH CHINH SUA -->
+                    <div class="sc-edit-bar"
+                         id="supportEditBar"
+                         hidden>
+                        <div style="min-width:0">
+                            <div class="sc-edit-title">
+                                ✎ Đang chỉnh sửa tin nhắn
+                            </div>
+                            <div class="sc-edit-preview"
+                                 id="supportEditPreview"></div>
+                        </div>
+
+                        <button type="button"
+                                class="sc-edit-cancel"
+                                id="supportCancelEdit">
+                            Hủy
+                        </button>
+                    </div>
+
+                    <!-- NHAP TIN NHAN / LUU CHINH SUA -->
                     <form class="sc-compose"
                           id="supportReplyForm">
 
@@ -599,22 +672,59 @@
                                 disabled>
                             Gửi
                         </button>
-
                     </form>
 
                     <div class="sc-flash"
                          id="supportError"
-                         role="alert">
-                    </div>
+                         role="alert"></div>
 
                     <div class="sc-note">
                         Tin nhắn tự cập nhật khoảng 8 giây/lần.
                     </div>
-
                 </section>
             </div>
         </main>
     </div>
+</div>
+
+<!-- BANG XAC NHAN THU HOI -->
+<div class="sc-recall-overlay"
+     id="supportRecallOverlay"
+     hidden>
+
+    <section class="sc-recall-dialog"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="supportRecallTitle"
+             aria-describedby="supportRecallDescription">
+
+        <div class="sc-recall-icon"
+             aria-hidden="true">!</div>
+
+        <h2 id="supportRecallTitle">
+            Thu hồi tin nhắn?
+        </h2>
+
+        <p id="supportRecallDescription">
+            Tin nhắn sẽ hiển thị thành
+            “Tin nhắn đã được thu hồi”
+            cho cả khách hàng và quản trị viên.
+        </p>
+
+        <div class="sc-recall-actions">
+            <button type="button"
+                    class="sc-recall-cancel"
+                    id="supportRecallCancel">
+                Hủy bỏ
+            </button>
+
+            <button type="button"
+                    class="sc-recall-confirm"
+                    id="supportRecallConfirm">
+                Thu hồi
+            </button>
+        </div>
+    </section>
 </div>
 
 <script>
@@ -644,6 +754,23 @@
     const send = el('supportSend');
     const close = el('supportClose');
 
+    const editBar = el('supportEditBar');
+    const editPreview = el('supportEditPreview');
+    const cancelEditButton = el('supportCancelEdit');
+
+    const overlay = el('supportRecallOverlay');
+    const cancelRecallButton = el('supportRecallCancel');
+    const confirmRecallButton = el('supportRecallConfirm');
+
+    const normalPlaceholder = reply.placeholder;
+
+    let editingMessage = null;
+    let previousDraft = '';
+
+    let recallMessage = null;
+    let recallTicketId = null;
+    let recallTrigger = null;
+
     let conversations = [];
     let activeId = null;
     let adminId = null;
@@ -656,7 +783,7 @@
     let lastTicket = null;
     let activeMenu = null;
 
-    // DONG MENU
+    // DONG MENU BA CHAM
     function closeMenu() {
         if (!activeMenu) return;
 
@@ -671,7 +798,6 @@
         activeMenu = null;
     }
 
-    // MO MENU
     function toggleMenu(wrap, trigger, panel) {
         const wasOpen =
             activeMenu && activeMenu.panel === panel;
@@ -689,14 +815,10 @@
 
         wrap.classList.add('is-open');
 
-        activeMenu = {
-            wrap,
-            trigger,
-            panel
-        };
+        activeMenu = {wrap, trigger, panel};
     }
 
-    // BAM RA NGOAI
+    // BAM RA NGOAI DE DONG MENU
     document.addEventListener('pointerdown', e => {
         if (
             activeMenu &&
@@ -706,11 +828,9 @@
         }
     });
 
-    // ESC DONG MENU
     document.addEventListener('keydown', e => {
         if (e.key === 'Escape' && activeMenu) {
             const trigger = activeMenu.trigger;
-
             closeMenu();
             trigger.focus();
         }
@@ -723,9 +843,7 @@
     function make(tag, cls, value) {
         const node = document.createElement(tag);
 
-        if (cls) {
-            node.className = cls;
-        }
+        if (cls) node.className = cls;
 
         if (value !== undefined) {
             node.textContent = value;
@@ -734,6 +852,7 @@
         return node;
     }
 
+    // API
     async function api(url, options = {}) {
         const response = await fetch(url, {
             credentials: 'same-origin',
@@ -767,14 +886,12 @@
 
             if (response.status === 404) {
                 throw new Error(
-                    'Tin nhắn hoặc cuộc chat không tồn tại, ' +
-                    'hoặc bạn không có quyền.'
+                    'Tin nhắn hoặc cuộc chat không tồn tại, hoặc bạn không có quyền.'
                 );
             }
 
             throw new Error(
-                'Không kết nối được hệ thống chat. ' +
-                'Hãy kiểm tra SQL Server.'
+                'Không kết nối được hệ thống chat. Hãy kiểm tra SQL Server.'
             );
         }
 
@@ -787,7 +904,6 @@
         return response.json();
     }
 
-    // POST KEM CSRF
     function post(url, body) {
         const headers = {
             'Content-Type': 'application/json'
@@ -802,16 +918,194 @@
         });
     }
 
+    // CHINH SUA TRUC TIEP TAI O NHAP ADMIN
+    function beginEdit(message) {
+        if (busy || activeId == null) return;
+
+        if (!editingMessage) {
+            previousDraft = reply.value;
+        }
+
+        editingMessage = message;
+
+        editPreview.textContent =
+            message.content || '';
+
+        editBar.hidden = false;
+
+        reply.value = message.content || '';
+        reply.placeholder = 'Chỉnh sửa tin nhắn...';
+
+        send.textContent = 'Lưu';
+
+        error('');
+        reply.focus();
+
+        reply.setSelectionRange(
+            reply.value.length,
+            reply.value.length
+        );
+    }
+
+    function cancelEdit(restoreDraft = true) {
+        editingMessage = null;
+        editBar.hidden = true;
+        editPreview.textContent = '';
+
+        reply.placeholder = normalPlaceholder;
+        send.textContent = 'Gửi';
+
+        reply.value = restoreDraft
+            ? previousDraft
+            : '';
+
+        previousDraft = '';
+    }
+
+    cancelEditButton.addEventListener('click', () => {
+        cancelEdit();
+        reply.focus();
+    });
+
+    // MO BANG XAC NHAN THU HOI
+    function openRecall(message, trigger) {
+        if (busy || activeId == null) return;
+
+        recallMessage = message;
+        recallTicketId = activeId;
+        recallTrigger = trigger;
+
+        overlay.hidden = false;
+        cancelRecallButton.focus();
+    }
+
+    function closeRecall() {
+        if (busy) return;
+
+        overlay.hidden = true;
+
+        recallMessage = null;
+        recallTicketId = null;
+
+        if (
+            recallTrigger &&
+            recallTrigger.isConnected
+        ) {
+            recallTrigger.focus();
+        }
+
+        recallTrigger = null;
+    }
+
+    cancelRecallButton.addEventListener(
+        'click',
+        closeRecall
+    );
+
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay) {
+            closeRecall();
+        }
+    });
+
+    // ESC VA TAB TRONG BANG XAC NHAN
+    overlay.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            e.preventDefault();
+            closeRecall();
+        }
+
+        if (e.key !== 'Tab') return;
+
+        if (
+            e.shiftKey &&
+            document.activeElement === cancelRecallButton
+        ) {
+            e.preventDefault();
+            confirmRecallButton.focus();
+
+        } else if (
+            !e.shiftKey &&
+            document.activeElement === confirmRecallButton
+        ) {
+            e.preventDefault();
+            cancelRecallButton.focus();
+        }
+    });
+
+    // XAC NHAN THU HOI
+    confirmRecallButton.addEventListener('click', async () => {
+        if (
+            busy ||
+            !recallMessage ||
+            recallTicketId == null
+        ) {
+            return;
+        }
+
+        busy = true;
+
+        confirmRecallButton.disabled = true;
+        cancelRecallButton.disabled = true;
+
+        const message = recallMessage;
+        const ticketId = recallTicketId;
+
+        try {
+            const data = await post(
+                base +
+                '/' + encodeURIComponent(ticketId) +
+                '/messages/' +
+                encodeURIComponent(message.id) +
+                '/recall',
+                {}
+            );
+
+            overlay.hidden = true;
+
+            recallMessage = null;
+            recallTicketId = null;
+            recallTrigger = null;
+
+            if (
+                editingMessage &&
+                editingMessage.id === message.id
+            ) {
+                cancelEdit();
+            }
+
+            if (ticketId === activeId) {
+                lastSnapshot = '';
+                renderThread(data);
+            }
+
+            await loadList(true);
+            error('');
+
+        } catch (e) {
+            error(
+                e.message ||
+                'Không thể thu hồi tin nhắn.'
+            );
+
+            overlay.hidden = true;
+            recallMessage = null;
+            recallTicketId = null;
+            recallTrigger = null;
+
+        } finally {
+            busy = false;
+            confirmRecallButton.disabled = false;
+            cancelRecallButton.disabled = false;
+        }
+    });
+
     function statusClass(status) {
-        if (status === 'Đã đóng') {
-            return ' is-closed';
-        }
-
-        if (status === 'Đang xử lý') {
-            return ' is-active';
-        }
-
-        return '';
+        return status === 'Đã đóng'
+            ? ' is-closed'
+            : status === 'Đang xử lý'
+                ? ' is-active'
+                : '';
     }
 
     // HIEN THI DANH SACH HOI THOAI
@@ -828,7 +1122,9 @@
                 c.customerName,
                 c.customerEmail,
                 c.preview
-            ].join(' ').toLocaleLowerCase('vi-VN');
+            ]
+            .join(' ')
+            .toLocaleLowerCase('vi-VN');
 
             return (
                 (!status || c.status === status) &&
@@ -886,7 +1182,11 @@
             button.append(line);
 
             button.append(
-                make('small', '', c.customerEmail || '')
+                make(
+                    'small',
+                    '',
+                    c.customerEmail || ''
+                )
             );
 
             button.append(
@@ -898,11 +1198,23 @@
             );
 
             button.append(
-                make('small', '', c.lastAt || '')
+                make(
+                    'small',
+                    '',
+                    c.lastAt || ''
+                )
             );
 
             button.addEventListener('click', () => {
+                if (busy) return;
+
                 closeMenu();
+
+                if (editingMessage) {
+                    cancelEdit(false);
+                }
+
+                closeRecall();
 
                 activeId = c.id;
                 lastSnapshot = '';
@@ -932,20 +1244,19 @@
 
             renderList();
 
-            if (!silent) {
-                error('');
-            }
+            if (!silent) error('');
 
         } catch (e) {
             if (!silent) {
                 error(e.message);
             }
+
         } finally {
             listLoading = false;
         }
     }
 
-    // HIEN THI TIN NHAN
+    // HIEN THI NOI DUNG HOI THOAI
     function renderThread(data) {
         const c = data.conversation;
 
@@ -975,6 +1286,22 @@
         if (next === lastSnapshot) return;
 
         lastSnapshot = next;
+
+        // Kiem tra tin nhan dang sua con hop le
+        if (editingMessage) {
+            const latest = rows.find(
+                m => m.id === editingMessage.id
+            );
+
+            if (latest && latest.recalled) {
+                cancelEdit();
+
+                error(
+                    'Tin nhắn đang sửa đã được thu hồi.'
+                );
+            }
+        }
+
         closeMenu();
 
         const nearBottom =
@@ -1000,7 +1327,8 @@
 
             const row = make(
                 'div',
-                'sc-msg' + (own ? ' from-admin' : '')
+                'sc-msg' +
+                (own ? ' from-admin' : '')
             );
 
             row.append(
@@ -1013,25 +1341,24 @@
                 )
             );
 
-            // BUBBLE VA MENU CUNG HANG NGANG
+            // BUBBLE VA DAU BA CHAM CUNG HANG
             const messageLine = make(
                 'div',
                 'sc-message-line'
             );
 
-            const bubble = make(
-                'div',
-                'sc-bubble' +
-                (recalled ? ' is-recalled' : ''),
-                recalled
-                    ? 'Tin nhắn đã được thu hồi'
-                    : (m.content || '')
+            messageLine.append(
+                make(
+                    'div',
+                    'sc-bubble' +
+                    (recalled ? ' is-recalled' : ''),
+                    recalled
+                        ? 'Tin nhắn đã được thu hồi'
+                        : (m.content || '')
+                )
             );
 
-            messageLine.append(bubble);
-
-            // Chi tin nhan cua Admin dang dang nhap
-            // moi co dau ba cham.
+            // CHI ADMIN DA GUI TIN MOI CO BA CHAM
             if (
                 own &&
                 m.canManage &&
@@ -1053,11 +1380,6 @@
 
                 trigger.setAttribute(
                     'aria-label',
-                    'Tùy chọn tin nhắn'
-                );
-
-                trigger.setAttribute(
-                    'title',
                     'Tùy chọn tin nhắn'
                 );
 
@@ -1094,15 +1416,8 @@
                 edit.type = 'button';
                 recall.type = 'button';
 
-                edit.setAttribute(
-                    'role',
-                    'menuitem'
-                );
-
-                recall.setAttribute(
-                    'role',
-                    'menuitem'
-                );
+                edit.setAttribute('role', 'menuitem');
+                recall.setAttribute('role', 'menuitem');
 
                 trigger.addEventListener('click', e => {
                     e.stopPropagation();
@@ -1114,27 +1429,25 @@
                     );
                 });
 
+                // DUA TIN NHAN VAO O NHAP
                 edit.addEventListener('click', () => {
                     closeMenu();
-                    changeMessage(m, false);
+                    beginEdit(m);
                 });
 
+                // MO MODAL XAC NHAN THU HOI
                 recall.addEventListener('click', () => {
                     closeMenu();
-                    changeMessage(m, true);
+                    openRecall(m, trigger);
                 });
 
                 menu.append(edit, recall);
                 wrap.append(trigger, menu);
-
-                // QUAN TRONG:
-                // Gan ba cham vao canh bong bong tin nhan.
                 messageLine.append(wrap);
             }
 
             row.append(messageLine);
 
-            // Thoi gian van o ben duoi
             row.append(
                 make(
                     'small',
@@ -1155,79 +1468,18 @@
             nearBottom ||
             !messages.dataset.loaded
         ) {
-            messages.scrollTop =
-                messages.scrollHeight;
+            messages.scrollTop = messages.scrollHeight;
         }
 
         messages.dataset.loaded = 'true';
     }
 
-    // CHINH SUA VA THU HOI
-    async function changeMessage(message, recall) {
-        if (busy || activeId == null) return;
-
-        let content = '';
-
-        if (recall) {
-            if (!window.confirm(
-                'Bạn muốn thu hồi tin nhắn này?'
-            )) {
-                return;
-            }
-        } else {
-            const changed = window.prompt(
-                'Chỉnh sửa tin nhắn:',
-                message.content || ''
-            );
-
-            if (changed === null) return;
-
-            content = changed.trim();
-
-            if (!content || content.length > 1000) {
-                error(
-                    'Tin nhắn phải có từ 1 đến 1000 ký tự.'
-                );
-                return;
-            }
-        }
-
-        busy = true;
-        const requestedId = activeId;
-
-        try {
-            const data = await post(
-                base +
-                '/' + encodeURIComponent(requestedId) +
-                '/messages/' +
-                encodeURIComponent(message.id) +
-                (recall ? '/recall' : '/edit'),
-                recall ? {} : {content}
-            );
-
-            if (requestedId === activeId) {
-                lastSnapshot = '';
-                renderThread(data);
-            }
-
-            await loadList(true);
-            error('');
-
-        } catch (e) {
-            error(
-                e.message ||
-                'Không thể thay đổi tin nhắn.'
-            );
-        } finally {
-            busy = false;
-        }
-    }
-
-    // TAI LICH SU CHAT
+    // TAI TIN NHAN
     async function loadThread(silent = false) {
         if (
             threadLoading ||
             busy ||
+            !overlay.hidden ||
             activeId == null
         ) {
             return;
@@ -1248,14 +1500,11 @@
                 renderThread(data);
             }
 
-            if (!silent) {
-                error('');
-            }
+            if (!silent) error('');
 
         } catch (e) {
-            if (!silent) {
-                error(e.message);
-            }
+            if (!silent) error(e.message);
+
         } finally {
             threadLoading = false;
 
@@ -1268,7 +1517,7 @@
         }
     }
 
-    // GUI TIN NHAN ADMIN
+    // GUI TIN NHAN HOAC LUU CHINH SUA ADMIN
     el('supportReplyForm').addEventListener(
         'submit',
         async e => {
@@ -1291,15 +1540,29 @@
             try {
                 const requestedId = activeId;
 
-                const data = await post(
-                    base +
-                    '/' +
-                    encodeURIComponent(requestedId) +
-                    '/reply',
-                    {content}
-                );
+                const editedId = editingMessage
+                    ? editingMessage.id
+                    : null;
 
-                reply.value = '';
+                // Co ID dang sua -> API edit
+                // Khong co -> API reply
+                const url = editedId !== null
+                    ? base +
+                      '/' + encodeURIComponent(requestedId) +
+                      '/messages/' +
+                      encodeURIComponent(editedId) +
+                      '/edit'
+                    : base +
+                      '/' + encodeURIComponent(requestedId) +
+                      '/reply';
+
+                const data = await post(url, {content});
+
+                if (editedId !== null) {
+                    cancelEdit();
+                } else {
+                    reply.value = '';
+                }
 
                 if (requestedId === activeId) {
                     lastSnapshot = '';
@@ -1320,7 +1583,7 @@
         }
     );
 
-    // DONG CUOC TRO CHUYEN
+    // DONG HOI THOAI (GIU CHUC NANG CU)
     close.addEventListener('click', async () => {
         if (
             busy ||
@@ -1340,8 +1603,7 @@
 
             const data = await post(
                 base +
-                '/' +
-                encodeURIComponent(requestedId) +
+                '/' + encodeURIComponent(requestedId) +
                 '/close',
                 {}
             );
@@ -1388,11 +1650,12 @@
             !e.isComposing
         ) {
             e.preventDefault();
+
             el('supportReplyForm').requestSubmit();
         }
     });
 
-    // LAY ID ADMIN
+    // LAY ID ADMIN DANG DANG NHAP
     api(
         base.replace(/\/conversations$/, '/me')
     )
@@ -1400,11 +1663,9 @@
         adminId = me.id;
         loadList();
     })
-    .catch(e => {
-        error(e.message);
-    });
+    .catch(e => error(e.message));
 
-    // TU DONG CAP NHAT CHAT
+    // TU DONG TAI CHAT MOI 8 GIAY
     setInterval(() => {
         if (!document.hidden && !busy) {
             loadList(true);
@@ -1414,5 +1675,6 @@
 
 })();
 </script>
+
 </body>
 </html>
