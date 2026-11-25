@@ -1,5 +1,7 @@
 package com.fitfood.controller;
-
+import java.util.Map;
+import java.util.LinkedHashMap;
+import org.springframework.jdbc.core.RowMapper;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -89,6 +91,12 @@ public class OrderController {
                    COALESCE(d.receiver_phone, cp.phone) AS phone,
                    COALESCE(d.delivery_address, cp.address) AS address,
                    o.status, o.total,
+                   COALESCE((
+                       SELECT TOP 1 pm.status
+                       FROM dbo.fitfood_payments pm
+                       WHERE pm.order_id = o.id
+                       ORDER BY pm.id DESC
+                   ), N'Chưa thanh toán') AS payment_status,
                    COUNT(oi.id) AS item_count
             FROM dbo.fitfood_orders AS o
             JOIN dbo.fitfood_users AS u ON u.id = o.user_id
@@ -144,6 +152,7 @@ public class OrderController {
                     rs.getString("phone"),
                     rs.getString("address"),
                     rs.getString("status"),
+                    rs.getString("payment_status"),
                     rs.getBigDecimal("total"),
                     rs.getInt("item_count"));
         }, parameters.toArray());
@@ -161,6 +170,85 @@ public class OrderController {
      * Cập nhật trạng thái của 1 đơn hàng (id lấy từ URL), rồi quay lại trang danh sách,
      * vẫn giữ nguyên bộ lọc/từ khóa đang xem (keyword, filter) để không bị mất vị trí tìm kiếm.
      */
+ 
+@GetMapping("/{id}")
+public String detail(@PathVariable long id, Model model) {
+
+    String sql = """
+        SELECT o.id, o.placed_at, u.full_name, u.email,
+               COALESCE(d.receiver_phone, cp.phone) AS phone,
+               COALESCE(d.delivery_address, cp.address) AS address,
+               o.status, o.note,
+               o.subtotal, o.discount, o.delivery_fee, o.total,
+               p.code AS promotion_code,
+               COALESCE((
+                   SELECT TOP 1 pm.status
+                   FROM dbo.fitfood_payments pm
+                   WHERE pm.order_id = o.id
+                   ORDER BY pm.id DESC
+               ), N'Chưa thanh toán') AS payment_status
+        FROM dbo.fitfood_orders o
+        JOIN dbo.fitfood_users u ON u.id = o.user_id
+        LEFT JOIN dbo.fitfood_deliveries d ON d.order_id = o.id
+        LEFT JOIN dbo.fitfood_customer_profiles cp ON cp.user_id = u.id
+        LEFT JOIN dbo.fitfood_promotions p ON p.id = o.promotion_id
+        WHERE o.id = ?
+        """;
+
+    RowMapper<Map<String, Object>> mapper = (rs, row) -> {
+        Map<String, Object> m = new LinkedHashMap<>();
+
+        Timestamp ts = rs.getTimestamp("placed_at");
+
+        m.put("id", rs.getLong("id"));
+        m.put("placedAt", ts == null ? null : ts.toLocalDateTime());
+        m.put("customerName", rs.getString("full_name"));
+        m.put("email", rs.getString("email"));
+        m.put("phone", rs.getString("phone"));
+        m.put("address", rs.getString("address"));
+        m.put("status", rs.getString("status"));
+        m.put("paymentStatus", rs.getString("payment_status"));
+        m.put("note", rs.getString("note") == null ? "" : rs.getString("note"));
+        m.put("subtotal", rs.getBigDecimal("subtotal"));
+        m.put("discount", rs.getBigDecimal("discount"));
+        m.put("deliveryFee", rs.getBigDecimal("delivery_fee"));
+        m.put("total", rs.getBigDecimal("total"));
+        m.put("promotionCode", rs.getString("promotion_code") == null
+                ? "Không áp dụng" : rs.getString("promotion_code"));
+
+        return m;
+    };
+
+    List<Map<String, Object>> orders =
+            jdbc.query(sql, mapper, id);
+
+    if (orders.isEmpty()) {
+        return "redirect:/admin/orders";
+    }
+
+    List<Map<String, Object>> items = jdbc.query("""
+        SELECT product_name, quantity, unit_price, line_total
+        FROM dbo.fitfood_order_items
+        WHERE order_id = ?
+        ORDER BY id
+        """, (rs, row) -> {
+
+        Map<String, Object> item = new LinkedHashMap<>();
+
+        item.put("productName", rs.getString("product_name"));
+        item.put("quantity", rs.getInt("quantity"));
+        item.put("unitPrice", rs.getBigDecimal("unit_price"));
+        item.put("lineTotal", rs.getBigDecimal("line_total"));
+
+        return item;
+
+    }, id);
+
+    model.addAttribute("invoice", orders.get(0));
+    model.addAttribute("items", items);
+
+    return "admin-invoice-detail";
+}
     @PostMapping("/{id}/status")
     @Transactional
     public String updateStatus(@PathVariable long id,
@@ -321,8 +409,19 @@ public class OrderController {
      * equals/hashCode/toString, không cần viết tay. Thymeleaf hiểu ${order.id}, ${order.placedAt}
      * và tự gọi đúng accessor tương ứng, nên template HTML không cần thay đổi gì.
      */
-    public record OrderRow(long id, LocalDateTime placedAt, String customerName,
-                           String email, String phone, String address,
-                           String status, BigDecimal total, int itemCount) {
-    }
+    public record OrderRow(
+        long id,
+        LocalDateTime placedAt,
+        String customerName,
+        String email,
+        String phone,
+        String address,
+        String status,
+        String paymentStatus,
+        BigDecimal total,
+        int itemCount) {
+}
+
+
+
 }
