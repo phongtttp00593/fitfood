@@ -567,10 +567,10 @@ BEGIN TRY
        (N'Salad', N'Salad ức gà', N'Rau xanh, cà chua, dưa chuột và ức gà', 60000.00, N'/images/chicken-salad.jpg'),
        (N'Salad', N'Salad cá ngừ', N'Cá ngừ với rau xanh và sốt', 65000.00, N'/images/green-bowl.jpg'),
        (N'Salad', N'Salad tôm', N'Tôm tươi với rau củ', 70000.00, N'/images/seafood-bowl.jpg'),
-       (N'Đồ uống', N'Sinh tố bơ', N'Sinh tố bơ nguyên chất', 40000.00, NULL),
-       (N'Đồ uống', N'Sinh tố xoài', N'Sinh tố xoài tươi', 40000.00, NULL),
-       (N'Đồ uống', N'Nước ép cam', N'Nước ép cam tươi', 35000.00, NULL),
-       (N'Đồ uống', N'Nước ép dứa', N'Nước ép dứa tươi', 35000.00, NULL)
+       (N'Đồ uống', N'Sinh tố bơ', N'Sinh tố bơ nguyên chất', 40000.00, N'/images/avocado-smoothie.jpg'),
+       (N'Đồ uống', N'Sinh tố xoài', N'Sinh tố xoài tươi', 40000.00, N'/images/mango-smoothie.jpg'),
+       (N'Đồ uống', N'Nước ép cam', N'Nước ép cam tươi', 35000.00, N'/images/orange-juice.jpg'),
+       (N'Đồ uống', N'Nước ép dứa', N'Nước ép dứa tươi', 35000.00, N'/images/pineapple-juice.jpg')
     ) AS s(category_name, product_name, detail, price, image_url)
     JOIN dbo.fitfood_categories AS c ON c.[name] = s.category_name;
 
