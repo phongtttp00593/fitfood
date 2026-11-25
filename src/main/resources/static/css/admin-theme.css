@@ -236,3 +236,11 @@ body.admin-body .fit-admin-logout button:active { transform:translateY(0); }
 body.admin-body .reports-topbar { display:flex; align-items:center; justify-content:space-between; gap:18px; padding:0 28px; }
 body.admin-body .reports-topbar-right { display:flex; align-items:center; gap:14px; }
 @media(max-width:760px){ body.admin-body .adm-top{padding:0 14px;gap:10px;} body.admin-body .fit-admin-top-label{display:none;} body.admin-body .fit-admin-logout button{min-height:38px;padding:0 12px;} body.admin-body .fit-admin-logout button span{display:inline;} body.admin-body .reports-topbar{padding:0 14px;} }
+
+/* Ô tìm kiếm nằm trong khung có viền riêng (.order-search): input bên trong không vẽ thêm viền/nền */
+body.admin-body .order-search input[type="search"],
+body.admin-body .order-search input[type="search"]:focus {
+  border: none; background: transparent; border-radius: 0; box-shadow: none; outline: none;
+}
+body.admin-body .order-search { border-color: var(--line-strong); background: var(--surface); border-radius: 12px; }
+body.admin-body .order-search:focus-within { border-color: var(--gold); box-shadow: 0 0 0 4px var(--gold-50); }
