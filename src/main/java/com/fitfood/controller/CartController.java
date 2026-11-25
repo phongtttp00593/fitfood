@@ -1,5 +1,5 @@
 package com.fitfood.controller;
-
+import org.springframework.web.bind.annotation.RequestParam;
 import com.fitfood.auth.model.AppUser;
 import com.fitfood.auth.repository.AppUserRepository;
 import com.fitfood.auth.repository.CartItemRepository;
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -88,7 +87,30 @@ public class CartController {
     }
 
     @GetMapping
-    public String viewCart(@AuthenticationPrincipal UserDetails userDetails, Model model) {
+public String viewCart(
+        @AuthenticationPrincipal UserDetails userDetails,
+        @RequestParam(defaultValue = "0") String recheckout,
+        Model model) {
+
+    if ("1".equals(recheckout)) {
+        return "redirect:/cart/checkout?paymentError=1";
+    }
+
+    return loadCartPage(userDetails, model, false);
+}
+
+@GetMapping("/checkout")
+public String viewCheckout(
+        @AuthenticationPrincipal UserDetails userDetails,
+        Model model) {
+
+    return loadCartPage(userDetails, model, true);
+}
+
+private String loadCartPage(
+        UserDetails userDetails,
+        Model model,
+        boolean checkoutPage) {
         if (userDetails == null) {
             return "redirect:/dang-nhap";
         }
@@ -166,7 +188,16 @@ public class CartController {
         model.addAttribute("customerPhone", defaultPhone);
         model.addAttribute("customerAddress", defaultAddress);
 
-        return "v2/cart";
+        if (checkoutPage && (cart == null
+        || cart.getItems() == null
+        || cart.getItems().isEmpty())) {
+
+    return "redirect:/cart";
+}
+
+model.addAttribute("checkoutPage", checkoutPage);
+
+return "v2/cart";
     }
 
     @PostMapping("/add")
@@ -233,63 +264,6 @@ public class CartController {
             }
             redirectAttributes.addFlashAttribute("successMessage", "Thêm món vào giỏ hàng thành công!");
         }
-        return "redirect:/cart";
-    }
-
-    @PostMapping("/add-meal-plan")
-    @Transactional
-    public String addMealPlanToCart(@AuthenticationPrincipal UserDetails userDetails,
-                                    @RequestParam("mealPlanId") Long mealPlanId,
-                                    RedirectAttributes redirectAttributes) {
-        if (userDetails == null) return "redirect:/dang-nhap";
-        AppUser user = appUserRepository.findByEmailIgnoreCase(userDetails.getUsername()).orElse(null);
-        if (user == null) return "redirect:/dang-nhap";
-
-        var plans = jdbc.query("SELECT id, name, price FROM dbo.fitfood_meal_plans WHERE id = ? AND active = 1",
-                (rs, rowNum) -> new Object[]{rs.getLong("id"), rs.getString("name"), rs.getBigDecimal("price")}, mealPlanId);
-        if (plans.isEmpty()) {
-            redirectAttributes.addFlashAttribute("mealPlanError", "Gói ăn không còn mở bán.");
-            return "redirect:/menu#goi-an";
-        }
-        Object[] plan = plans.get(0);
-        String planName = (String) plan[1];
-        BigDecimal planPrice = (BigDecimal) plan[2];
-        var dishes = jdbc.query("""
-                SELECT p.id AS product_id, mpi.quantity
-                FROM dbo.fitfood_meal_plan_items mpi
-                JOIN dbo.fitfood_products p ON p.id = mpi.product_id
-                WHERE mpi.meal_plan_id = ? AND p.active = 1
-                ORDER BY p.id
-                """, (rs, rowNum) -> new long[]{rs.getLong("product_id"), rs.getInt("quantity")}, mealPlanId);
-        if (dishes.isEmpty()) {
-            redirectAttributes.addFlashAttribute("mealPlanError", "Gói ăn chưa có món. Vui lòng liên hệ Admin cập nhật thực đơn.");
-            return "redirect:/menu#goi-an";
-        }
-        Cart cart = cartRepository.findByUserId(user.getId()).orElseGet(() -> {
-            Cart created = new Cart(); created.setUser(user); return cartRepository.save(created);
-        });
-        Product representativeProduct = productRepository.findById(dishes.get(0)[0]).orElse(null);
-        if (representativeProduct == null) {
-            redirectAttributes.addFlashAttribute("mealPlanError", "Không tìm thấy món tham chiếu của gói ăn.");
-            return "redirect:/menu#goi-an";
-        }
-        Optional<CartItem> existingPlanItem = cartItemRepository
-                .findFirstByCartIdAndMealPlanNameOrderByIdAsc(cart.getId(), planName);
-        if (existingPlanItem.isPresent()) {
-            CartItem packageItem = existingPlanItem.get();
-            packageItem.setQuantity(packageItem.getQuantity() + 1);
-            packageItem.setUnitPrice(planPrice);
-            cartItemRepository.save(packageItem);
-        } else {
-            CartItem packageItem = new CartItem();
-            packageItem.setCart(cart);
-            packageItem.setProduct(representativeProduct);
-            packageItem.setQuantity(1);
-            packageItem.setUnitPrice(planPrice);
-            packageItem.setMealPlanName(planName);
-            cartItemRepository.save(packageItem);
-        }
-        redirectAttributes.addFlashAttribute("successMessage", "Đã thêm gói “" + planName + "” vào giỏ hàng.");
         return "redirect:/cart";
     }
 
