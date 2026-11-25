@@ -30,7 +30,7 @@ public class StatisticsController {
 
     @GetMapping("/reports")
     public String reports(
-            @RequestParam(defaultValue = "month") String period,
+            @RequestParam(defaultValue = "range") String period,
             @RequestParam(required = false) String date,
             @RequestParam(required = false) String month,
             @RequestParam(required = false) String year,
@@ -138,30 +138,41 @@ public class StatisticsController {
                 Integer.class, startTime, endTime);
 
         // 2. Tổng doanh thu, loại trừ đơn đã hủy
-        BigDecimal totalRevenue = jdbcTemplate.queryForObject(
-                """
-                SELECT COALESCE(SUM(total), 0)
-                FROM dbo.fitfood_orders
-                WHERE placed_at >= ? AND placed_at < ?
-                  AND LOWER(LTRIM(RTRIM(COALESCE([status], ''))))
-                      NOT IN (N'đã hủy', N'đã huỷ',
-                              N'cancelled', N'canceled')
-                """,
-                BigDecimal.class, startTime, endTime);
+        // 2. Tổng doanh thu của các đơn đã thanh toán
+BigDecimal totalRevenue = jdbcTemplate.queryForObject(
+        """
+        SELECT COALESCE(SUM(o.total), 0)
+        FROM dbo.fitfood_orders o
+        WHERE o.placed_at >= ?
+          AND o.placed_at < ?
+          AND o.status <> N'Đã hủy'
+          AND EXISTS (
+              SELECT 1
+              FROM dbo.fitfood_payments p
+              WHERE p.order_id = o.id
+                AND p.status = N'Đã thanh toán'
+          )
+        """,
+        BigDecimal.class, startTime, endTime);
 
-        // 3. Tổng số lượng sản phẩm đã bán
-        Integer totalProductsSold = jdbcTemplate.queryForObject(
-                """
-                SELECT COALESCE(SUM(oi.quantity), 0)
-                FROM dbo.fitfood_order_items oi
-                INNER JOIN dbo.fitfood_orders o
-                    ON o.id = oi.order_id
-                WHERE o.placed_at >= ? AND o.placed_at < ?
-                  AND LOWER(LTRIM(RTRIM(COALESCE(o.[status], ''))))
-                      NOT IN (N'đã hủy', N'đã huỷ',
-                              N'cancelled', N'canceled')
-                """,
-                Integer.class, startTime, endTime);
+       // 3. Tổng số lượng sản phẩm đã bán
+Integer totalProductsSold = jdbcTemplate.queryForObject(
+        """
+        SELECT COALESCE(SUM(oi.quantity), 0)
+        FROM dbo.fitfood_order_items oi
+        INNER JOIN dbo.fitfood_orders o
+            ON o.id = oi.order_id
+        WHERE o.placed_at >= ?
+          AND o.placed_at < ?
+          AND o.status <> N'Đã hủy'
+          AND EXISTS (
+              SELECT 1
+              FROM dbo.fitfood_payments p
+              WHERE p.order_id = o.id
+                AND p.status = N'Đã thanh toán'
+          )
+        """,
+        Integer.class, startTime, endTime);
 
         // 4. Số khách hàng đã đặt hàng
         Integer totalCustomers = jdbcTemplate.queryForObject(
@@ -217,24 +228,26 @@ public class StatisticsController {
 
         // 6. Doanh thu theo từng ngày để hiển thị biểu đồ
         List<Map<String, Object>> rawRevenue =
-                jdbcTemplate.queryForList(
-                """
-                SELECT
-                    CONVERT(varchar(10), CAST(placed_at AS date), 103)
-                        AS reportDate,
-                    COALESCE(SUM(CASE
-                        WHEN LOWER(LTRIM(RTRIM(
-                            COALESCE([status], '')))) IN
-                            (N'đã hủy', N'đã huỷ',
-                             N'cancelled', N'canceled')
-                        THEN 0 ELSE total
-                    END), 0) AS revenue
-                FROM dbo.fitfood_orders
-                WHERE placed_at >= ? AND placed_at < ?
-                GROUP BY CAST(placed_at AS date)
-                ORDER BY CAST(placed_at AS date)
-                """,
-                startTime, endTime);
+        jdbcTemplate.queryForList(
+        """
+        SELECT
+            CONVERT(varchar(10),
+                CAST(o.placed_at AS date), 103) AS reportDate,
+            COALESCE(SUM(o.total), 0) AS revenue
+        FROM dbo.fitfood_orders o
+        WHERE o.placed_at >= ?
+          AND o.placed_at < ?
+          AND o.status <> N'Đã hủy'
+          AND EXISTS (
+              SELECT 1
+              FROM dbo.fitfood_payments p
+              WHERE p.order_id = o.id
+                AND p.status = N'Đã thanh toán'
+          )
+        GROUP BY CAST(o.placed_at AS date)
+        ORDER BY CAST(o.placed_at AS date)
+        """,
+        startTime, endTime);
 
         BigDecimal maxRevenue = BigDecimal.ZERO;
 
