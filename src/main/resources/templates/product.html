@@ -1,534 +1,672 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="FITFOOD — Ăn ngon, sống khỏe">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="FITFOOD — Ăn ngon, sống khỏe">
 
-    <title th:text="${product.name} + ' | FITFOOD'">
-        Chi tiết sản phẩm | FITFOOD
-    </title>
+        <title th:text="${product.name} + ' | FITFOOD'">
+            Chi tiết sản phẩm | FITFOOD
+        </title>
 
-    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
-    <link rel="stylesheet" th:href="@{/css/fitfood-auth.css}">
-    <link rel="stylesheet" th:href="@{/css/fitfood-account.css}">
-    <link rel="stylesheet" th:href="@{/css/site-theme.css}">
-    <link rel="stylesheet" th:href="@{/css/support-chat.css}">
+        <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}">
+        <link rel="stylesheet" th:href="@{/css/fitfood-auth.css}">
+        <link rel="stylesheet" th:href="@{/css/fitfood-account.css}">
+        <link rel="stylesheet" th:href="@{/css/site-theme.css}">
+        <link rel="stylesheet" th:href="@{/css/support-chat.css}">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+              rel="stylesheet">
 
-    <style>
-        .product-message {
-            margin: 16px 0;
-            padding: 12px 16px;
-            border-radius: 8px;
-            background: #e9f8ed;
-            color: #166534;
-        }
+        <style>
+            .product-message {
+                margin: 16px 0;
+                padding: 12px 16px;
+                border-radius: 8px;
+                background: #e9f8ed;
+                color: #166534;
+            }
 
-        .product-error {
-            background: #fef2f2;
-            color: #991b1b;
-        }
+            .product-error {
+                background: #fef2f2;
+                color: #991b1b;
+            }
 
-        .cart-submit-form {
-            flex: 1;
-            min-width: 0;
-        }
+            .cart-submit-form {
+                flex: 1;
+                min-width: 0;
+            }
 
-        .cart-submit-form .fill-btn {
-            width: 100%;
-        }
+            .cart-submit-form .fill-btn {
+                width: 100%;
+            }
 
-        #quantityInput {
-            width: 60px;
-            padding: 9px 4px;
-            border: 0;
-            text-align: center;
-            font-weight: bold;
-            outline: none;
-            background: white;
-        }
+            #quantityInput {
+                width: 60px;
+                padding: 9px 4px;
+                border: 0;
+                text-align: center;
+                font-weight: bold;
+                outline: none;
+                background: white;
+            }
 
-        .quantity-row button:disabled {
-            opacity: .5;
-            cursor: not-allowed;
-        }
+            .quantity-row button:disabled {
+                opacity: .5;
+                cursor: not-allowed;
+            }
 
-        .btn-out-of-stock {
-            width: 100%;
-            padding: 12px 20px;
-            background: #e2e8f0;
-            color: #64748b;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 14px;
-            cursor: not-allowed;
-            text-align: center;
-        }
-    </style>
-</head>
+            .btn-out-of-stock {
+                width: 100%;
+                padding: 12px 20px;
+                background: #e2e8f0;
+                color: #64748b;
+                border: none;
+                border-radius: 8px;
+                font-weight: 700;
+                font-size: 14px;
+                cursor: not-allowed;
+                text-align: center;
+            }
+        </style>
 
-<body>
 
-<header class="site-header">
-    <div class="nav-inner">
-        <a href="/" class="site-brand">
-            <img th:src="@{/images/leaf.svg}" alt="">
-            <span>FITFOOD</span>
-        </a>
+        <style>
 
-        <nav class="nav-menu" aria-label="Menu chính">
-            <a href="/">Trang chủ</a>
-            <a href="/menu" class="nav-active">Thực đơn</a>
-            <a href="/#about">Về chúng tôi</a>
-            <a href="/#features">Ưu đãi</a>
-            <a href="/#footer">Liên hệ</a>
-        </nav>
+            .detail-grid {
+                align-items: start;
+            }
 
-        <div class="nav-search">
-            <span>Tìm kiếm món ăn...</span>
-            <kbd>⌘ K</kbd>
-        </div>
+            .detail-gallery {
+                min-width: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 22px;
+            }
 
-        <div class="nav-right">
-            <a class="icon-only" th:href="@{/cart}" aria-label="Giỏ hàng">🛒</a>
+            .detail-gallery .big-photo {
+                margin-bottom: 0;
+            }
 
-            <a class="login-pill"
-               th:if="${accountInfo == null}"
-               th:href="@{/dang-nhap}">
-                Đăng nhập →
-            </a>
+            .food-description-card {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 24px;
+                background: #fffdf8;
+                border: 1px solid #e6dece;
+                border-radius: 18px;
+                box-shadow: 0 5px 18px rgba(0, 0, 0, 0.04);
+            }
 
-            <details class="fit-account-dropdown"
-                     th:if="${accountInfo != null}">
-                <summary class="fit-account-toggle">
-                    <span class="fit-account-avatar"
-                          th:text="${accountInfo.initials}">P</span>
+            .food-description-header {
+                display: flex;
+                align-items: center;
+                gap: 13px;
+                padding-bottom: 18px;
+                border-bottom: 1px solid #ece6da;
+            }
 
-                    <span class="fit-account-name"
-                          th:text="${accountInfo.fullName}">Họ tên</span>
+            .food-description-icon {
+                width: 46px;
+                height: 46px;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: #e7f2e8;
+                color: #2f6948;
+                border-radius: 12px;
+            }
 
-                    <span aria-hidden="true">⌄</span>
-                </summary>
+            .food-description-header h3 {
+                margin: 0 0 5px;
+                color: #2f6948;
+                font-size: 19px;
+                font-weight: 750;
+            }
 
-                <div class="fit-account-popup">
-                    <div class="fit-popup-identity">
-                        <strong th:text="${accountInfo.fullName}">Họ tên</strong>
-                        <small th:text="${accountInfo.email}">Email</small>
-                    </div>
+            .food-description-header span {
+                font-size: 12px;
+                color: #918578;
+            }
 
-                    <a th:href="@{/tai-khoan}">👤 Thông tin tài khoản</a>
+            .food-description-content {
+                padding: 18px 0;
+            }
 
-                    <a th:if="${isAdmin}" th:href="@{/admin}">
-                        ⚙ Trang quản trị
+            .food-description-content p {
+                margin: 0;
+                color: #51483f;
+                font-size: 14px;
+                line-height: 1.9;
+                white-space: pre-wrap;
+                overflow-wrap: anywhere;
+            }
+
+            .food-description-tags {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .food-description-tags span {
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 8px 12px;
+                background: #edf5e9;
+                border: 1px solid #dce9d7;
+                border-radius: 30px;
+                color: #38734a;
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+            @media (max-width: 768px) {
+
+                .detail-gallery {
+                    gap: 16px;
+                }
+
+                .food-description-card {
+                    padding: 18px;
+                    border-radius: 14px;
+                }
+
+                .food-description-header h3 {
+                    font-size: 17px;
+                }
+
+                .food-description-content p {
+                    font-size: 13px;
+                }
+
+            }
+
+        </style>
+
+    </head>
+
+    <body>
+
+        <header class="site-header">
+            <div class="nav-inner">
+                <a href="/" class="site-brand">
+                    <img th:src="@{/images/leaf.svg}" alt="">
+                    <span>FITFOOD</span>
+                </a>
+
+                <nav class="nav-menu" aria-label="Menu chính">
+                    <a href="/">Trang chủ</a>
+                    <a href="/menu" class="nav-active">Thực đơn</a>
+                    <a href="/#about">Về chúng tôi</a>
+                    <a href="/#features">Ưu đãi</a>
+                    <a href="/#footer">Liên hệ</a>
+                </nav>
+
+                <div class="nav-search">
+                    <span>Tìm kiếm món ăn...</span>
+                    <kbd>⌘ K</kbd>
+                </div>
+
+                <div class="nav-right">
+                    <a class="icon-only" th:href="@{/cart}" aria-label="Giỏ hàng">🛒</a>
+
+                    <a class="login-pill"
+                       th:if="${accountInfo == null}"
+                       th:href="@{/dang-nhap}">
+                        Đăng nhập →
                     </a>
 
-                    
-                </div>
-            </details>
-        </div>
-    </div>
-</header>
+                    <details class="fit-account-dropdown"
+                             th:if="${accountInfo != null}">
+                        <summary class="fit-account-toggle">
+                            <span class="fit-account-avatar"
+                                  th:text="${accountInfo.initials}">P</span>
 
-<main class="page-wrap detail-page">
+                            <span class="fit-account-name"
+                                  th:text="${accountInfo.fullName}">Họ tên</span>
 
-    <div class="bread">
-        <a href="/">Trang chủ</a> /
-        <a href="/menu">Thực đơn</a> /
-        <strong th:text="${product.name}">Tên món</strong>
-    </div>
+                            <span aria-hidden="true">⌄</span>
+                        </summary>
 
-    <!-- Thông báo từ CartController -->
-    <div th:if="${cartMessage != null}"
-         class="product-message"
-         role="status"
-         th:text="${cartMessage}">
-        Thông báo
-    </div>
+                        <div class="fit-account-popup">
+                            <div class="fit-popup-identity">
+                                <strong th:text="${accountInfo.fullName}">Họ tên</strong>
+                                <small th:text="${accountInfo.email}">Email</small>
+                            </div>
 
-    <div class="detail-grid">
+                            <a th:href="@{/tai-khoan}">👤 Thông tin tài khoản</a>
 
-        <!-- HÌNH ẢNH -->
-        <div class="detail-gallery">
-            <div class="big-photo">
-                <img th:src="${product.imageUrl != null
-                              and !#strings.isEmpty(product.imageUrl)
-                              ? product.imageUrl : '/images/hero-bowl.jpg'}"
-                     th:alt="${product.name}"
-                     onerror="this.onerror=null;this.src='/images/hero-bowl.jpg'">
+                            <a th:if="${isAdmin}" th:href="@{/admin}">
+                                ⚙ Trang quản trị
+                            </a>
 
-                <div class="photo-side-label">FRESH FOOD ✦</div>
-            </div>
 
-            <div class="thumbs">
-                <img th:src="${product.imageUrl != null
-                              and !#strings.isEmpty(product.imageUrl)
-                              ? product.imageUrl : '/images/hero-bowl.jpg'}"
-                     th:alt="${product.name}">
-            </div>
-        </div>
-
-        <!-- THÔNG TIN SẢN PHẨM -->
-        <div class="detail-info">
-            <div class="detail-label">
-                FITFOOD · MÓN ĂN ĐƯỢC YÊU THÍCH
-            </div>
-
-            <h1 th:text="${product.name}">Tên món</h1>
-
-            <div class="review-line">
-                <span th:text="${product.categoryName}">Danh mục</span>
-            </div>
-
-            <div class="detail-price"
-                 id="displayBasePrice"
-                 th:text="${product.priceLabel}">
-                0đ
-            </div>
-
-            <p class="detail-description"
-               th:text="${product.description}">
-                Mô tả món ăn
-            </p>
-
-            <div class="nutrition-chips">
-                <span>🌿 Rau tươi</span>
-                <span>✓ Giàu protein</span>
-                <span>♡ Cân bằng</span>
-            </div>
-
-            <div class="detail-divider"></div>
-
-            <!-- KHU VỰC BIẾN THỂ (Chỉ hiện khi còn hàng) -->
-            <div id="dynamicVariantsContainer"
-                 th:if="${product.stock != null and product.stock > 0}"
-                 style="background:#f8fafc;
-                        border:1px solid #e2e8f0;
-                        border-radius:12px;
-                        padding:15px;
-                        margin-bottom:20px;">
-
-                <h4 style="margin:0 0 12px;color:#14532d;font-size:16px;">
-                    ⚙️ Tùy chọn khẩu phần &amp; Biến thể
-                </h4>
-
-                <div id="userVariantBody">
-                    <p>Đang tải tùy chọn món ăn...</p>
+                        </div>
+                    </details>
                 </div>
             </div>
+        </header>
 
-            <!-- GHI CHÚ (Chỉ hiện khi còn hàng) -->
-            <div th:if="${product.stock != null and product.stock > 0}" style="margin-bottom:15px;">
-                <label for="userFoodNote">Ghi chú cho bếp</label>
+        <main class="page-wrap detail-page">
 
-                <input type="text"
-                       id="userFoodNote"
-                       name="foodNote"
-                       maxlength="500"
-                       placeholder="Ví dụ: Ít sốt, để riêng rau..."
-                       style="width:100%;
-                              padding:10px;
-                              border:1px solid #cbd5e1;
-                              border-radius:8px;
-                              box-sizing:border-box;
-                              font-size:13px;">
+            <div class="bread">
+                <a href="/">Trang chủ</a> /
+                <a href="/menu">Thực đơn</a> /
+                <strong th:text="${product.name}">Tên món</strong>
             </div>
 
-            <!-- FORM THÊM GIỎ HÀNG (Nếu còn hàng thì cho đặt) -->
-            <form id="addToCartForm"
-                  th:if="${product.stock != null and product.stock > 0}"
-                  accept-charset="UTF-8"
-                  th:action="@{/cart/add}"
-                  method="post"
-                  onsubmit="return prepareCartSubmit();">
+            <!-- Thông báo từ CartController -->
+            <div th:if="${cartMessage != null}"
+                 class="product-message"
+                 role="status"
+                 th:text="${cartMessage}">
+                Thông báo
+            </div>
 
-                <input type="hidden"
+            <div class="detail-grid">
+
+
+                <!-- HÌNH ẢNH VÀ MÔ TẢ MÓN ĂN -->
+                <div class="detail-gallery">
+
+                    <div class="big-photo">
+                        <img th:src="${product.imageUrl != null
+                             and !#strings.isEmpty(product.imageUrl)
+                             ? product.imageUrl : '/images/hero-bowl.jpg'}"
+                             th:alt="${product.name}"
+                             onerror="this.onerror=null;this.src='/images/hero-bowl.jpg'">
+
+                        <div class="photo-side-label">
+                            FRESH FOOD ✦
+                        </div>
+                    </div>
+
+                    <!-- KHUNG MÔ TẢ MÓN ĂN -->
+                    <section class="food-description-card">
+
+                        <div class="food-description-header">
+
+                            <div class="food-description-icon">
+
+                                <svg width="22" height="22"
+                                     viewBox="0 0 24 24"
+                                     fill="none"
+                                     stroke="currentColor"
+                                     stroke-width="1.8"
+                                     stroke-linecap="round"
+                                     stroke-linejoin="round">
+
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16
+                                      a2 2 0 0 0 2 2h12
+                                      a2 2 0 0 0 2-2V8z"/>
+                                <path d="M14 2v6h6M8 13h8M8 17h8"/>
+
+                                </svg>
+
+                            </div>
+
+                            <div>
+                                <h3>Mô tả món ăn</h3>
+                                <span>Khám phá hương vị FITFOOD</span>
+                            </div>
+
+                        </div>
+
+                        <div class="food-description-content">
+
+                            <p th:text="${product.description != null
+                               and !#strings.isEmpty(product.description)
+                               ? product.description
+                               : 'Thông tin món ăn đang được cập nhật.'}">
+                                Mô tả món ăn
+                            </p>
+
+                        </div>
+
+                        <div class="food-description-tags">
+                            <span>🌿 Rau tươi</span>
+                            <span>✓ Giàu protein</span>
+                            <span>♡ Cân bằng</span>
+                        </div>
+
+                    </section>
+
+                </div>
+
+
+                <div class="detail-divider"></div>
+
+                <!-- KHU VỰC BIẾN THỂ (Chỉ hiện khi còn hàng) -->
+                <div id="dynamicVariantsContainer"
+                     th:if="${product.stock != null and product.stock > 0}"
+                     style="background:#f8fafc;
+                     border:1px solid #e2e8f0;
+                     border-radius:12px;
+                     padding:15px;
+                     margin-bottom:20px;">
+
+                    <h4 style="margin:0 0 12px;color:#14532d;font-size:16px;">
+                        ⚙️ Tùy chọn khẩu phần &amp; Biến thể
+                    </h4>
+
+                    <div id="userVariantBody">
+                        <p>Đang tải tùy chọn món ăn...</p>
+                    </div>
+                </div>
+
+                <!-- GHI CHÚ (Chỉ hiện khi còn hàng) -->
+                <div th:if="${product.stock != null and product.stock > 0}" style="margin-bottom:15px;">
+                    <label for="userFoodNote">Ghi chú cho bếp</label>
+
+                    <input type="text"
+                           id="userFoodNote"
+                           name="foodNote"
+                           maxlength="500"
+                           placeholder="Ví dụ: Ít sốt, để riêng rau..."
+                           style="width:100%;
+                           padding:10px;
+                           border:1px solid #cbd5e1;
+                           border-radius:8px;
+                           box-sizing:border-box;
+                           font-size:13px;">
+                </div>
+
+                <!-- FORM THÊM GIỎ HÀNG (Nếu còn hàng thì cho đặt) -->
+                <form id="addToCartForm"
+                      th:if="${product.stock != null and product.stock > 0}"
+                      accept-charset="UTF-8"
+                      th:action="@{/cart/add}"
+                      method="post"
+                      onsubmit="return prepareCartSubmit(event);"
+
+                      <input type="hidden"
                        th:name="${_csrf.parameterName}"
                        th:value="${_csrf.token}">
 
-                <input type="hidden"
-                       name="productId"
-                       th:value="${product.id}">
+                    <input type="hidden"
+                           name="productId"
+                           th:value="${product.id}">
 
-                <input type="hidden"
-                       id="cartQuantity"
-                       name="quantity"
-                       value="1">
+                    <input type="hidden"
+                           id="cartQuantity"
+                           name="quantity"
+                           value="1">
 
-                <input type="hidden"
-                       id="cartFoodNote"
-                       name="foodNote"
-                       value="">
+                    <input type="hidden"
+                           id="cartFoodNote"
+                           name="foodNote"
+                           value="">
 
-                <input type="hidden"
-                       id="cartVariantName"
-                       name="variantName"
-                       value="">
+                    <input type="hidden"
+                           id="cartVariantName"
+                           name="variantName"
+                           value="">
 
-                <div class="quantity-row"
-                     style="display:flex;gap:15px;align-items:center;">
+                    <div class="quantity-row"
+                         style="display:flex;gap:15px;align-items:center;">
 
-                    <div class="quantity"
-                         style="display:flex;
-                                align-items:center;
-                                border:1px solid #cbd5e1;
-                                border-radius:8px;
-                                overflow:hidden;
-                                background:#fff;">
+                        <div class="quantity"
+                             style="display:flex;
+                             align-items:center;
+                             border:1px solid #cbd5e1;
+                             border-radius:8px;
+                             overflow:hidden;
+                             background:#fff;">
 
-                        <button type="button"
-                                id="decreaseQty"
-                                onclick="changeCartQty(-1)"
-                                style="padding:10px 14px;
-                                       border:none;
-                                       background:#fff;
-                                       cursor:pointer;">
-                            −
-                        </button>
+                            <button type="button"
+                                    id="decreaseQty"
+                                    onclick="changeCartQty(-1)"
+                                    style="padding:10px 14px;
+                                    border:none;
+                                    background:#fff;
+                                    cursor:pointer;">
+                                −
+                            </button>
 
-                        <input type="number"
-                               id="quantityInput"
-                               value="1"
-                               min="1"
-                               th:max="${product.stock != null ? product.stock : 99}"
-                               aria-label="Số lượng sản phẩm"
-                               onchange="setCartQty(this.value)">
+                            <input type="number"
+                                   id="quantityInput"
+                                   value="1"
+                                   min="1"
+                                   th:max="${product.stock != null ? product.stock : 99}"
+                                   aria-label="Số lượng sản phẩm"
+                                   onchange="setCartQty(this.value)">
 
-                        <button type="button"
-                                id="increaseQty"
-                                onclick="changeCartQty(1)"
-                                style="padding:10px 14px;
-                                       border:none;
-                                       background:#fff;
-                                       cursor:pointer;">
-                            +
+                            <button type="button"
+                                    id="increaseQty"
+                                    onclick="changeCartQty(1)"
+                                    style="padding:10px 14px;
+                                    border:none;
+                                    background:#fff;
+                                    cursor:pointer;">
+                                +
+                            </button>
+                        </div>
+
+                        <button type="submit"
+                                id="addToCartButton"
+                                class="btn btn-primary fill-btn"
+                                style="flex:1;justify-content:center;">
+
+                            🛒 Thêm vào giỏ ·
+
+                            <span id="modalTotalPrice"
+                                  th:text="${product.priceLabel}">
+                                0đ
+                            </span>
                         </button>
                     </div>
+                </form>
 
-                    <button type="submit"
-                            id="addToCartButton"
-                            class="btn btn-primary fill-btn"
-                            style="flex:1;justify-content:center;">
-
-                        🛒 Thêm vào giỏ ·
-
-                        <span id="modalTotalPrice"
-                              th:text="${product.priceLabel}">
-                            0đ
-                        </span>
+                <!-- NẾU HẾT HÀNG (stock <= 0 hoặc null): Khóa thao tác, giữ nguyên trang hiện tại -->
+                <div th:unless="${product.stock != null and product.stock > 0}" style="margin-top: 15px;">
+                    <button type="button" class="btn-out-of-stock" disabled>
+                        🚫 Đã hết sản phẩm
                     </button>
                 </div>
-            </form>
 
-            <!-- NẾU HẾT HÀNG (stock <= 0 hoặc null): Khóa thao tác, giữ nguyên trang hiện tại -->
-            <div th:unless="${product.stock != null and product.stock > 0}" style="margin-top: 15px;">
-                <button type="button" class="btn-out-of-stock" disabled>
-                    🚫 Đã hết sản phẩm
-                </button>
-            </div>
+                <div style="margin-top:12px;display:flex;
+                     justify-content:space-between;align-items:center;">
+                    <span id="liveCaloBadge"
+                          style="background:#dcfce7;color:#15803d;
+                          padding:6px 12px;border-radius:20px;
+                          font-size:13px;font-weight:bold;">
+                        FITFOOD
+                    </span>
 
-            <div style="margin-top:12px;display:flex;
-                        justify-content:space-between;align-items:center;">
-                <span id="liveCaloBadge"
-                      style="background:#dcfce7;color:#15803d;
-                             padding:6px 12px;border-radius:20px;
-                             font-size:13px;font-weight:bold;">
-                    FITFOOD
-                </span>
-
-                <div class="detail-hint" style="margin:0;">
-                    Giao hàng tận nơi
+                    <div class="detail-hint" style="margin:0;">
+                        Giao hàng tận nơi
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- THÔNG TIN BÊN DƯỚI -->
-    <section class="detail-tabs">
-        <div class="tab-bar">
-            <span class="tab-on">Mô tả</span>
-            <span>Thành phần</span>
-            <span>Dinh dưỡng</span>
-            <span>Đánh giá</span>
+
+    </main>
+
+    <footer id="footer" class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-about">
+                <a href="/" class="site-brand">
+                    <img th:src="@{/images/leaf.svg}" alt="">
+                    <span>FITFOOD</span>
+                </a>
+
+                <p>Ăn ngon, sống khỏe, mỗi ngày.</p>
+
+                <div class="footer-tag">Made fresh, made with care</div>
+            </div>
+
+            <div>
+                <h4>Khám phá</h4>
+                <a href="/menu">Thực đơn</a>
+                <a href="/cart">Giỏ hàng</a>
+            </div>
+
+            <div>
+                <h4>Hỗ trợ</h4>
+                <a href="/#about">Về FITFOOD</a>
+                <a href="/#features">Cam kết chất lượng</a>
+                <a href="/dang-nhap">Tài khoản</a>
+            </div>
+
+            <div>
+                <h4>Liên hệ</h4>
+                <p>Hải Phòng, Việt Nam</p>
+                <p>support@fitfood.vn</p>
+                <p>Giờ hoạt động: 8:00 – 21:00</p>
+            </div>
         </div>
 
-        <div class="tab-body">
-            <h3>Tươi ngon trong từng nguyên liệu</h3>
+        <div class="footer-copy">© 2026 FITFOOD</div>
+    </footer>
 
-            <p>
-                <span th:text="${product.description}">
-                    Mô tả sản phẩm
-                </span>
-            </p>
+    <!-- Dữ liệu cho file JavaScript biến thể hiện có -->
+    <script th:inline="javascript">
+        window.fitfoodProduct = {
+            id: /*[[${product.id}]]*/ 0,
+            basePrice: /*[[${product.price}]]*/ 0,
+            stock: /*[[${product.stock != null ? product.stock : 0}]]*/ 0,
+            groups: /*[[${variantGroups}]]*/ []
+        };
+    </script>
 
-            <ul>
-                <li>Nguyên liệu được lựa chọn cẩn thận.</li>
-                <li>Phù hợp với lối sống năng động.</li>
-                <li>Chọn món ăn phù hợp với nhu cầu của bạn.</li>
-            </ul>
-        </div>
-    </section>
-</main>
+    <script>
+        // Đồng bộ số lượng trên giao diện với form gửi đến server.
+        function setCartQty(value) {
+            let quantity = parseInt(value, 10);
+            const maxStock = (window.fitfoodProduct && window.fitfoodProduct.stock > 0) ? window.fitfoodProduct.stock : 99;
 
-<footer id="footer" class="site-footer">
-    <div class="footer-inner">
-        <div class="footer-about">
-            <a href="/" class="site-brand">
-                <img th:src="@{/images/leaf.svg}" alt="">
-                <span>FITFOOD</span>
-            </a>
-
-            <p>Ăn ngon, sống khỏe, mỗi ngày.</p>
-
-            <div class="footer-tag">Made fresh, made with care</div>
-        </div>
-
-        <div>
-            <h4>Khám phá</h4>
-            <a href="/menu">Thực đơn</a>
-            <a href="/cart">Giỏ hàng</a>
-        </div>
-
-        <div>
-            <h4>Hỗ trợ</h4>
-            <a href="/#about">Về FITFOOD</a>
-            <a href="/#features">Cam kết chất lượng</a>
-            <a href="/dang-nhap">Tài khoản</a>
-        </div>
-
-        <div>
-            <h4>Liên hệ</h4>
-            <p>Hải Phòng, Việt Nam</p>
-            <p>support@fitfood.vn</p>
-            <p>Giờ hoạt động: 8:00 – 21:00</p>
-        </div>
-    </div>
-
-    <div class="footer-copy">© 2026 FITFOOD</div>
-</footer>
-
-<!-- Dữ liệu cho file JavaScript biến thể hiện có -->
-<script th:inline="javascript">
-    window.fitfoodProduct = {
-        id: /*[[${product.id}]]*/ 0,
-        basePrice: /*[[${product.price}]]*/ 0,
-        stock: /*[[${product.stock != null ? product.stock : 0}]]*/ 0,
-        groups: /*[[${variantGroups}]]*/ []
-    };
-</script>
-
-<script>
-    // Đồng bộ số lượng trên giao diện với form gửi đến server.
-    function setCartQty(value) {
-        let quantity = parseInt(value, 10);
-        const maxStock = (window.fitfoodProduct && window.fitfoodProduct.stock > 0) ? window.fitfoodProduct.stock : 99;
-
-        if (isNaN(quantity)) {
-            quantity = 1;
-        }
-
-        quantity = Math.max(1, Math.min(maxStock, quantity));
-
-        const qtyInput = document.getElementById('quantityInput');
-        const cartQtyInput = document.getElementById('cartQuantity');
-        const decBtn = document.getElementById('decreaseQty');
-        const incBtn = document.getElementById('increaseQty');
-
-        if (qtyInput) qtyInput.value = quantity;
-        if (cartQtyInput) cartQtyInput.value = quantity;
-
-        if (decBtn) decBtn.disabled = quantity <= 1;
-        if (incBtn) incBtn.disabled = quantity >= maxStock;
-
-        updateDisplayedTotal();
-    }
-
-    function changeCartQty(amount) {
-        const qtyInput = document.getElementById('quantityInput');
-        const current = parseInt(qtyInput ? qtyInput.value : 1, 10) || 1;
-        setCartQty(current + amount);
-    }
-
-    function updateDisplayedTotal() {
-        const product = window.fitfoodProduct || {};
-        const price = Number(product.basePrice || 0);
-        const qtyInput = document.getElementById('quantityInput');
-        const quantity = Number(qtyInput ? qtyInput.value : 1);
-
-        const total = price * quantity;
-        const totalElem = document.getElementById('modalTotalPrice');
-
-        if (totalElem) {
-            totalElem.textContent = new Intl.NumberFormat('vi-VN').format(total) + 'đ';
-        }
-    }
-
-    function prepareCartSubmit() {
-        const qtyInput = document.getElementById('quantityInput');
-        const quantity = parseInt(qtyInput ? qtyInput.value : 1, 10);
-
-        if (isNaN(quantity) || quantity < 1) {
-            alert('Vui lòng chọn số lượng hợp lệ.');
-            return false;
-        }
-
-        const cartQtyInput = document.getElementById('cartQuantity');
-        if (cartQtyInput) cartQtyInput.value = quantity;
-
-        // Đưa ghi chú vào form
-        const userFoodNote = document.getElementById('userFoodNote');
-        const cartFoodNote = document.getElementById('cartFoodNote');
-        if (userFoodNote && cartFoodNote) {
-            cartFoodNote.value = userFoodNote.value;
-        }
-
-        // Tự động gom tên biến thể đang được chọn
-        const selectedLabels = [];
-        const checkedRadios = document.querySelectorAll('#userVariantBody input[type="radio"]:checked, #userVariantBody input[type="checkbox"]:checked');
-        checkedRadios.forEach(input => {
-            let labelText = '';
-            if (input.nextElementSibling) {
-                labelText = input.nextElementSibling.textContent.trim();
-            } else if (input.parentElement) {
-                labelText = input.parentElement.textContent.trim();
+            if (isNaN(quantity)) {
+                quantity = 1;
             }
-            if (labelText) {
-                labelText = labelText.replace(/\s*\([^\)]*\)/g, '').trim();
-                selectedLabels.push(labelText);
-            } else if (input.value) {
-                selectedLabels.push(input.value);
+
+            quantity = Math.max(1, Math.min(maxStock, quantity));
+
+            const qtyInput = document.getElementById('quantityInput');
+            const cartQtyInput = document.getElementById('cartQuantity');
+            const decBtn = document.getElementById('decreaseQty');
+            const incBtn = document.getElementById('increaseQty');
+
+            if (qtyInput)
+                qtyInput.value = quantity;
+            if (cartQtyInput)
+                cartQtyInput.value = quantity;
+
+            if (decBtn)
+                decBtn.disabled = quantity <= 1;
+            if (incBtn)
+                incBtn.disabled = quantity >= maxStock;
+
+            updateDisplayedTotal();
+        }
+
+        function changeCartQty(amount) {
+            const qtyInput = document.getElementById('quantityInput');
+            const current = parseInt(qtyInput ? qtyInput.value : 1, 10) || 1;
+            setCartQty(current + amount);
+        }
+
+        function updateDisplayedTotal() {
+            const product = window.fitfoodProduct || {};
+            const price = Number(product.basePrice || 0);
+            const qtyInput = document.getElementById('quantityInput');
+            const quantity = Number(qtyInput ? qtyInput.value : 1);
+
+            const total = price * quantity;
+            const totalElem = document.getElementById('modalTotalPrice');
+
+            if (totalElem) {
+                totalElem.textContent = new Intl.NumberFormat('vi-VN').format(total) + 'đ';
             }
-        });
-
-        const variantNameInput = document.getElementById('cartVariantName');
-        if (variantNameInput) {
-            variantNameInput.value = selectedLabels.join(', ');
         }
 
-        const button = document.getElementById('addToCartButton');
-        if (button) {
-            button.disabled = true;
-            button.textContent = 'Đang thêm vào giỏ hàng...';
-        }
+        function prepareCartSubmit(event) {
+            const qtyInput = document.getElementById('quantityInput');
+            const quantity = parseInt(qtyInput ? qtyInput.value : 1, 10);
 
-        return true;
-    }
+            if (isNaN(quantity) || quantity < 1) {
+                alert('Vui lòng chọn số lượng hợp lệ.');
+                return false;
+            }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        setCartQty(1);
-    });
-</script>
+            const cartQtyInput = document.getElementById('cartQuantity');
+            if (cartQtyInput)
+                cartQtyInput.value = quantity;
 
-<script defer th:src="@{/js/product-detail.js}"></script>
-<script defer th:src="@{/js/site-motion.js}"></script>
+            // Đưa ghi chú vào form
+            const userFoodNote = document.getElementById('userFoodNote');
+            const cartFoodNote = document.getElementById('cartFoodNote');
+            if (userFoodNote && cartFoodNote) {
+                cartFoodNote.value = userFoodNote.value;
+            }
 
-<!-- CHAT HO TRO KHACH HANG -->
-<div th:replace="~{fragments/support-chat :: widget}"></div>
+            // Tự động gom tên biến thể đang được chọn
+            const selectedLabels = [];
+            const checkedRadios = document.querySelectorAll('#userVariantBody input[type="radio"]:checked, #userVariantBody input[type="checkbox"]:checked');
+            checkedRadios.forEach(input => {
+                let labelText = '';
+                if (input.nextElementSibling) {
+                    labelText = input.nextElementSibling.textContent.trim();
+                } else if (input.parentElement) {
+                    labelText = input.parentElement.textContent.trim();
+                }
+                if (labelText) {
+                    labelText = labelText.replace(/\s*\([^\)]*\)/g, '').trim();
+                    selectedLabels.push(labelText);
+                } else if (input.value) {
+                    selectedLabels.push(input.value);
+                }
+            });
 
+            const variantNameInput = document.getElementById('cartVariantName');
+            if (variantNameInput) {
+                variantNameInput.value = selectedLabels.join(', ');
+            }
+
+            const button = document.getElementById('addToCartButton');
+
+            if (button) {
+
+                button.disabled = true;
+
+                button.textContent = 'Đang thêm vào giỏ hàng...';
+
+            }
+
+            // Animation món ăn bay vào giỏ hàng
+            if (typeof window.flyToCart === 'function') {
+
+                event.preventDefault();
+
+                const form = event.currentTarget;
+
+                const productImage =
+                        document.querySelector('.big-photo img');
+
+                window.flyToCart(productImage, function () {
+                    HTMLFormElement.prototype.submit.call(form);
+                });
+
+                return false;
+            }
+
+            return true;
+
+            document.addEventListener('DOMContentLoaded', function () {
+                setCartQty(1);
+            }
+            );
+    </script>
+
+    <script defer th:src="@{/js/product-detail.js}"></script>
+    <script defer th:src="@{/js/site-motion.js}"></script>
+
+    <!-- CHAT HO TRO KHACH HANG -->
+    <div th:replace="~{fragments/support-chat :: widget}"></div>
+    <script th:src="@{/js/cart-animation.js}" defer></script>
 </body>
 </html>
