@@ -1,81 +1,359 @@
-// Lọc danh mục, tìm kiếm và sắp xếp món ăn trên trang /menu.
+
 (function () {
-  'use strict';
 
-  function initMenu() {
-    var grid = document.getElementById('menuGrid');
-    if (!grid) return;
+    'use strict';
 
-    var cards = Array.prototype.slice.call(grid.children);
-    var q = document.getElementById('q');
-    var sort = document.getElementById('sort');
-    var count = document.getElementById('resultCount');
-    var empty = document.getElementById('menuEmpty');
-    var tabs = Array.prototype.slice.call(document.querySelectorAll('.cat-list .tab'));
-    var cat = '';
-    var initialCategory = new URLSearchParams(window.location.search).get('category');
+    function initMenu() {
 
-    function normalize(value) {
-      return (value || '').toString().trim().toLocaleLowerCase('vi-VN');
-    }
+        const grid = document.getElementById('menuGrid');
 
-    function apply() {
-      var keyword = normalize(q ? q.value : '');
-      var visible = cards.filter(function (card) {
-        var cardCategory = normalize(card.getAttribute('data-cat'));
-        var name = normalize(card.getAttribute('data-name'));
-        var description = normalize(card.getAttribute('data-description'));
-        var matchesCategory = !cat || cardCategory === normalize(cat);
-        var matchesKeyword = !keyword || name.indexOf(keyword) !== -1 || description.indexOf(keyword) !== -1 || cardCategory.indexOf(keyword) !== -1;
-        return matchesCategory && matchesKeyword;
-      });
+        if (!grid) return;
 
-      if (sort && sort.value === 'price_asc') {
-        visible.sort(function (a, b) { return Number(a.dataset.price || 0) - Number(b.dataset.price || 0); });
-      } else if (sort && sort.value === 'price_desc') {
-        visible.sort(function (a, b) { return Number(b.dataset.price || 0) - Number(a.dataset.price || 0); });
-      }
+        const cards = Array.from(grid.children);
 
-      cards.forEach(function (card) { card.hidden = true; });
-      visible.forEach(function (card) {
-        card.hidden = false;
-        grid.appendChild(card);
-      });
+        const searchInput = document.getElementById('q');
+        const sortSelect = document.getElementById('sort');
+        const resultCount = document.getElementById('resultCount');
+        const emptyMessage = document.getElementById('menuEmpty');
+        const resetButton = document.getElementById('resetMenuFilters');
 
-      if (count) count.textContent = visible.length + ' món';
-      if (empty) empty.hidden = visible.length !== 0;
-    }
+        const tabs = Array.from(
+            document.querySelectorAll('#menuApp .cat-list .tab')
+        );
 
-    tabs.forEach(function (tab) {
-      tab.addEventListener('click', function () {
-        cat = tab.getAttribute('data-filter') || '';
-        tabs.forEach(function (other) {
-          other.classList.remove('on', 'active');
-          other.setAttribute('aria-pressed', 'false');
+        const priceOptions = Array.from(
+            document.querySelectorAll(
+                '#menuApp input[name="priceRange"]'
+            )
+        );
+
+        let selectedCategory = '';
+        let selectedPrice = 'all';
+
+        // Tìm kiếm tiếng Việt có dấu và không dấu
+        function normalize(value) {
+
+            return String(value || '')
+                .toLowerCase()
+                .trim()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/đ/g, 'd');
+
+        }
+
+        // Kiểm tra khoảng giá
+        function matchesPrice(price) {
+
+            switch (selectedPrice) {
+
+                case 'under50':
+                    return price < 50000;
+
+                case '50to100':
+                    return price >= 50000 && price <= 100000;
+
+                case '100to200':
+                    return price > 100000 && price <= 200000;
+
+                case 'over200':
+                    return price > 200000;
+
+                default:
+                    return true;
+            }
+
+        }
+
+        // Áp dụng toàn bộ điều kiện lọc
+        function applyFilters() {
+
+            const keyword = normalize(
+                searchInput ? searchInput.value : ''
+            );
+
+            let visibleCards = cards.filter(function (card) {
+
+                const name = normalize(card.dataset.name);
+                const category = normalize(card.dataset.cat);
+                const description = normalize(card.dataset.description);
+
+                const price = Number(card.dataset.price || 0);
+
+                const categoryMatched =
+                    !selectedCategory ||
+                    category === normalize(selectedCategory);
+
+                const searchableText =
+                    name + ' ' + category + ' ' + description;
+
+                const keywordMatched =
+                    !keyword ||
+                    keyword.split(/\s+/).every(function (word) {
+                        return searchableText.includes(word);
+                    });
+
+                const priceMatched = matchesPrice(price);
+
+                return categoryMatched &&
+                       keywordMatched &&
+                       priceMatched;
+
+            });
+
+            const sortValue = sortSelect ? sortSelect.value : '';
+
+            // Sắp xếp theo giá
+            if (sortValue === 'price_asc') {
+
+                visibleCards.sort(function (a, b) {
+
+                    return Number(a.dataset.price || 0)
+                         - Number(b.dataset.price || 0);
+
+                });
+
+            } else if (sortValue === 'price_desc') {
+
+                visibleCards.sort(function (a, b) {
+
+                    return Number(b.dataset.price || 0)
+                         - Number(a.dataset.price || 0);
+
+                });
+
+            // Sắp xếp theo tên
+            } else if (sortValue === 'name_asc') {
+
+                visibleCards.sort(function (a, b) {
+
+                    return String(a.dataset.name || '')
+                        .localeCompare(
+                            String(b.dataset.name || ''),
+                            'vi'
+                        );
+
+                });
+
+            } else if (sortValue === 'name_desc') {
+
+                visibleCards.sort(function (a, b) {
+
+                    return String(b.dataset.name || '')
+                        .localeCompare(
+                            String(a.dataset.name || ''),
+                            'vi'
+                        );
+
+                });
+
+            }
+
+            // Ẩn tất cả sản phẩm
+            cards.forEach(function (card) {
+
+                card.hidden = true;
+
+            });
+
+            // Hiện sản phẩm phù hợp
+            visibleCards.forEach(function (card) {
+
+                card.hidden = false;
+
+                grid.appendChild(card);
+
+            });
+
+            // Cập nhật số lượng kết quả
+            if (resultCount) {
+
+                resultCount.textContent =
+                    'Hiển thị ' + visibleCards.length
+                    + ' / ' + cards.length + ' món ăn';
+
+            }
+
+            // Thông báo không tìm thấy sản phẩm
+            if (emptyMessage) {
+
+                emptyMessage.hidden =
+                    visibleCards.length !== 0;
+
+                emptyMessage.textContent =
+                    'Không tìm thấy món ăn phù hợp. '
+                    + 'Bạn hãy thử thay đổi bộ lọc.';
+
+            }
+
+        }
+
+        // Chọn danh mục
+        function selectCategory(tab) {
+
+            selectedCategory = tab.dataset.filter || '';
+
+            tabs.forEach(function (item) {
+
+                item.classList.remove('on', 'active');
+
+                item.setAttribute(
+                    'aria-pressed',
+                    'false'
+                );
+
+            });
+
+            tab.classList.add('on', 'active');
+
+            tab.setAttribute(
+                'aria-pressed',
+                'true'
+            );
+
+            applyFilters();
+
+        }
+
+        tabs.forEach(function (tab) {
+
+            tab.addEventListener('click', function () {
+
+                selectCategory(tab);
+
+            });
+
         });
-        tab.classList.add('on', 'active');
-        tab.setAttribute('aria-pressed', 'true');
-        apply();
-      });
-    });
 
-    if (q) q.addEventListener('input', apply);
-    if (sort) sort.addEventListener('change', apply);
+        // Lọc theo giá
+        priceOptions.forEach(function (option) {
 
-    if (initialCategory) {
-      var requested = tabs.find(function (tab) {
-        return normalize(tab.getAttribute('data-filter')) === normalize(initialCategory);
-      });
-      if (requested) requested.click();
-      else apply();
-    } else {
-      apply();
+            option.addEventListener('change', function () {
+
+                if (option.checked) {
+
+                    selectedPrice = option.value;
+
+                    applyFilters();
+
+                }
+
+            });
+
+        });
+
+        // Tìm kiếm
+        if (searchInput) {
+
+            searchInput.addEventListener(
+                'input',
+                applyFilters
+            );
+
+        }
+
+        // Sắp xếp
+        if (sortSelect) {
+
+            sortSelect.addEventListener(
+                'change',
+                applyFilters
+            );
+
+        }
+
+        // Đặt lại toàn bộ bộ lọc
+        if (resetButton) {
+
+            resetButton.addEventListener('click', function () {
+
+                selectedCategory = '';
+                selectedPrice = 'all';
+
+                if (searchInput) {
+
+                    searchInput.value = '';
+
+                }
+
+                if (sortSelect) {
+
+                    sortSelect.value = '';
+
+                }
+
+                priceOptions.forEach(function (option) {
+
+                    option.checked = option.value === 'all';
+
+                });
+
+                const allTab = tabs.find(function (tab) {
+
+                    return !tab.dataset.filter;
+
+                });
+
+                if (allTab) {
+
+                    selectCategory(allTab);
+
+                } else {
+
+                    applyFilters();
+
+                }
+
+                // Xóa danh mục cũ trên URL, giữ các tham số khác
+                const url = new URL(window.location.href);
+
+                url.searchParams.delete('category');
+
+                window.history.replaceState(
+                    {},
+                    '',
+                    url.toString()
+                );
+
+            });
+
+        }
+
+        // Nhận danh mục khi chuyển từ trang chủ sang
+        const initialCategory =
+            new URLSearchParams(window.location.search)
+                .get('category');
+
+        const initialTab = tabs.find(function (tab) {
+
+            return normalize(tab.dataset.filter)
+                === normalize(initialCategory);
+
+        });
+
+        if (initialTab) {
+
+            selectCategory(initialTab);
+
+        } else {
+
+            applyFilters();
+
+        }
+
     }
-  }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMenu);
-  } else {
-    initMenu();
-  }
+    if (document.readyState === 'loading') {
+
+        document.addEventListener(
+            'DOMContentLoaded',
+            initMenu
+        );
+
+    } else {
+
+        initMenu();
+
+    }
+
 })();
