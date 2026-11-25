@@ -929,5 +929,13 @@ LEFT JOIN dbo.fitfood_inventory i
 ORDER BY p.id;
 GO
 
+USE FITFOOD;
+
+UPDATE dbo.fitfood_meal_plans
+SET active = 0;
+
+SELECT id, name, price, active
+FROM dbo.fitfood_meal_plans;
+
 PRINT N'HOAN THANH: DATABASE FITFOOD DA DUOC TAO MOI, TAO DU LIEU MAU VA DONG BO KHO THANH CONG.';
 GO

@@ -24,10 +24,29 @@ public class SecurityConfig {
 
         http
             .authorizeHttpRequests(auth -> auth
+
+                // VO HIEU HOA CHUC NANG GOI AN
+                .requestMatchers(
+                    "/admin/meal-plans",
+                    "/admin/meal-plans/**",
+                    "/admin/customers/*/meal-plan",
+                    "/admin/customers/*/meal-plan/**",
+                    "/meal-plan",
+                    "/meal-plan/**",
+                    "/meal-plans",
+                    "/meal-plans/**",
+                    "/cart/add-meal-plan",
+                    "/tai-khoan/goi-an",
+                    "/tai-khoan/goi-an/**"
+                ).denyAll()
+
                 .requestMatchers("/admin", "/admin/**")
                     .hasRole("ADMIN")
 
-                .requestMatchers("/payment/vnpay/ipn", "/payment/vnpay/return").permitAll()
+                .requestMatchers(
+                    "/payment/vnpay/ipn",
+                    "/payment/vnpay/return"
+                ).permitAll()
 
                 .requestMatchers(
                     "/",
@@ -56,7 +75,9 @@ public class SecurityConfig {
                 .passwordParameter("password")
 
                 .successHandler((request, response, authentication) -> {
-                    boolean admin = authentication.getAuthorities()
+
+                    boolean admin = authentication
+                        .getAuthorities()
                         .stream()
                         .anyMatch(a ->
                             a.getAuthority().equals("ROLE_ADMIN")
@@ -66,6 +87,7 @@ public class SecurityConfig {
                         request.getContextPath()
                         + (admin ? "/admin" : "/")
                     );
+
                 })
 
                 .failureUrl("/dang-nhap?error")
@@ -84,7 +106,6 @@ public class SecurityConfig {
                 .frameOptions(frame -> frame.sameOrigin())
             )
 
-            // Không forward POST sang trang chỉ hỗ trợ GET
             .exceptionHandling(ex -> ex
                 .accessDeniedHandler((request, response, exception) -> {
 
@@ -92,34 +113,54 @@ public class SecurityConfig {
                         request.getContextPath() + "/api/";
 
                     if (request.getRequestURI().startsWith(apiPrefix)) {
+
                         response.sendError(403);
+
                     } else {
+
                         response.sendRedirect(
                             request.getContextPath() + "/403"
                         );
+
                     }
+
                 })
             );
 
-        // IPN là callback server-to-server từ VNPAY, không có CSRF token của phiên trình duyệt.
-        http.csrf(csrf -> csrf.ignoringRequestMatchers("/payment/vnpay/ipn"));
+        // Giữ nguyên callback VNPAY
+        http.csrf(csrf ->
+            csrf.ignoringRequestMatchers("/payment/vnpay/ipn")
+        );
 
-        // Khoi tao CSRF token som truoc khi render view de tranh loi IllegalStateException commit response
-        http.addFilterAfter(new org.springframework.web.filter.OncePerRequestFilter() {
-            @Override
-            protected void doFilterInternal(jakarta.servlet.http.HttpServletRequest request,
-                                            jakarta.servlet.http.HttpServletResponse response,
-                                            jakarta.servlet.FilterChain filterChain)
-                    throws jakarta.servlet.ServletException, java.io.IOException {
-                org.springframework.security.web.csrf.CsrfToken csrfToken =
-                        (org.springframework.security.web.csrf.CsrfToken) request.getAttribute(
-                                org.springframework.security.web.csrf.CsrfToken.class.getName());
-                if (csrfToken != null) {
-                    csrfToken.getToken();
+        // Khởi tạo CSRF token trước khi render giao diện
+        http.addFilterAfter(
+            new org.springframework.web.filter.OncePerRequestFilter() {
+
+                @Override
+                protected void doFilterInternal(
+                        jakarta.servlet.http.HttpServletRequest request,
+                        jakarta.servlet.http.HttpServletResponse response,
+                        jakarta.servlet.FilterChain filterChain)
+                        throws jakarta.servlet.ServletException,
+                               java.io.IOException {
+
+                    org.springframework.security.web.csrf.CsrfToken csrfToken =
+                        (org.springframework.security.web.csrf.CsrfToken)
+                        request.getAttribute(
+                            org.springframework.security.web.csrf.CsrfToken.class.getName()
+                        );
+
+                    if (csrfToken != null) {
+                        csrfToken.getToken();
+                    }
+
+                    filterChain.doFilter(request, response);
                 }
-                filterChain.doFilter(request, response);
-            }
-        }, org.springframework.security.web.csrf.CsrfFilter.class);
+
+            },
+            org.springframework.security.web.csrf.CsrfFilter.class
+        );
+
         return http.build();
     }
 }
