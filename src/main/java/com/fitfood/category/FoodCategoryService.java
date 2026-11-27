@@ -19,11 +19,28 @@ public class FoodCategoryService {
     public List<FoodCategory> search(String keyword, String status) {
         String key = keyword == null ? "" : keyword.strip().toLowerCase(Locale.ROOT);
         String filter = status == null ? "all" : status;
+
+        // Tách số ID nếu người dùng nhập "DM5", "dm5" hoặc "5"
+        String numericPart = key.startsWith("dm") ? key.substring(2).strip() : key;
+        Long searchId = null;
+        if (!numericPart.isEmpty() && numericPart.chars().allMatch(Character::isDigit)) {
+            try {
+                searchId = Long.parseLong(numericPart);
+            } catch (NumberFormatException ignored) {
+            }
+        }
+        final Long targetId = searchId;
+
         return repository.findAllByOrderByIdDesc().stream()
-                .filter(c -> key.isEmpty()
-                        || c.getName().toLowerCase(Locale.ROOT).contains(key)
-                        || (c.getDescription() != null
-                            && c.getDescription().toLowerCase(Locale.ROOT).contains(key)))
+                .filter(c -> {
+                    if (key.isEmpty()) return true;
+                    String code = ("dm" + c.getId());
+                    boolean matchCode = code.contains(key) || (targetId != null && targetId.equals(c.getId()));
+                    boolean matchName = c.getName().toLowerCase(Locale.ROOT).contains(key);
+                    boolean matchDesc = c.getDescription() != null
+                            && c.getDescription().toLowerCase(Locale.ROOT).contains(key);
+                    return matchCode || matchName || matchDesc;
+                })
                 .filter(c -> switch (filter) {
                     case "active" -> c.isActive();
                     case "inactive" -> !c.isActive();
