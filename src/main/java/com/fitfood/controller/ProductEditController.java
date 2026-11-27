@@ -1,3 +1,4 @@
+
 package com.fitfood.controller;
 
 import com.fitfood.category.FoodCategory;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -44,11 +46,19 @@ public class ProductEditController {
     }
 
     @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Long id, Model model) {
+    public String showEditForm(
+            @PathVariable Long id,
+            Model model,
+            RedirectAttributes redirectAttributes) {
+
         Product product = productRepository.findById(id).orElse(null);
+
         if (product == null) {
-            model.addAttribute("errorMessage", "Không tìm thấy món ăn!");
-            return "admin-product-edit";
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Không tìm thấy món ăn!"
+            );
+            return "redirect:/admin/products";
         }
 
         ProductForm form = new ProductForm();
@@ -63,6 +73,7 @@ public class ProductEditController {
 
         model.addAttribute("productForm", form);
         addCategoriesToModel(model);
+
         return "admin-product-edit";
     }
 
@@ -71,12 +82,17 @@ public class ProductEditController {
             @PathVariable Long id,
             @Valid @ModelAttribute("productForm") ProductForm form,
             BindingResult bindingResult,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
         Product product = productRepository.findById(id).orElse(null);
+
         if (product == null) {
-            model.addAttribute("errorMessage", "Không tìm thấy món ăn!");
-            return "admin-product-edit";
+            redirectAttributes.addFlashAttribute(
+                    "errorMessage",
+                    "Không tìm thấy món ăn!"
+            );
+            return "redirect:/admin/products";
         }
 
         if (bindingResult.hasErrors()) {
@@ -87,19 +103,31 @@ public class ProductEditController {
 
         product.setName(form.getName().trim());
         product.setCategoryId(form.getCategoryId());
-        product.setDescription(form.getDescription() != null ? form.getDescription().trim() : null);
+
+        product.setDescription(
+                form.getDescription() != null
+                        ? form.getDescription().trim() : null
+        );
+
         product.setPrice(form.getPrice());
         product.setStock(form.getStock() != null ? form.getStock() : 0);
         product.setActive(form.isActive());
 
         MultipartFile file = form.getImageFile();
+
         if (file != null && !file.isEmpty()) {
             try {
                 String filename = saveImage(file);
                 product.setImageUrl("/uploads/products/" + filename);
                 form.setImageUrl(product.getImageUrl());
+
             } catch (IOException e) {
-                bindingResult.rejectValue("imageFile", "upload.failed", "Không thể lưu tệp ảnh, vui lòng thử lại.");
+                bindingResult.rejectValue(
+                        "imageFile",
+                        "upload.failed",
+                        "Không thể lưu tệp ảnh, vui lòng thử lại."
+                );
+
                 form.setImageUrl(product.getImageUrl());
                 addCategoriesToModel(model);
                 return "admin-product-edit";
@@ -108,10 +136,12 @@ public class ProductEditController {
 
         productRepository.save(product);
 
-        // Gửi successMessage để iframe kích hoạt thông báo và gửi tín hiệu ra ngoài
-        model.addAttribute("successMessage", "Đã cập nhật sản phẩm vào danh sách");
-        addCategoriesToModel(model);
-        return "admin-product-edit";
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Đã cập nhật sản phẩm thành công!"
+        );
+
+        return "redirect:/admin/products";
     }
 
     private void addCategoriesToModel(Model model) {
@@ -121,19 +151,29 @@ public class ProductEditController {
 
     private String saveImage(MultipartFile file) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
+
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
         String originalName = file.getOriginalFilename();
         String extension = "";
+
         if (originalName != null && originalName.contains(".")) {
-            extension = originalName.substring(originalName.lastIndexOf("."));
+            extension = originalName.substring(
+                    originalName.lastIndexOf(".")
+            );
         }
 
-        String filename = UUID.randomUUID().toString() + extension;
+        String filename = UUID.randomUUID() + extension;
         Path filePath = uploadPath.resolve(filename);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        Files.copy(
+                file.getInputStream(),
+                filePath,
+                StandardCopyOption.REPLACE_EXISTING
+        );
+
         return filename;
     }
 }
