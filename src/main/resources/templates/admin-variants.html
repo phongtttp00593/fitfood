@@ -14,53 +14,101 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        .variants-screen {color:#173d2b; padding-bottom:40px}
+        .variants-screen {color:#173d2b; padding-bottom:48px}
         .variants-screen *, .variants-screen *::before, .variants-screen *::after {box-sizing:border-box}
+        
+        /* Toolbar chọn món */
         .vv-toolbar {display:flex; flex-wrap:wrap; align-items:end; gap:14px; padding:20px; margin:0 0 18px; border:1px solid #e2ece6; border-radius:18px; background:#fff;box-shadow:0 3px 20px rgba(20,70,40,.035)}
-        .vv-field {display:flex; flex-direction:column; gap:8px; min-width:180px; flex:1}
-        .vv-field label, .vv-label {font-weight:700;font-size:13px;color:#355542}
-        .vv-field input, .vv-field select, .vv-modal input, .vv-modal select {height:43px; padding:0 13px; border:1px solid #cadbd0; border-radius:10px;background:#fff;color:#1a3a2b;font:inherit;width:100%;outline:none}
-        .vv-field input:focus, .vv-field select:focus, .vv-modal input:focus {border-color:#2a8959; box-shadow:0 0 0 3px rgba(42,137,89,.10)}
+        .vv-field {display:flex; flex-direction:column; gap:7px; min-width:180px; flex:1}
+        .vv-field label {font-weight:700;font-size:13px;color:#355542}
+        .vv-field input, .vv-field select, .vv-modal input, .vv-modal select {height:43px; padding:0 13px; border:1px solid #cadbd0; border-radius:10px;background:#fff;color:#1a3a2b;font:inherit;font-size:14px;width:100%;outline:none;transition:border-color .15s, box-shadow .15s}
+        .vv-field input:focus, .vv-field select:focus, .vv-modal input:focus {border-color:#2a8959; box-shadow:0 0 0 3px rgba(42,137,89,.12)}
+        .vv-field input:disabled {background:#f4f8f5;color:#7a9184;cursor:not-allowed}
         .vv-field.vv-id {max-width:150px;flex:0 1 150px}
-        .vv-btn {display:inline-flex;justify-content:center;align-items:center;gap:6px;cursor:pointer;padding:11px 18px;border-radius:10px;font:inherit;font-size:13px;font-weight:750;background:#236c49;color:#fff;border:1px solid #236c49;text-decoration:none;white-space:nowrap;min-height:43px}
-        .vv-btn:hover {background:#194d36;color:#fff}
-        .vv-btn:disabled {opacity:.55;cursor:not-allowed}
+
+        /* Buttons */
+        .vv-btn {display:inline-flex;justify-content:center;align-items:center;gap:6px;cursor:pointer;padding:10px 18px;border-radius:10px;font:inherit;font-size:13px;font-weight:700;background:#236c49;color:#fff;border:1px solid #236c49;text-decoration:none;white-space:nowrap;min-height:42px;transition:all .15s}
+        .vv-btn:hover:not(:disabled) {background:#194d36;border-color:#194d36;color:#fff}
+        .vv-btn:disabled {opacity:.5;cursor:not-allowed}
         .vv-btn-ghost {background:#fff;color:#236c49;border-color:#c3dbcb}
-        .vv-btn-ghost:hover {background:#eff7f1;color:#164b31}
-        .vv-alert {margin:0 0 18px;padding:13px 16px;background:#fff8e9;border:1px solid #eed8a5;border-radius:10px;color:#805419;font-size:13px;line-height:1.5}
+        .vv-btn-ghost:hover:not(:disabled) {background:#eff7f1;color:#164b31}
+        .vv-btn-danger-ghost {background:#fff;color:#b42b2b;border-color:#f0c4c4;padding:6px 12px;min-height:34px;font-size:12px}
+        .vv-btn-danger-ghost:hover:not(:disabled) {background:#fff2f2;border-color:#e09b9b}
+        .vv-btn-sm {padding:7px 13px;min-height:34px;font-size:12px}
+
+        /* Alert & Stats */
+        .vv-alert {margin:0 0 18px;padding:13px 16px;background:#fff8e9;border:1px solid #eed8a5;border-radius:11px;color:#805419;font-size:13px;line-height:1.5;display:flex;align-items:center;justify-content:space-between;gap:12px}
+        .vv-alert[hidden] {display:none}
         .vv-alert[data-type='success'] {background:#ecf8f0;border-color:#b5e2c6;color:#1d6c3d}
         .vv-alert[data-type='error'] {background:#fff0f0;border-color:#f6bcbc;color:#a52b2b}
-        .vv-stats {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:20px}
-        .vv-stat {padding:18px 20px;background:#fff;border:1px solid #e2ece6;border-radius:15px}
-        .vv-stat small {display:block;color:#60756a;font-size:12px;font-weight:600;margin-bottom:7px}
-        .vv-stat strong {font-size:26px;color:#174d32}
-        .vv-section-head {display:flex;justify-content:space-between;align-items:center;gap:12px;margin:4px 0 14px}
+        .vv-stats {display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:22px}
+        .vv-stat {padding:16px 20px;background:#fff;border:1px solid #e2ece6;border-radius:15px}
+        .vv-stat small {display:block;color:#60756a;font-size:12px;font-weight:600;margin-bottom:6px}
+        .vv-stat strong {font-size:25px;color:#174d32}
+
+        /* Tabs Navigation */
+        .vv-tabs {display:flex;flex-wrap:wrap;gap:8px;border-bottom:1px solid #dfeae3;margin-bottom:22px;padding-bottom:12px}
+        .vv-tab {display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:10px;font:inherit;font-size:13px;font-weight:700;border:1px solid transparent;background:transparent;color:#546e5f;cursor:pointer;transition:all .15s}
+        .vv-tab:hover:not(:disabled) {background:#eff6f1;color:#1a4731}
+        .vv-tab.active {background:#236c49;color:#fff;box-shadow:0 3px 10px rgba(35,108,73,.18)}
+        .vv-tab:disabled {opacity:.45;cursor:not-allowed}
+        .vv-tab-badge {background:rgba(255,255,255,.22);padding:2px 7px;border-radius:99px;font-size:11px}
+        .vv-tab:not(.active) .vv-tab-badge {background:#e5efe8;color:#2c5e43}
+
+        /* Form Card Panel (Tab 2 & Tab 3) */
+        .vv-card-panel {background:#fff;border:1px solid #dfeae3;border-radius:17px;padding:24px;box-shadow:0 4px 16px rgba(23,63,42,.025);max-width:640px}
+        .vv-card-panel h2 {margin:0 0 6px;font-size:19px;color:#153b28}
+        .vv-card-panel > p {color:#61756b;font-size:13px;margin:0 0 20px;line-height:1.5}
+        .vv-card-panel .vv-field {margin-bottom:16px}
+        .vv-grid-2 {display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        .vv-check {display:flex;align-items:center;gap:10px;font-size:13px;margin:12px 0;cursor:pointer;color:#244633;font-weight:600;user-select:none}
+        .vv-check input {width:17px;height:17px;accent-color:#236c49;cursor:pointer}
+        .vv-hint {font-size:12px;color:#687e72;margin-top:4px}
+        .vv-actions {display:flex;flex-wrap:wrap;justify-content:flex-end;gap:10px;margin-top:22px}
+        .vv-card-panel .vv-actions {justify-content:flex-start}
+        .vv-form-error {font-size:12.5px;font-weight:600;color:#aa2a2a;margin:10px 0;min-height:18px}
+
+        /* Group Cards & Table */
+        .vv-section-head {display:flex;justify-content:space-between;align-items:center;gap:12px;margin:0 0 14px}
         .vv-section-head h2 {font-size:19px;margin:0;color:#153b28}
-        .vv-section-head p {color:#61756b;font-size:13px;margin:5px 0 0}
+        .vv-section-head p {color:#61756b;font-size:13px;margin:4px 0 0}
         .vv-groups {display:grid;gap:16px}
-        .vv-group {background:#fff;border:1px solid #dfeae3;border-radius:17px;overflow:hidden;box-shadow:0 4px 16px rgba(23,63,42,.025)}
-        .vv-group-head {display:flex;justify-content:space-between;gap:14px;padding:18px 20px;border-bottom:1px solid #eaf0eb;align-items:center;flex-wrap:wrap}
-        .vv-group-head h3 {margin:0 0 7px;font-size:18px;color:#1d4932}
+        .vv-group {background:#fff;border:1px solid #dfeae3;border-radius:17px;overflow:hidden;box-shadow:0 4px 16px rgba(23,63,42,.025);transition:border-color .3s, box-shadow .3s}
+        .vv-group.is-highlight {border-color:#2a8959;box-shadow:0 0 0 3px rgba(42,137,89,.16)}
+        .vv-group-head {display:flex;justify-content:space-between;gap:14px;padding:16px 20px;border-bottom:1px solid #eaf0eb;align-items:center;flex-wrap:wrap;background:#fcfefd}
+        .vv-group-head h3 {margin:0 0 7px;font-size:17px;color:#1d4932}
+        .vv-group-actions {display:flex;gap:8px;flex-wrap:wrap}
         .vv-tags {display:flex;gap:7px;flex-wrap:wrap}
-        .vv-tag {border-radius:7px;background:#eff6f1;color:#326347;padding:4px 8px;font-size:11px;font-weight:700}
+        .vv-tag {border-radius:7px;background:#eff6f1;color:#326347;padding:4px 9px;font-size:11px;font-weight:700}
+        .vv-tag.is-req {background:#fff3e0;color:#9a5800}
         .vv-table-wrap {overflow-x:auto}
-        .vv-table {width:100%;border-collapse:collapse;text-align:left;min-width:570px}
-        .vv-table th {background:#f8fbf9;color:#607367;font-size:12px;font-weight:700;padding:13px 20px}
-        .vv-table td {font-size:13px;padding:13px 20px;border-top:1px solid #edf2ee;color:#344b3c}
+        .vv-table {width:100%;border-collapse:collapse;text-align:left;min-width:560px}
+        .vv-table th {background:#f8fbf9;color:#607367;font-size:11.5px;font-weight:700;padding:12px 20px;letter-spacing:.3px}
+        .vv-table td {font-size:13px;padding:13px 20px;border-top:1px solid #edf2ee;color:#344b3c;vertical-align:middle}
+        .vv-table tr:hover td {background:#fafdfb}
         .vv-table td:first-child {font-weight:700;color:#244633}
         .vv-table .vv-price {font-weight:750;color:#226b47}
-        .vv-empty {border:1px dashed #bfcfc4;border-radius:16px;text-align:center;padding:38px 20px;color:#637e6c;background:#fff;line-height:1.7}
+        .vv-badge-default {display:inline-block;background:#e6f6ec;color:#1d6c3d;padding:3px 8px;border-radius:6px;font-size:11.5px;font-weight:700}
+        .vv-empty {border:1px dashed #bfcfc4;border-radius:16px;text-align:center;padding:36px 20px;color:#637e6c;background:#fff;line-height:1.7}
+        .vv-empty-inline {text-align:center;padding:24px 20px;color:#6b8274;font-size:13px}
+
+        /* Modal */
         .vv-modal {border:0;border-radius:17px;box-shadow:0 22px 80px rgba(12,44,25,.25);padding:0;width:min(460px,calc(100vw - 25px));color:#1d4330}
         .vv-modal::backdrop {background:rgba(14,35,24,.50)}
         .vv-modal-inner {padding:25px}
-        .vv-modal h2 {margin:0 0 6px;font-size:22px}
+        .vv-modal h2 {margin:0 0 6px;font-size:21px}
         .vv-modal p {color:#677d70;font-size:13px;margin:0 0 18px;line-height:1.5}
         .vv-modal .vv-field {margin-bottom:15px}
-        .vv-check {display:flex;align-items:center;gap:10px;font-size:13px;margin:11px 0;cursor:pointer}
-        .vv-check input {width:16px;height:16px;accent-color:#236c49}
-        .vv-actions {display:flex;justify-content:flex-end;gap:10px;margin-top:23px}
-        .vv-form-error {font-size:12px;color:#aa2a2a;margin:10px 0;min-height:16px}
-        @media(max-width:700px){.vv-stats{grid-template-columns:1fr 1fr}.vv-section-head{align-items:flex-start;flex-direction:column}.vv-field.vv-id{max-width:none;flex:1 1 100%}.vv-toolbar{padding:14px}.vv-group-head{padding:15px}.vv-table th,.vv-table td{padding:12px}}
+
+        @media(max-width:700px){
+            .vv-stats{grid-template-columns:1fr}
+            .vv-grid-2{grid-template-columns:1fr}
+            .vv-section-head{align-items:flex-start;flex-direction:column}
+            .vv-field.vv-id{max-width:none;flex:1 1 100%}
+            .vv-toolbar{padding:14px}
+            .vv-group-head{padding:14px}
+            .vv-table th,.vv-table td{padding:11px 12px}
+        }
     </style>
 </head>
 <body class="admin-body">
@@ -73,81 +121,190 @@
                 <a class="adm-user fit-admin-avatar" th:href="@{/tai-khoan}"
                    th:text="${accountInfo != null ? accountInfo.initials : 'A'}" title="Tài khoản của tôi">A</a>
             </div>
-        
-                    <div class="fit-admin-top-actions">
-                      <span class="fit-admin-top-label">Khu vực quản trị</span>
-                      <form class="fit-admin-logout" method="post" th:action="@{/logout}">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                        <button type="submit" aria-label="Đăng xuất khỏi trang quản trị"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg><span>Đăng xuất</span></button>
-                      </form>
-                    </div>
-                </header>
+            <div class="fit-admin-top-actions">
+                <span class="fit-admin-top-label">Khu vực quản trị</span>
+                <form class="fit-admin-logout" method="post" th:action="@{/logout}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" aria-label="Đăng xuất khỏi trang quản trị">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg>
+                        <span>Đăng xuất</span>
+                    </button>
+                </form>
+            </div>
+        </header>
+
         <main class="adm-content variants-screen">
             <div class="adm-page-header">
                 <div>
                     <span class="admin-eyebrow">QUẢN LÝ CỬA HÀNG</span>
                     <h1>Biến thể món ăn</h1>
-                    <p>Thông tin lấy từ SQL Server FITFOOD qua API Spring Boot.</p>
+                    <p>Cấu hình nhóm lựa chọn (Kích cỡ, Sốt, Topping) và giá/calories cộng thêm cho từng món ăn.</p>
                 </div>
             </div>
 
+            <!-- Thanh chọn món ăn -->
             <section class="vv-toolbar" aria-label="Chọn món ăn">
                 <div class="vv-field">
-                    <label for="foodSelect">Chọn món ăn trong SQL Server</label>
+                    <label for="foodSelect">Chọn món ăn trong hệ thống</label>
                     <select id="foodSelect"><option value="">Đang tải danh sách món...</option></select>
                 </div>
                 <div class="vv-field vv-id">
-                    <label for="foodId">Hoặc nhập ID món ăn</label>
-                    <input id="foodId" type="number" min="1" step="1" placeholder="Ví dụ: 1">
+                    <label for="foodId">Hoặc nhập ID</label>
+                    <input id="foodId" type="number" min="1" step="1" placeholder="VD: 1">
                 </div>
-                <button type="button" class="vv-btn vv-btn-ghost" id="loadBtn">Xem biến thể</button>
-                <button type="button" class="vv-btn" id="addGroupBtn" disabled>+ Thêm nhóm</button>
+                <button type="button" class="vv-btn vv-btn-ghost" id="loadBtn">Tải dữ liệu</button>
             </section>
 
-            <p class="vv-alert" id="notice" role="status" aria-live="polite" hidden></p>
-
-            <section class="vv-stats" aria-label="Thông tin thống kê">
-                <div class="vv-stat"><small>Món ăn trong hệ thống</small><strong id="foodCount">—</strong></div>
-                <div class="vv-stat"><small>Nhóm biến thể của món đang chọn</small><strong id="groupCount">0</strong></div>
-                <div class="vv-stat"><small>Tùy chọn của món đang chọn</small><strong id="optionCount">0</strong></div>
-            </section>
-
-            <div class="vv-section-head">
-                <div>
-                    <h2 id="selectedTitle">Danh sách biến thể</h2>
-                    <p>Mỗi nhóm có thể gồm nhiều tùy chọn và mức giá cộng thêm.</p>
-                </div>
+            <!-- Thông báo trạng thái -->
+            <div class="vv-alert" id="notice" role="status" aria-live="polite" hidden>
+                <span id="noticeText"></span>
+                <button type="button" class="vv-btn vv-btn-ghost vv-btn-sm" id="closeNoticeBtn" style="padding:2px 8px;min-height:26px">Đóng</button>
             </div>
-            <section id="groups" class="vv-groups" aria-live="polite">
-                <div class="vv-empty">Đang tải dữ liệu...</div>
+
+            <!-- Thống kê nhanh -->
+            <section class="vv-stats" aria-label="Thông tin thống kê">
+                <div class="vv-stat"><small>Tổng số món ăn</small><strong id="foodCount">—</strong></div>
+                <div class="vv-stat"><small>Nhóm biến thể (Món đang chọn)</small><strong id="groupCount">0</strong></div>
+                <div class="vv-stat"><small>Tổng tùy chọn (Món đang chọn)</small><strong id="optionCount">0</strong></div>
+            </section>
+
+            <!-- Điều hướng Tab -->
+            <nav class="vv-tabs" role="tablist" aria-label="Chức năng quản lý biến thể">
+                <button type="button" class="vv-tab active" role="tab" id="tabListBtn" aria-selected="true" aria-controls="panelList">
+                    Danh sách biến thể <span class="vv-tab-badge" id="tabBadgeCount">0</span>
+                </button>
+                <button type="button" class="vv-tab" role="tab" id="tabAddGroupBtn" aria-selected="false" aria-controls="panelAddGroup" disabled>
+                    + Thêm nhóm biến thể
+                </button>
+                <button type="button" class="vv-tab" role="tab" id="tabQuickOptionBtn" aria-selected="false" aria-controls="panelQuickOption" disabled>
+                    + Thêm nhanh tùy chọn
+                </button>
+            </nav>
+
+            <!-- TAB 1: DANH SÁCH BIẾN THỂ -->
+            <section id="panelList" role="tabpanel" aria-labelledby="tabListBtn">
+                <div class="vv-section-head">
+                    <div>
+                        <h2 id="selectedTitle">Danh sách biến thể</h2>
+                        <p>Bấm "+ Thêm tùy chọn" trên từng nhóm để bổ sung lựa chọn mới.</p>
+                    </div>
+                </div>
+                <div id="groups" class="vv-groups" aria-live="polite">
+                    <div class="vv-empty">Đang tải dữ liệu...</div>
+                </div>
+            </section>
+
+            <!-- TAB 2: THÊM NHÓM BIẾN THỂ -->
+            <section id="panelAddGroup" role="tabpanel" aria-labelledby="tabAddGroupBtn" hidden>
+                <div class="vv-card-panel">
+                    <h2>Tạo nhóm biến thể mới</h2>
+                    <p id="addGroupSubtitle">Tạo nhóm lựa chọn cho món ăn đang chọn.</p>
+                    <form id="groupForm">
+                        <div class="vv-field">
+                            <label for="groupName">Tên nhóm biến thể *</label>
+                            <input id="groupName" name="group_name" required maxlength="100" placeholder="Ví dụ: Kích cỡ, Chọn loại sốt, Thêm Topping...">
+                        </div>
+
+                        <label class="vv-check">
+                            <input type="checkbox" id="groupRequired" checked>
+                            <span>Bắt buộc khách hàng phải chọn nhóm này khi đặt món</span>
+                        </label>
+
+                        <label class="vv-check">
+                            <input type="checkbox" id="groupMultiple">
+                            <span>Cho phép chọn nhiều tùy chọn cùng lúc (Checkbox)</span>
+                        </label>
+
+                        <div class="vv-field">
+                            <label for="groupMax">Số lựa chọn tối đa</label>
+                            <input type="number" id="groupMax" min="1" step="1" value="1" disabled required>
+                            <span class="vv-hint" id="groupMaxHint">Chế độ chọn một mặc định giới hạn tối đa 1 lựa chọn.</span>
+                        </div>
+
+                        <p class="vv-form-error" id="groupError" role="alert"></p>
+
+                        <div class="vv-actions">
+                            <button type="submit" class="vv-btn">Lưu nhóm biến thể</button>
+                            <button type="button" class="vv-btn vv-btn-ghost" data-goto="list">Quay lại danh sách</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- TAB 3: THÊM NHANH TÙY CHỌN (Dành cho nhập liệu nhiều món liên tiếp) -->
+            <section id="panelQuickOption" role="tabpanel" aria-labelledby="tabQuickOptionBtn" hidden>
+                <div class="vv-card-panel">
+                    <h2>Thêm nhanh tùy chọn vào nhóm</h2>
+                    <p>Phù hợp khi cần nhập liên tiếp nhiều tùy chọn mà không cần đóng mở cửa sổ.</p>
+                    <form id="quickOptionForm">
+                        <div class="vv-field">
+                            <label for="quickGroupSelect">Chọn nhóm biến thể đích *</label>
+                            <select id="quickGroupSelect" required></select>
+                        </div>
+                        <div class="vv-field">
+                            <label for="quickOptionName">Tên tùy chọn *</label>
+                            <input id="quickOptionName" required maxlength="100" placeholder="Ví dụ: Size L, Sốt mè rang, Thêm ức gà...">
+                        </div>
+                        <div class="vv-grid-2">
+                            <div class="vv-field">
+                                <label for="quickOptionPrice">Giá cộng thêm (VNĐ)</label>
+                                <input id="quickOptionPrice" type="number" step="100" min="0" value="0" required>
+                            </div>
+                            <div class="vv-field">
+                                <label for="quickOptionCalories">Calories cộng thêm (kcal)</label>
+                                <input id="quickOptionCalories" type="number" step="1" min="0" value="0" required>
+                            </div>
+                        </div>
+                        <label class="vv-check">
+                            <input type="checkbox" id="quickOptionDefault">
+                            <span>Đặt làm lựa chọn mặc định của nhóm</span>
+                        </label>
+                        <label class="vv-check">
+                            <input type="checkbox" id="quickStayOnTab" checked>
+                            <span>Ở lại tab này sau khi lưu để nhập tiếp tùy chọn khác</span>
+                        </label>
+
+                        <p class="vv-form-error" id="quickOptionError" role="alert"></p>
+
+                        <div class="vv-actions">
+                            <button type="submit" class="vv-btn">Lưu tùy chọn</button>
+                            <button type="button" class="vv-btn vv-btn-ghost" data-goto="list">Xem danh sách</button>
+                        </div>
+                    </form>
+                </div>
             </section>
         </main>
     </div>
 </div>
 
-<dialog class="vv-modal" id="groupDialog" aria-labelledby="groupDialogTitle">
-    <form class="vv-modal-inner" id="groupForm">
-        <h2 id="groupDialogTitle">Thêm nhóm biến thể</h2>
-        <p>Ví dụ: Kích cỡ, Chọn sốt, Topping.</p>
-        <div class="vv-field"><label for="groupName">Tên nhóm *</label><input id="groupName" name="group_name" required maxlength="100" placeholder="Ví dụ: Kích cỡ"></div>
-        <label class="vv-check"><input type="checkbox" id="groupRequired" checked> Bắt buộc khách hàng chọn</label>
-        <label class="vv-check"><input type="checkbox" id="groupMultiple"> Cho phép chọn nhiều tùy chọn</label>
-        <div class="vv-field"><label for="groupMax">Số lựa chọn tối đa</label><input type="number" id="groupMax" min="1" step="1" value="1" required></div>
-        <p class="vv-form-error" id="groupError" role="alert"></p>
-        <div class="vv-actions"><button type="button" class="vv-btn vv-btn-ghost" data-close="groupDialog">Hủy</button><button type="submit" class="vv-btn">Lưu nhóm</button></div>
-    </form>
-</dialog>
-
+<!-- Modal thêm tùy chọn nhanh ngay tại thẻ nhóm -->
 <dialog class="vv-modal" id="optionDialog" aria-labelledby="optionDialogTitle">
     <form class="vv-modal-inner" id="optionForm">
         <h2 id="optionDialogTitle">Thêm tùy chọn</h2>
         <p id="optionHint">Thêm một tùy chọn mới vào nhóm đã chọn.</p>
-        <div class="vv-field"><label for="optionName">Tên tùy chọn *</label><input id="optionName" required maxlength="100" placeholder="Ví dụ: Size L"></div>
-        <div class="vv-field"><label for="optionPrice">Giá cộng thêm (đồng)</label><input id="optionPrice" type="number" step="0.01" min="0" value="0" required></div>
-        <div class="vv-field"><label for="optionCalories">Calories cộng thêm (kcal)</label><input id="optionCalories" type="number" step="1" min="0" value="0" required></div>
-        <label class="vv-check"><input id="optionDefault" type="checkbox"> Lựa chọn mặc định</label>
+        <div class="vv-field">
+            <label for="optionName">Tên tùy chọn *</label>
+            <input id="optionName" required maxlength="100" placeholder="Ví dụ: Size L">
+        </div>
+        <div class="vv-grid-2">
+            <div class="vv-field">
+                <label for="optionPrice">Giá cộng thêm (đồng)</label>
+                <input id="optionPrice" type="number" step="100" min="0" value="0" required>
+            </div>
+            <div class="vv-field">
+                <label for="optionCalories">Calories cộng (kcal)</label>
+                <input id="optionCalories" type="number" step="1" min="0" value="0" required>
+            </div>
+        </div>
+        <label class="vv-check">
+            <input id="optionDefault" type="checkbox">
+            <span>Lựa chọn mặc định</span>
+        </label>
         <p class="vv-form-error" id="optionError" role="alert"></p>
-        <div class="vv-actions"><button type="button" class="vv-btn vv-btn-ghost" data-close="optionDialog">Hủy</button><button type="submit" class="vv-btn">Lưu tùy chọn</button></div>
+        <div class="vv-actions">
+            <button type="button" class="vv-btn vv-btn-ghost" data-close="optionDialog">Hủy</button>
+            <button type="submit" class="vv-btn">Lưu tùy chọn</button>
+        </div>
     </form>
 </dialog>
 
@@ -155,146 +312,268 @@
 (() => {
     'use strict';
     const byId = id => document.getElementById(id);
-    const state = {foods: [], foodId: null, groups: [], optionGroupId: null};
+    const state = {
+        foods: [],
+        foodId: null,
+        groups: [],
+        optionGroupId: null,
+        highlightGroupId: null
+    };
+
     const fmt = n => new Intl.NumberFormat('vi-VN').format(Number(n || 0));
-    const isTrue = value => value === true || value === 1 || value === '1' || value === 'true';
-    const node = (tag, className, value) => {
+    const isTrue = v => v === true || v === 1 || v === '1' || v === 'true';
+
+    const node = (tag, className, text) => {
         const el = document.createElement(tag);
         if (className) el.className = className;
-        if (value !== undefined) el.textContent = String(value);
+        if (text !== undefined) el.textContent = String(text);
         return el;
     };
+
     const notice = (message, type = 'info') => {
-        const el = byId('notice');
-        el.textContent = message;
-        el.dataset.type = type;
-        el.hidden = false;
+        const box = byId('notice');
+        byId('noticeText').textContent = message;
+        box.dataset.type = type;
+        box.hidden = false;
     };
     const clearNotice = () => { byId('notice').hidden = true; };
-    const empty = (message) => {
+
+    const renderEmpty = (message) => {
         byId('groups').replaceChildren(node('div', 'vv-empty', message));
     };
+
+    // Quản lý chuyển Tab tập trung
+    function switchTab(tab) {
+        const tabs = {
+            list: { btn: byId('tabListBtn'), panel: byId('panelList') },
+            addGroup: { btn: byId('tabAddGroupBtn'), panel: byId('panelAddGroup') },
+            quickOption: { btn: byId('tabQuickOptionBtn'), panel: byId('panelQuickOption') }
+        };
+
+        Object.entries(tabs).forEach(([key, item]) => {
+            const active = key === tab;
+            item.btn.classList.toggle('active', active);
+            item.btn.setAttribute('aria-selected', String(active));
+            item.panel.hidden = !active;
+        });
+
+        if (tab === 'addGroup') {
+            byId('groupForm').reset();
+            syncMultipleState(false);
+            byId('groupError').textContent = '';
+            byId('groupName').focus();
+        } else if (tab === 'quickOption') {
+            populateQuickGroupSelect();
+            byId('quickOptionError').textContent = '';
+            byId('quickOptionName').focus();
+        }
+    }
+
+    function syncMultipleState(allowMultiple) {
+        const maxInput = byId('groupMax');
+        const hint = byId('groupMaxHint');
+        if (allowMultiple) {
+            maxInput.disabled = false;
+            if (Number(maxInput.value) < 2) maxInput.value = 2;
+            hint.textContent = 'Nhập số lượng tùy chọn tối đa khách có thể chọn trong nhóm này.';
+        } else {
+            maxInput.value = 1;
+            maxInput.disabled = true;
+            hint.textContent = 'Chế độ chọn một mặc định giới hạn tối đa 1 lựa chọn.';
+        }
+    }
+
+    function populateQuickGroupSelect() {
+        const select = byId('quickGroupSelect');
+        const prevVal = select.value;
+        select.replaceChildren();
+        for (const g of state.groups) {
+            const opt = node('option', '', `${g.group_name || 'Nhóm #' + g.id} (${(g.options || []).length} tùy chọn)`);
+            opt.value = String(g.id);
+            select.append(opt);
+        }
+        if (prevVal && state.groups.some(g => String(g.id) === prevVal)) {
+            select.value = prevVal;
+        }
+    }
+
     async function api(url, options = {}) {
-        const headers = {Accept: 'application/json', ...(options.headers || {})};
-        if (options.body !== undefined) {
-            headers['Content-Type'] = 'application/json';
+        const headers = { Accept: 'application/json', ...(options.headers || {}) };
+        if (options.body !== undefined || (options.method && options.method !== 'GET')) {
+            if (options.body !== undefined) headers['Content-Type'] = 'application/json';
             const token = document.querySelector('meta[name="_csrf"]')?.content;
             const header = document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
             if (token) headers[header] = token;
         }
-        const response = await fetch(url, {...options, headers, credentials: 'same-origin'});
+        const response = await fetch(url, { ...options, headers, credentials: 'same-origin' });
         const type = response.headers.get('content-type') || '';
         if (!type.includes('application/json')) {
-            throw new Error('API không trả về JSON. Kiểm tra đăng nhập hoặc quyền truy cập /api/admin/variants.');
+            throw new Error('Phiên đăng nhập hết hạn hoặc API không trả về JSON.');
         }
         const data = await response.json();
-        if (!response.ok || data.status === 'error') throw new Error(data.message || `Lỗi HTTP ${response.status}`);
+        if (!response.ok || data.status === 'error') {
+            throw new Error(data.message || `Lỗi hệ thống (HTTP ${response.status})`);
+        }
         return data;
     }
+
     async function loadFoods() {
         try {
             const data = await api('/api/admin/variants/foods');
             state.foods = Array.isArray(data.foods) ? data.foods : [];
             byId('foodCount').textContent = state.foods.length;
-            byId('foodSelect').replaceChildren(node('option', '', '-- Chọn món ăn --'));
-            byId('foodSelect').firstElementChild.value = '';
+
+            const select = byId('foodSelect');
+            select.replaceChildren(node('option', '', '-- Chọn món ăn --'));
+            select.firstElementChild.value = '';
+
             for (const food of state.foods) {
-                const option = node('option', '', `${food.name || 'Món #' + food.id} (#${food.id})`);
-                option.value = String(food.id);
-                byId('foodSelect').append(option);
+                const opt = node('option', '', `${food.name || 'Món #' + food.id} (#${food.id})`);
+                opt.value = String(food.id);
+                select.append(opt);
             }
+
             if (state.foods.length) {
-                byId('foodSelect').value = String(state.foods[0].id);
-                byId('foodId').value = state.foods[0].id;
-                await loadVariants(state.foods[0].id);
+                const firstId = state.foods[0].id;
+                select.value = String(firstId);
+                byId('foodId').value = firstId;
+                await loadVariants(firstId);
             } else {
-                empty('Chưa tìm thấy món ăn trong bảng foods. Bạn có thể nhập ID và nhấn Xem biến thể.');
-                notice('Không tìm thấy món ăn trong bảng foods.', 'info');
+                renderEmpty('Chưa có món ăn nào trong hệ thống. Bạn có thể nhập ID món ăn trực tiếp ở ô bên cạnh.');
             }
         } catch (error) {
             byId('foodCount').textContent = '—';
-            byId('foodSelect').replaceChildren(node('option', '', 'Không tải được danh sách món'));
-            empty('Bạn có thể nhập ID món ăn để xem biến thể đã lưu.');
-            notice(`Không tải được danh sách món ăn: ${error.message}`, 'error');
+            byId('foodSelect').replaceChildren(node('option', '', 'Lỗi tải danh sách món'));
+            renderEmpty('Không tải được danh sách món. Hãy nhập ID món ăn để tra cứu trực tiếp.');
+            notice(error.message, 'error');
         }
     }
-    async function loadVariants(id) {
+
+    async function loadVariants(id, keepCurrentTab = false) {
         const foodId = Number(id);
         if (!Number.isSafeInteger(foodId) || foodId <= 0) {
-            notice('Vui lòng chọn món hoặc nhập ID món ăn là số nguyên dương.', 'error');
+            notice('ID món ăn phải là một số nguyên dương hợp lệ.', 'error');
             return;
         }
+
         state.foodId = foodId;
-        state.groups = [];
         byId('foodId').value = foodId;
         byId('foodSelect').value = state.foods.some(f => String(f.id) === String(foodId)) ? String(foodId) : '';
-        byId('addGroupBtn').disabled = false;
+        byId('tabAddGroupBtn').disabled = false;
+
         const food = state.foods.find(f => String(f.id) === String(foodId));
+        const foodLabel = food ? `${food.name} (#${foodId})` : `Món #${foodId}`;
         byId('selectedTitle').textContent = food ? `Biến thể: ${food.name}` : `Biến thể món #${foodId}`;
-        byId('groupCount').textContent = '0';
-        byId('optionCount').textContent = '0';
-        clearNotice();
-        empty('Đang tải nhóm và tùy chọn từ SQL Server...');
+        byId('addGroupSubtitle').textContent = `Đang thêm nhóm biến thể cho: ${foodLabel}`;
+
+        if (!keepCurrentTab) switchTab('list');
+        renderEmpty('Đang tải dữ liệu biến thể...');
+
         try {
             const result = await api(`/api/admin/variants/food/${foodId}`);
             if (state.foodId !== foodId) return;
             state.groups = Array.isArray(result.variant_groups) ? result.variant_groups : [];
             renderGroups();
+            if (keepCurrentTab && !byId('panelQuickOption').hidden) {
+                populateQuickGroupSelect();
+            }
         } catch (error) {
-            empty('Không thể tải biến thể. Hãy kiểm tra SQL Server và API.');
+            state.groups = [];
+            updateCounters();
+            renderEmpty('Không thể tải biến thể cho món ăn này.');
             notice(error.message, 'error');
         }
     }
+
+    function updateCounters() {
+        const groupLen = state.groups.length;
+        const optLen = state.groups.reduce((sum, g) => sum + (g.options || []).length, 0);
+        byId('groupCount').textContent = groupLen;
+        byId('tabBadgeCount').textContent = groupLen;
+        byId('optionCount').textContent = optLen;
+        // Chỉ bật Tab Thêm nhanh tùy chọn khi món ăn đã có ít nhất 1 nhóm
+        byId('tabQuickOptionBtn').disabled = groupLen === 0;
+    }
+
     function renderGroups() {
+        updateCounters();
         const list = byId('groups');
         list.replaceChildren();
-        const groups = state.groups;
-        byId('groupCount').textContent = groups.length;
-        byId('optionCount').textContent = groups.reduce((sum, group) => sum + (group.options || []).length, 0);
-        if (!groups.length) {
-            empty('Món ăn này chưa có nhóm biến thể. Nhấn "+ Thêm nhóm" để tạo nhóm mới.');
+
+        if (!state.groups.length) {
+            renderEmpty('Món ăn này chưa có nhóm biến thể nào. Hãy chuyển sang tab "+ Thêm nhóm biến thể" để tạo.');
             return;
         }
-        for (const group of groups) {
+
+        let highlightedEl = null;
+
+        for (const group of state.groups) {
             const card = node('article', 'vv-group');
+            card.dataset.groupId = String(group.id);
+
+            if (state.highlightGroupId && String(group.id) === String(state.highlightGroupId)) {
+                card.classList.add('is-highlight');
+                highlightedEl = card;
+            }
+
             const header = node('div', 'vv-group-head');
             const info = node('div');
             info.append(node('h3', '', group.group_name || `Nhóm #${group.id}`));
+
             const tags = node('div', 'vv-tags');
-            tags.append(node('span', 'vv-tag', isTrue(group.is_required) ? 'Bắt buộc' : 'Không bắt buộc'));
-            tags.append(node('span', 'vv-tag', isTrue(group.allow_multiple) ? 'Chọn nhiều' : 'Chọn một'));
-            tags.append(node('span', 'vv-tag', `Tối đa: ${group.max_select ?? 1}`));
+            const reqTag = node('span', isTrue(group.is_required) ? 'vv-tag is-req' : 'vv-tag', isTrue(group.is_required) ? 'Bắt buộc chọn' : 'Không bắt buộc');
+            tags.append(reqTag);
+            tags.append(node('span', 'vv-tag', isTrue(group.allow_multiple) ? `Chọn nhiều (Tối đa ${group.max_select ?? 1})` : 'Chọn một'));
             info.append(tags);
-            const addBtn = node('button', 'vv-btn vv-btn-ghost', '+ Thêm tùy chọn');
+
+            const actions = node('div', 'vv-group-actions');
+            const addBtn = node('button', 'vv-btn vv-btn-ghost vv-btn-sm', '+ Thêm tùy chọn');
             addBtn.type = 'button';
-            addBtn.addEventListener('click', () => {
-                state.optionGroupId = group.id;
-                byId('optionHint').textContent = `Nhóm: ${group.group_name || '#' + group.id}`;
-                byId('optionForm').reset();
-                byId('optionError').textContent = '';
-                byId('optionDialog').showModal();
-            });
-            header.append(info, addBtn);
+            addBtn.addEventListener('click', () => openOptionModal(group));
+
+            const delGroupBtn = node('button', 'vv-btn vv-btn-danger-ghost', 'Xóa nhóm');
+            delGroupBtn.type = 'button';
+            delGroupBtn.addEventListener('click', () => deleteGroup(group));
+
+            actions.append(addBtn, delGroupBtn);
+            header.append(info, actions);
             card.append(header);
+
             const opts = Array.isArray(group.options) ? group.options : [];
             if (!opts.length) {
-                card.append(node('div', 'vv-empty', 'Nhóm này chưa có tùy chọn.'));
+                card.append(node('div', 'vv-empty-inline', 'Nhóm này chưa có tùy chọn nào. Bấm "+ Thêm tùy chọn" ở góc trên để thêm.'));
             } else {
                 const wrap = node('div', 'vv-table-wrap');
                 const table = node('table', 'vv-table');
                 const thead = node('thead');
                 const tr = node('tr');
-                for (const label of ['TÙY CHỌN', 'GIÁ CỘNG THÊM', 'CALORIES CỘNG', 'MẶC ĐỊNH']) {
+                for (const label of ['TÊN TÙY CHỌN', 'GIÁ CỘNG THÊM', 'CALORIES CỘNG', 'MẶC ĐỊNH', 'THAO TÁC']) {
                     tr.append(node('th', '', label));
                 }
                 thead.append(tr);
+
                 const tbody = node('tbody');
                 for (const option of opts) {
                     const row = node('tr');
                     row.append(node('td', '', option.option_name || `Tùy chọn #${option.id}`));
                     row.append(node('td', 'vv-price', `+${fmt(option.extra_price)}đ`));
                     row.append(node('td', '', `+${fmt(option.extra_calories)} kcal`));
-                    row.append(node('td', '', isTrue(option.is_default) ? '✓ Có' : 'Không'));
+
+                    const defCell = node('td');
+                    if (isTrue(option.is_default)) {
+                        defCell.append(node('span', 'vv-badge-default', 'Mặc định'));
+                    } else {
+                        defCell.textContent = '—';
+                    }
+                    row.append(defCell);
+
+                    const actCell = node('td');
+                    const delOptBtn = node('button', 'vv-btn vv-btn-danger-ghost', 'Xóa');
+                    delOptBtn.type = 'button';
+                    delOptBtn.addEventListener('click', () => deleteOption(option));
+                    actCell.append(delOptBtn);
+                    row.append(actCell);
+
                     tbody.append(row);
                 }
                 table.append(thead, tbody);
@@ -303,61 +582,158 @@
             }
             list.append(card);
         }
-    }
-    async function save(event, url, payload, errorElement, dialog) {
-        event.preventDefault();
-        const submit = event.currentTarget.querySelector('button[type="submit"]');
-        submit.disabled = true;
-        errorElement.textContent = '';
-        try {
-            const data = await api(url, {method:'POST', body:JSON.stringify(payload)});
-            dialog.close();
-            await loadVariants(state.foodId);
-            notice(data.message || 'Đã lưu vào SQL Server.', 'success');
-        } catch (error) {
-            errorElement.textContent = error.message;
-        } finally {
-            submit.disabled = false;
+
+        if (highlightedEl) {
+            highlightedEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => highlightedEl.classList.remove('is-highlight'), 2600);
+            state.highlightGroupId = null;
         }
     }
-    byId('foodSelect').addEventListener('change', event => {
-        const id = event.target.value;
-        if (id) { byId('foodId').value = id; loadVariants(id); }
+
+    function openOptionModal(group) {
+        state.optionGroupId = group.id;
+        byId('optionHint').textContent = `Thêm tùy chọn vào nhóm: "${group.group_name || '#' + group.id}"`;
+        byId('optionForm').reset();
+        byId('optionError').textContent = '';
+        byId('optionDialog').showModal();
+        byId('optionName').focus();
+    }
+
+    async function deleteGroup(group) {
+        if (!confirm(`Bạn có chắc muốn xóa nhóm "${group.group_name}" và toàn bộ tùy chọn bên trong?`)) return;
+        try {
+            const data = await api(`/api/admin/variants/group/${group.id}`, { method: 'DELETE' });
+            await loadVariants(state.foodId, true);
+            notice(data.message || `Đã xóa nhóm "${group.group_name}".`, 'success');
+        } catch (error) {
+            notice(`Không thể xóa nhóm: ${error.message}`, 'error');
+        }
+    }
+
+    async function deleteOption(option) {
+        if (!confirm(`Xóa tùy chọn "${option.option_name}"?`)) return;
+        try {
+            const data = await api(`/api/admin/variants/option/${option.id}`, { method: 'DELETE' });
+            await loadVariants(state.foodId, true);
+            notice(data.message || `Đã xóa tùy chọn "${option.option_name}".`, 'success');
+        } catch (error) {
+            notice(`Không thể xóa tùy chọn: ${error.message}`, 'error');
+        }
+    }
+
+    async function submitPost(event, url, payload, errorEl, onSuccess) {
+        event.preventDefault();
+        const submitBtn = event.currentTarget.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        errorEl.textContent = '';
+        try {
+            const data = await api(url, { method: 'POST', body: JSON.stringify(payload) });
+            if (onSuccess) await onSuccess(data);
+            notice(data.message || 'Thao tác thành công.', 'success');
+        } catch (error) {
+            errorEl.textContent = error.message;
+        } finally {
+            submitBtn.disabled = false;
+        }
+    }
+
+    // Event Listeners
+    byId('foodSelect').addEventListener('change', e => {
+        if (e.target.value) {
+            clearNotice();
+            loadVariants(e.target.value);
+        }
     });
-    byId('loadBtn').addEventListener('click', () => loadVariants(byId('foodId').value));
-    byId('foodId').addEventListener('keydown', event => {
-        if (event.key === 'Enter') loadVariants(byId('foodId').value);
+    byId('loadBtn').addEventListener('click', () => {
+        clearNotice();
+        loadVariants(byId('foodId').value);
     });
-    byId('addGroupBtn').addEventListener('click', () => {
-        byId('groupForm').reset();
-        byId('groupMax').value = 1;
-        byId('groupError').textContent = '';
-        byId('groupDialog').showModal();
+    byId('foodId').addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+            clearNotice();
+            loadVariants(byId('foodId').value);
+        }
     });
-    byId('groupMultiple').addEventListener('change', event => {
-        if (!event.target.checked) byId('groupMax').value = 1;
+
+    byId('closeNoticeBtn').addEventListener('click', clearNotice);
+
+    // Chuyển Tab
+    byId('tabListBtn').addEventListener('click', () => switchTab('list'));
+    byId('tabAddGroupBtn').addEventListener('click', () => { if (state.foodId) switchTab('addGroup'); });
+    byId('tabQuickOptionBtn').addEventListener('click', () => { if (state.groups.length) switchTab('quickOption'); });
+    document.querySelectorAll('[data-goto]').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.goto));
     });
-    document.querySelectorAll('[data-close]').forEach(button => button.addEventListener('click', () => byId(button.dataset.close).close()));
-    byId('groupForm').addEventListener('submit', event => {
-        let max = Number(byId('groupMax').value);
-        if (!byId('groupMultiple').checked) max = 1;
-        save(event, '/api/admin/variants/group/add', {
+
+    // Đồng bộ checkbox chọn nhiều -> input số lượng tối đa
+    byId('groupMultiple').addEventListener('change', e => syncMultipleState(e.target.checked));
+
+    // Đóng modal
+    document.querySelectorAll('[data-close]').forEach(btn => {
+        btn.addEventListener('click', () => byId(btn.dataset.close).close());
+    });
+
+    // Submit Tab 2: Thêm nhóm biến thể
+    byId('groupForm').addEventListener('submit', e => {
+        const allowMultiple = byId('groupMultiple').checked;
+        const maxSelect = allowMultiple ? Math.max(1, Number(byId('groupMax').value)) : 1;
+
+        submitPost(e, '/api/admin/variants/group/add', {
             food_id: state.foodId,
             group_name: byId('groupName').value.trim(),
             is_required: byId('groupRequired').checked,
-            allow_multiple: byId('groupMultiple').checked,
-            max_select: max
-        }, byId('groupError'), byId('groupDialog'));
+            allow_multiple: allowMultiple,
+            max_select: maxSelect
+        }, byId('groupError'), async (res) => {
+            // Lưu ID nhóm mới (nếu API trả về) để highlight sau khi reload
+            state.highlightGroupId = res.group?.id || res.id || null;
+            await loadVariants(state.foodId, false); // Tự động quay về tab Danh sách và làm mới
+        });
     });
-    byId('optionForm').addEventListener('submit', event => {
-        save(event, '/api/admin/variants/option/add', {
-            group_id: state.optionGroupId,
+
+    // Submit Tab 3: Thêm nhanh tùy chọn
+    byId('quickOptionForm').addEventListener('submit', e => {
+        const groupId = Number(byId('quickGroupSelect').value);
+        const stayOnTab = byId('quickStayOnTab').checked;
+
+        submitPost(e, '/api/admin/variants/option/add', {
+            group_id: groupId,
+            option_name: byId('quickOptionName').value.trim(),
+            extra_price: Number(byId('quickOptionPrice').value),
+            extra_calories: Number(byId('quickOptionCalories').value),
+            is_default: byId('quickOptionDefault').checked
+        }, byId('quickOptionError'), async () => {
+            byId('quickOptionName').value = '';
+            byId('quickOptionPrice').value = 0;
+            byId('quickOptionCalories').value = 0;
+            byId('quickOptionDefault').checked = false;
+
+            await loadVariants(state.foodId, stayOnTab);
+            if (stayOnTab) {
+                byId('quickOptionName').focus();
+            } else {
+                state.highlightGroupId = groupId;
+                renderGroups();
+            }
+        });
+    });
+
+    // Submit Modal: Thêm tùy chọn từ card nhóm
+    byId('optionForm').addEventListener('submit', e => {
+        const targetGroupId = state.optionGroupId;
+        submitPost(e, '/api/admin/variants/option/add', {
+            group_id: targetGroupId,
             option_name: byId('optionName').value.trim(),
             extra_price: Number(byId('optionPrice').value),
             extra_calories: Number(byId('optionCalories').value),
             is_default: byId('optionDefault').checked
-        }, byId('optionError'), byId('optionDialog'));
+        }, byId('optionError'), async () => {
+            byId('optionDialog').close();
+            state.highlightGroupId = targetGroupId;
+            await loadVariants(state.foodId, true);
+        });
     });
+
     loadFoods();
 })();
 </script>
