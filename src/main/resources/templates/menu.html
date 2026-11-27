@@ -5,11 +5,8 @@
 
         <div th:replace="~{fragments/layout :: header('menu')}"></div>
 
-        <!-- TOAST THÔNG BÁO THÀNH CÔNG -->
-        <div id="toastSuccess" th:if="${successMessage}" 
-             style="position: fixed; top: 25px; right: 25px; z-index: 100000; background: #27ae60; color: #fff; padding: 14px 22px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); font-weight: 600; display: flex; align-items: center; gap: 10px; animation: slideIn 0.3s ease;">
-            <span>✓</span>
-            <span th:text="${successMessage}">Thêm món vào giỏ hàng thành công!</span>
+        <div role="status">
+            <div id="menuCartToast" th:text="${successMessage}"></div>
         </div>
 
         <main id="main">
@@ -597,7 +594,7 @@
                     <button type="button" onclick="closeQuickAddModal()" style="position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; border-radius: 50%; background: #f1f2f6; border: none; font-size: 18px; line-height: 1; cursor: pointer; color: #7f8c8d;">×</button>
                 </div>
 
-                <form th:action="@{/cart/add}" method="post" id="quickAddForm" onsubmit="return handleQuickAddSubmit(event);" style="display: flex; flex-direction: column; flex: 1; overflow: hidden; margin: 0;">
+                <form th:action="@{/cart/add}" th:data-login-url="@{/dang-nhap}" method="post" id="quickAddForm" onsubmit="handleQuickAddSubmit(event);" style="display: flex; flex-direction: column; flex: 1; overflow: hidden; margin: 0;">
                     <input type="hidden" name="productId" id="modalProductId" />
                     <input type="hidden" name="variantName" id="modalVariantName" />
                     <input type="hidden" name="unitPrice" id="modalCalculatedUnitPrice" />
@@ -643,8 +640,11 @@
     <script>
         let selectedProductPrice = 0;
         let currentLoadedGroups = [];
+        let quickAddTrigger;
+        let menuCartToastTimer;
 
         async function openQuickAddModal(button) {
+            quickAddTrigger = button;
             const id = button.getAttribute('data-id');
             const name = button.getAttribute('data-name');
             const price = parseFloat(button.getAttribute('data-price')) || 0;
@@ -779,7 +779,9 @@
         }
 
         function closeQuickAddModal() {
+            if (document.getElementById('modalSubmitBtn').disabled) return;
             document.getElementById('quickAddModal').style.display = 'none';
+            quickAddTrigger?.focus({ preventScroll: true });
         }
 
         function modifyQty(amount) {
@@ -817,14 +819,18 @@
         }
 
         // XỬ LÝ GOM TẤT CẢ CÁC BIẾN THỂ VÀ ĐƠN GIÁ TRƯỚC KHI SUBMIT
-        function handleQuickAddSubmit(event) {
+        async function handleQuickAddSubmit(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const submitBtn = document.getElementById('modalSubmitBtn');
+            if (submitBtn.disabled) return;
+
             for (let group of currentLoadedGroups) {
                 if (group.is_required) {
                     const checked = document.querySelectorAll(`input[name="quick_variant_${group.id}"]:checked`);
                     if (checked.length === 0) {
                         alert('Vui lòng chọn: ' + group.group_name);
-                        event.preventDefault();
-                        return false;
+                        return;
                     }
                 }
             }
@@ -851,59 +857,42 @@
                 unitPriceInput.value = selectedProductPrice + extra;
             }
 
-            const submitBtn = document.getElementById('modalSubmitBtn');
+            const body = new URLSearchParams(new FormData(form));
+            body.set('stayOnMenu', 'true');
+            const loginUrl = new URL(form.dataset.loginUrl, window.location.href);
+            submitBtn.disabled = true;
 
-            if (submitBtn && submitBtn.disabled) {
-                event.preventDefault();
-                return false;
+            try {
+                const response = await fetch(form.action, { method: 'POST', body });
+                if (response.status === 401 || (response.redirected && response.url === loginUrl.href)) {
+                    window.location.assign(loginUrl.href);
+                    return;
+                }
+                if (response.status !== 204) {
+                    showMenuCartToast('Không thể thêm món vào giỏ hàng. Vui lòng thử lại.', true);
+                    return;
+                }
+            } catch {
+                showMenuCartToast('Không thể kết nối để thêm món vào giỏ hàng. Vui lòng thử lại.', true);
+                return;
+            } finally {
+                submitBtn.disabled = false;
             }
 
-            if (submitBtn) {
-                submitBtn.disabled = true;
+            try {
+                window.flyToCart?.(document.getElementById('modalProductImg'));
+            } finally {
+                closeQuickAddModal();
+                showMenuCartToast('Đã thêm món vào giỏ hàng.');
             }
+        }
 
-            if (typeof window.flyToCart === 'function') {
-
-                event.preventDefault();
-
-                const form = event.currentTarget;
-
-                const productImage =
-                        document.getElementById('modalProductImg');
-
-                window.flyToCart(productImage, function () {
-                    HTMLFormElement.prototype.submit.call(form);
-                });
-
-                return false;
-            }
-
-            return true;
-
-            if (submitBtn) {
-                submitBtn.disabled = true;
-            }
-
-            // Animation bay vào giỏ hàng
-            if (typeof window.flyToCart === 'function') {
-
-                event.preventDefault();
-
-                const form = document.getElementById('quickAddForm');
-
-                const productImage = document.getElementById('modalProductImg');
-
-                window.flyToCart(productImage, function () {
-
-                    form.submit();
-
-                });
-
-                return false;
-
-            }
-
-            return true;
+        function showMenuCartToast(message, isError = false) {
+            const toast = document.getElementById('menuCartToast');
+            clearTimeout(menuCartToastTimer);
+            toast.classList.toggle('is-error', isError);
+            toast.textContent = message;
+            menuCartToastTimer = setTimeout(() => { toast.textContent = ''; }, 3000);
         }
 
         window.addEventListener('click', function (event) {
@@ -912,17 +901,30 @@
                 closeQuickAddModal();
         });
 
-        setTimeout(() => {
-            const toast = document.getElementById('toastSuccess');
-            if (toast) {
-                toast.style.transition = 'opacity 0.5s ease';
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 500);
-            }
-        }, 3000);
+        const initialCartMessage = document.getElementById('menuCartToast').textContent;
+        if (initialCartMessage) showMenuCartToast(initialCartMessage);
     </script>
 
     <style>
+        #menuCartToast:not(:empty) {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            z-index: 100000;
+            max-width: calc(100vw - 50px);
+            padding: 14px 22px;
+            border-radius: 8px;
+            background: #166534;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-weight: 600;
+            animation: slideIn 0.3s ease;
+        }
+
+        #menuCartToast.is-error {
+            background: #991b1b;
+        }
+
         @keyframes slideIn {
             from {
                 transform: translateX(50px);

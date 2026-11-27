@@ -1,5 +1,5 @@
 package com.fitfood.controller;
-import org.springframework.web.bind.annotation.RequestParam;
+
 import com.fitfood.auth.model.AppUser;
 import com.fitfood.auth.repository.AppUserRepository;
 import com.fitfood.auth.repository.CartItemRepository;
@@ -9,6 +9,7 @@ import com.fitfood.category.CartItem;
 import com.fitfood.category.Product;
 import com.fitfood.category.ProductRepository;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -207,7 +208,9 @@ return "cart";
                             @RequestParam(value = "variantName", required = false) String variantName,
                             @RequestParam(value = "unitPrice", required = false) BigDecimal unitPrice,
                             @RequestParam(value = "foodNote", required = false) String foodNote,
-                            RedirectAttributes redirectAttributes) {
+                            @RequestParam(defaultValue = "false") boolean stayOnMenu,
+                            RedirectAttributes redirectAttributes,
+                            HttpServletResponse response) {
         if (userDetails == null) {
             return "redirect:/dang-nhap";
         }
@@ -262,7 +265,14 @@ return "cart";
                 }
                 cartItemRepository.save(newItem);
             }
+            if (stayOnMenu) {
+                response.setStatus(HttpServletResponse.SC_NO_CONTENT);
+                return null;
+            }
             redirectAttributes.addFlashAttribute("successMessage", "Thêm món vào giỏ hàng thành công!");
+        } else if (stayOnMenu) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return null;
         }
         return "redirect:/cart";
     }
