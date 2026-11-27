@@ -1,5 +1,5 @@
 /*
-    BAN TONG HOP: FITFOOD DATABASE + CHAT USER/ADMIN + FOOD VARIANTS
+    BAN TONG HOP: FITFOOD DATABASE + CHAT USER/ADMIN (EDIT/RECALL) + FOOD VARIANTS
     CANH BAO: FILE NAY GIU NGUYEN LENH DROP DATABASE FITFOOD TRONG SCRIPT GOC.
     CHI CHAY KHI MUON TAO LAI DATABASE TU DAU VA DA SAO LUU DU LIEU!
 */
@@ -322,6 +322,9 @@ BEGIN
         content NVARCHAR(1000) NOT NULL,
         created_at DATETIME2(6) NOT NULL
             CONSTRAINT DF_ff_support_message_created DEFAULT (SYSDATETIME()),
+        edited_at DATETIME2(6) NULL,
+        is_recalled BIT NOT NULL
+            CONSTRAINT DF_ff_support_messages_is_recalled DEFAULT (0),
         CONSTRAINT FK_ff_support_msg_ticket
             FOREIGN KEY (ticket_id) REFERENCES dbo.fitfood_support_tickets(id),
         CONSTRAINT FK_ff_support_msg_sender
