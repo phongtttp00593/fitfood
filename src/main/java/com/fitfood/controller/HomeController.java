@@ -221,6 +221,20 @@ public class HomeController {
             loadProductVariantGroups(id)
         );
 
+        // Gợi ý tối đa 4 món cùng danh mục ở cuối trang chi tiết.
+        model.addAttribute("relatedProducts", jdbc.query("""
+            SELECT TOP (4) p.id, p.name, p.price, p.image_url
+            FROM dbo.fitfood_products p
+            WHERE p.active = 1 AND p.id <> ?
+              AND p.category_id = (
+                  SELECT category_id FROM dbo.fitfood_products WHERE id = ?)
+            ORDER BY p.name
+            """, (rs, rowNum) -> new RelatedProduct(
+                rs.getLong("id"),
+                rs.getString("name"),
+                rs.getBigDecimal("price"),
+                rs.getString("image_url")), id, id));
+
         return "product";
     }
 
@@ -283,6 +297,13 @@ public class HomeController {
             Long id,
             String name,
             String description,
+            BigDecimal price,
+            String imageUrl) {
+    }
+
+    public record RelatedProduct(
+            Long id,
+            String name,
             BigDecimal price,
             String imageUrl) {
     }

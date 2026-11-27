@@ -604,14 +604,20 @@
 
         </div>
 
-        <!-- BẢN ĐỒ CỬA HÀNG: Google Maps nhúng iframe, không cần API key.
-             Đổi địa chỉ qua biến môi trường STORE_ADDRESS (hoặc fitfood.store.address). -->
+        <!-- BẢN ĐỒ CỬA HÀNG: Leaflet + OpenStreetMap (miễn phí, không cần API key).
+             Hiện quán và (khi người xem cho phép) vị trí hiện tại của họ.
+             Địa chỉ: STORE_ADDRESS; điểm ghim chính xác: STORE_MAP_QUERY ("vĩ độ,kinh độ"). -->
         <section class="f-map" aria-labelledby="footerMapTitle">
 
             <div class="f-map-info">
                 <h3 id="footerMapTitle">Ghé cửa hàng FITFOOD</h3>
                 <p th:text="${storeAddress}">Hải Phòng, Việt Nam</p>
                 <p>Mở cửa 8:00 – 21:00 mỗi ngày · Giao tận nơi trong nội thành</p>
+                <button type="button" class="f-map-locate" id="storeMapLocate">
+                    Vị trí của tôi
+                </button>
+                <p class="f-map-status" id="storeMapStatus" role="status" aria-live="polite"></p>
+
                 <a class="f-map-link"
                    target="_blank"
                    rel="noopener"
@@ -621,12 +627,18 @@
             </div>
 
             <div class="f-map-frame">
-                <iframe title="Bản đồ vị trí cửa hàng FITFOOD"
-                        loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"
-                        allowfullscreen
-                        th:src="@{https://maps.google.com/maps(q=${storeMapQuery},z=17,output=embed)}">
-                </iframe>
+                <div id="storeMap"
+                     th:data-address="${storeAddress}"
+                     th:data-query="${storeMapQuery}"
+                     role="region"
+                     aria-label="Bản đồ: vị trí cửa hàng FITFOOD và vị trí của bạn"></div>
+
+                <noscript>
+                    <iframe title="Bản đồ vị trí cửa hàng FITFOOD"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            th:src="@{https://maps.google.com/maps(q=${storeMapQuery},z=17,output=embed)}">
+                    </iframe>
+                </noscript>
             </div>
 
         </section>
@@ -657,6 +669,11 @@
 
     <!-- JAVASCRIPT HIỆN CÓ -->
     <script th:src="@{/js/motion.js}"
+            defer>
+    </script>
+
+    <!-- BẢN ĐỒ CỬA HÀNG + ĐỊNH VỊ NGƯỜI XEM -->
+    <script th:src="@{/js/store-map.js}"
             defer>
     </script>
 
