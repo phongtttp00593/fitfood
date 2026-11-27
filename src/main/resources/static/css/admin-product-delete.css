@@ -3,138 +3,133 @@
     font-family: "Be Vietnam Pro", Arial, sans-serif;
 }
 
-.delete-product-container {
-    max-width: 520px;
-    margin: 30px auto;
-}
-
-.delete-card {
+body {
     background: var(--surface, #fffcf5);
-    border: 1px solid var(--gold-300, #dcc07e);
-    border-radius: 16px;
-    padding: 30px;
-    text-align: center;
-    box-shadow: 0 16px 40px rgba(35, 20, 13, 0.12);
-}
-
-.delete-icon {
-    font-size: 42px;
-    margin-bottom: 10px;
-    line-height: 1;
-}
-
-.delete-card h2 {
+    margin: 0;
+    padding: 18px 24px 30px;
     color: var(--lacquer, #3a2217);
-    font-size: 20px;
-    font-weight: 800;
-    margin: 0 0 8px;
-}
-
-.delete-warning {
-    color: var(--muted, #6e5d4f);
     font-size: 14px;
-    margin: 0 0 20px;
 }
 
-.product-info-box {
+.container {
+    max-width: 100%;
+    margin: 0 auto;
+}
+
+.message.error {
+    background: #fdf2f2;
+    color: #9b1c1c;
+    border: 1px solid #f8b4b4;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.info-box {
     display: flex;
     align-items: center;
     gap: 16px;
-    background: var(--gold-50, #f7eed6);
-    border: 1px dashed var(--gold-300, #dcc07e);
-    border-radius: 10px;
     padding: 14px;
-    margin-bottom: 24px;
-    text-align: left;
+    border: 1px solid var(--line, #e6d8bc);
+    border-radius: 8px;
+    background: var(--paper, #fdfaf3);
+    margin-top: 14px;
 }
 
-.info-thumb img {
-    width: 65px;
-    height: 65px;
+.thumb-wrap img {
+    width: 84px;
+    height: 84px;
     border-radius: 8px;
     object-fit: cover;
     border: 1px solid var(--line, #e6d8bc);
+    display: block;
 }
 
-.info-thumb .no-img {
-    width: 65px;
-    height: 65px;
-    background: var(--line, #e6d8bc);
+.thumb-wrap .no-img {
+    width: 84px;
+    height: 84px;
     border-radius: 8px;
+    background: #f3ead4;
+    border: 1px solid var(--line, #e6d8bc);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 11px;
+    font-size: 12px;
     color: var(--muted, #6e5d4f);
 }
 
-.info-detail h3 {
-    margin: 0 0 4px;
-    color: var(--lacquer, #3a2217);
+.info-content h3 {
+    margin: 0 0 6px;
     font-size: 16px;
     font-weight: 700;
+    color: var(--lacquer, #3a2217);
 }
 
-.info-detail p {
-    margin: 3px 0;
+.info-content p {
+    margin: 4px 0;
     font-size: 13px;
     color: var(--lacquer, #3a2217);
 }
 
-.badge {
-    padding: 2px 7px;
-    border-radius: 4px;
-    font-size: 11px;
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 12px;
     font-weight: 700;
 }
 
-.badge-success {
+.status-badge.active {
     background: #def7ec;
     color: #03543f;
 }
 
-.badge-danger {
-    background: #fde8e8;
+.status-badge.inactive {
+    background: #fdf2f2;
     color: #9b1c1c;
 }
 
-.delete-action-form {
+.actions {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line, #e6d8bc);
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     gap: 12px;
 }
 
-.btn-danger {
-    background: var(--red, #9b2c1f);
-    color: #ffffff;
-    border: none;
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
     padding: 10px 22px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
+    text-decoration: none;
     transition: 0.2s;
 }
 
-.btn-danger:hover {
-    background: #7a1f14;
+.btn.delete {
+    background: var(--red, #9b2c1f);
+    color: #ffffff;
+    border: none;
 }
 
-.btn-secondary {
+.btn.delete:hover {
+    background: #7d2117;
+}
+
+.btn.cancel {
     background: #e2e8f0;
     color: #4a5568;
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    transition: 0.2s;
 }
 
-.btn-secondary:hover {
+.btn.cancel:hover {
     background: #cbd5e0;
 }
