@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{v2/fragments/layout :: head(${mealPlan.name})}"></head>
+<head th:replace="~{fragments/layout :: head(${mealPlan.name})}"></head>
 <body>
-<div th:replace="~{v2/fragments/layout :: header('menu')}"></div>
+<div th:replace="~{fragments/layout :: header('menu')}"></div>
 <main id="main" class="meal-detail-page">
   <div class="container meal-detail-wrap">
     <nav class="meal-detail-breadcrumb"><a th:href="@{/}">Trang chủ</a><span>›</span><a th:href="@{/menu#goi-an}">Gói ăn</a><span>›</span><strong th:text="${mealPlan.name}">Tên gói</strong></nav>

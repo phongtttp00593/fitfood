@@ -150,7 +150,7 @@ public class HomeController {
 
             }));
 
-        return "v2/menu";
+        return "menu";
     }
 
     // ================= CHI TIET MON AN =================

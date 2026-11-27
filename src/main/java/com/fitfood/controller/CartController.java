@@ -197,7 +197,7 @@ private String loadCartPage(
 
 model.addAttribute("checkoutPage", checkoutPage);
 
-return "v2/cart";
+return "cart";
     }
 
     @PostMapping("/add")

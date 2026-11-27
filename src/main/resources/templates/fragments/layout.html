@@ -19,42 +19,42 @@
 
     <!-- BE VIETNAM PRO 400 - VIETNAMESE -->
     <link rel="preload"
-          th:href="@{/css/v2/fonts/be-vietnam-pro-normal-400-vietnamese.woff2}"
+          th:href="@{/css/fonts/be-vietnam-pro-normal-400-vietnamese.woff2}"
           as="font"
           type="font/woff2"
           crossorigin="anonymous" />
 
     <!-- BE VIETNAM PRO 400 - LATIN -->
     <link rel="preload"
-          th:href="@{/css/v2/fonts/be-vietnam-pro-normal-400-latin.woff2}"
+          th:href="@{/css/fonts/be-vietnam-pro-normal-400-latin.woff2}"
           as="font"
           type="font/woff2"
           crossorigin="anonymous" />
 
     <!-- BE VIETNAM PRO 600 - VIETNAMESE -->
     <link rel="preload"
-          th:href="@{/css/v2/fonts/be-vietnam-pro-normal-600-vietnamese.woff2}"
+          th:href="@{/css/fonts/be-vietnam-pro-normal-600-vietnamese.woff2}"
           as="font"
           type="font/woff2"
           crossorigin="anonymous" />
 
     <!-- BE VIETNAM PRO 600 - LATIN -->
     <link rel="preload"
-          th:href="@{/css/v2/fonts/be-vietnam-pro-normal-600-latin.woff2}"
+          th:href="@{/css/fonts/be-vietnam-pro-normal-600-latin.woff2}"
           as="font"
           type="font/woff2"
           crossorigin="anonymous" />
 
     <!-- PLAYFAIR DISPLAY - VIETNAMESE -->
     <link rel="preload"
-          th:href="@{/css/v2/fonts/playfair-display-normal-400-800-vietnamese.woff2}"
+          th:href="@{/css/fonts/playfair-display-normal-400-800-vietnamese.woff2}"
           as="font"
           type="font/woff2"
           crossorigin="anonymous" />
 
     <!-- PLAYFAIR DISPLAY - LATIN -->
     <link rel="preload"
-          th:href="@{/css/v2/fonts/playfair-display-normal-400-800-latin.woff2}"
+          th:href="@{/css/fonts/playfair-display-normal-400-800-latin.woff2}"
           as="font"
           type="font/woff2"
           crossorigin="anonymous" />
@@ -64,16 +64,16 @@
     <!-- ======================================== -->
 
     <link rel="stylesheet"
-          th:href="@{/css/v2/fonts/fonts.css}" />
+          th:href="@{/css/fonts/fonts.css}" />
 
     <link rel="stylesheet"
-          th:href="@{/css/v2/styles.css}" />
+          th:href="@{/css/styles.css}" />
 
     <link rel="stylesheet"
-          th:href="@{/css/v2/motion.css}" />
+          th:href="@{/css/motion.css}" />
 
     <link rel="stylesheet"
-          th:href="@{/css/v2/extra.css}" />
+          th:href="@{/css/extra.css}" />
 
     <!-- CSS CHAT HỖ TRỢ -->
     <link rel="stylesheet"
@@ -482,7 +482,7 @@
                 <ul>
 
                     <li>
-                        Địa chỉ: Hải Phòng, Việt Nam
+                        Địa chỉ: <span th:text="${storeAddress}">Hải Phòng, Việt Nam</span>
                     </li>
 
                     <li>
@@ -604,6 +604,33 @@
 
         </div>
 
+        <!-- BẢN ĐỒ CỬA HÀNG: Google Maps nhúng iframe, không cần API key.
+             Đổi địa chỉ qua biến môi trường STORE_ADDRESS (hoặc fitfood.store.address). -->
+        <section class="f-map" aria-labelledby="footerMapTitle">
+
+            <div class="f-map-info">
+                <h3 id="footerMapTitle">Ghé cửa hàng FITFOOD</h3>
+                <p th:text="${storeAddress}">Hải Phòng, Việt Nam</p>
+                <p>Mở cửa 8:00 – 21:00 mỗi ngày · Giao tận nơi trong nội thành</p>
+                <a class="f-map-link"
+                   target="_blank"
+                   rel="noopener"
+                   th:href="@{https://www.google.com/maps/dir/(api=1,destination=${storeMapQuery})}">
+                    Chỉ đường trên Google Maps →
+                </a>
+            </div>
+
+            <div class="f-map-frame">
+                <iframe title="Bản đồ vị trí cửa hàng FITFOOD"
+                        loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"
+                        allowfullscreen
+                        th:src="@{https://maps.google.com/maps(q=${storeMapQuery},z=17,output=embed)}">
+                </iframe>
+            </div>
+
+        </section>
+
         <!-- BẢN QUYỀN -->
         <div class="bottom">
 
@@ -629,9 +656,10 @@
     </div>
 
     <!-- JAVASCRIPT HIỆN CÓ -->
-    <script th:src="@{/js/v2-motion.js}"
+    <script th:src="@{/js/motion.js}"
             defer>
     </script>
+
 
 </th:block>
 

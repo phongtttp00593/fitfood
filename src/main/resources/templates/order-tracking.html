@@ -2,12 +2,12 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{v2/fragments/layout :: head('Chi tiết đơn hàng ' + ${order.code})}"></head>
+<head th:replace="~{fragments/layout :: head('Chi tiết đơn hàng ' + ${order.code})}"></head>
 
 <body>
 
 <!-- HEADER: CHỌN ĐÚNG MỤC ĐƠN HÀNG -->
-<div th:replace="~{v2/fragments/layout :: header('orders')}"></div>
+<div th:replace="~{fragments/layout :: header('orders')}"></div>
 
 <style>
   .tracking-wrap {
@@ -988,9 +988,9 @@
 </script>
 
 <!-- FOOTER -->
-<footer th:replace="~{v2/fragments/layout :: footer}"></footer>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 
-<th:block th:replace="~{v2/fragments/layout :: scripts}"></th:block>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 
 </body>
 </html>

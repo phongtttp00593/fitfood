@@ -1,64 +1,24 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Không có quyền truy cập | FITFOOD</title>
-        <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
-        <link rel="stylesheet" th:href="@{/css/fitfood-auth.css}" />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-            rel="preconnect"
-            href="https://fonts.gstatic.com"
-            crossorigin="anonymous"
-            />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
-            rel="stylesheet"
-            />
-    <link rel="stylesheet" th:href="@{/css/site-theme.css}" />
-</head>
-    <body>
-        <header class="site-header">
-            <div class="nav-inner">
-                <a th:href="@{/}" class="site-brand"
-                   ><img th:src="@{/images/leaf.svg}" alt="" /><span>FITFOOD</span></a
-                >
-                <nav class="nav-menu">
-                    <a th:href="@{/}">Trang chủ</a><a th:href="@{/menu}">Thực đơn</a
-                    ><a th:href="@{/dang-nhap}">Đăng nhập</a>
-                </nav>
-            </div>
-        </header>
-        <main class="login-page">
-            <div class="login-shell">
-                <div class="login-form-side">
-                    <a href="/" class="site-brand login-brand"
-                       ><img src="/images/leaf.svg" alt="" /><span>FITFOOD</span></a
-                    >
-                    <div class="login-center">
-                        <div class="section-kicker">403 · TRUY CẬP BỊ TỪ CHỐI</div>
-                        <h1>Không có quyền</h1>
-                        <p>
-                            Tài khoản của bạn không có quyền truy cập trang quản trị FITFOOD.
-                        </p>
-                        <a class="btn btn-primary login-submit" th:href="@{/}"
-                           >← Về trang chủ</a
-                        >
-                    </div>
-                </div>
-                <div class="login-photo-side">
-                    <div class="login-glow"></div>
-                    <img src="/images/welcome-green.jpg" alt="Thực phẩm healthy" />
-                    <div class="login-quote">
-                        <span>FITFOOD LIFESTYLE</span>
-                        <h2>Ăn sạch.<br />Sống xanh.<br /><em>Mỗi ngày.</em></h2>
-                        <p>Khởi đầu lối sống lành mạnh từ bữa ăn.</p>
-                    </div>
-                </div>
-            </div>
-        </main>
-        <div class="auth-footer">© 2026 FITFOOD · Ăn ngon, sống khỏe</div>
-    <script defer th:src="@{/js/site-motion.js}"></script>
+<head th:replace="~{fragments/layout :: head('Không có quyền')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header('login')}"></div>
+
+<main id="main">
+  <div class="auth-wrap">
+    <div class="container auth-container">
+      <div class="card pad stack auth-card">
+        <span class="auth-seal" aria-hidden="true"></span>
+        <p class="eyebrow">403 · Truy cập bị từ chối</p>
+        <h1>Không có quyền</h1>
+        <p class="muted">Tài khoản của bạn không có quyền truy cập trang quản trị FITFOOD.</p>
+        <a class="btn block" th:href="@{/}">← Về trang chủ</a>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
-</html>,
+</html>

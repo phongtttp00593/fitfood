@@ -1,125 +1,37 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tài khoản của tôi | FITFOOD</title>
-    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
-    <link rel="stylesheet" th:href="@{/css/fitfood-auth.css}" />
-    <link rel="stylesheet" th:href="@{/css/fitfood-account.css}" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
-      rel="stylesheet"
-    />
-  <link rel="stylesheet" th:href="@{/css/site-theme.css}" />
-</head>
-  <body>
-    <header class="site-header">
-      <div class="nav-inner">
-        <a th:href="@{/}" class="site-brand"
-          ><img th:src="@{/images/leaf.svg}" alt="" /><span>FITFOOD</span></a
-        >
-        <nav class="nav-menu">
-          <a th:href="@{/}">Trang chủ</a><a th:href="@{/menu}">Thực đơn</a
-          ><a th:href="@{/cart}">Giỏ hàng</a><a th:href="@{/tai-khoan/don-hang}">Đơn hàng</a>
-        </nav>
-        <div class="nav-right">
-          <a class="fit-account-back" th:href="@{/}">← Về trang chủ</a>
-          
-        </div>
+<head th:replace="~{fragments/layout :: head('Tài khoản')}"></head>
+<body>
+<div th:replace="~{fragments/layout :: header('account')}"></div>
+
+<main id="main">
+  <header class="page-hero compact-title">
+    <div class="container">
+      <nav class="breadcrumb" aria-label="Đường dẫn"><a th:href="@{/}">Trang chủ</a> <i>›</i> <span aria-current="page">Tài khoản</span></nav>
+      <p class="eyebrow">FITFOOD member</p>
+      <h1>Thông tin tài khoản</h1>
+    </div>
+  </header>
+  <div class="container" style="padding-bottom: 48px" th:if="${accountInfo != null}">
+    <div class="card pad stack" data-reveal="0">
+      <h2 class="card-title">Hồ sơ cá nhân</h2>
+      <dl class="kv">
+        <dt>Họ và tên</dt><dd th:text="${accountInfo.fullName}">Họ tên</dd>
+        <dt>Email</dt><dd th:text="${accountInfo.email}">email@example.com</dd>
+        <dt>Loại tài khoản</dt><dd th:text="${accountInfo.role}">Khách hàng</dd>
+        <dt>Ngày tham gia</dt><dd th:text="${accountInfo.joinedDate}">09/10/2026</dd>
+      </dl>
+      <div class="row">
+        <a class="btn" th:href="@{/tai-khoan/don-hang}">📦 Đơn hàng của tôi &amp; Theo dõi trạng thái →</a>
+        <a class="btn outline" th:href="@{/menu}">Xem thực đơn →</a>
+        <a class="btn outline" th:if="${isAdmin}" th:href="@{/admin}">Trang quản trị →</a>
+        <a class="btn ghost" th:href="@{/quen-mat-khau}">Đặt lại mật khẩu qua email</a>
       </div>
-    </header>
-    <main class="fit-profile-page" th:if="${accountInfo != null}">
-      <div class="fit-profile-container">
-        <div class="fit-profile-breadcrumb">
-          <a th:href="@{/}">Trang chủ</a><span>›</span
-          ><strong>Tài khoản của tôi</strong>
-        </div>
-        <div class="fit-profile-heading">
-          <div>
-            <span class="fit-profile-kicker">FITFOOD MEMBER</span>
-            <h1>Thông tin tài khoản</h1>
-            <p>Thông tin cá nhân được lưu trong hệ thống FITFOOD.</p>
-          </div>
-          <span class="fit-profile-active">● Đang hoạt động</span>
-        </div>
-        <div class="fit-profile-layout">
-          <aside class="fit-profile-side">
-            <div
-              class="fit-profile-large-avatar"
-              th:text="${accountInfo.initials}"
-            >
-              P
-            </div>
-            <h2 th:text="${accountInfo.fullName}">Họ tên</h2>
-            <p th:text="${accountInfo.email}">email@example.com</p>
-            <div class="fit-profile-pill" th:text="${accountInfo.role}">
-              Khách hàng
-            </div>
-            <nav class="fit-profile-links">
-              <a th:href="@{/tai-khoan}" class="fit-profile-selected"
-                >👤 Thông tin của tôi</a
-              >
-              <a th:href="@{/tai-khoan/don-hang}">📦 Đơn hàng &amp; Theo dõi</a>
-              <a th:href="@{/menu}">🥗 Khám phá thực đơn</a>
-              <a th:if="${isAdmin}" th:href="@{/admin}">⚙ Trang quản trị</a>
-              <a th:href="@{/quen-mat-khau}">🔐 Đặt lại mật khẩu qua email</a>
-            </nav>
-          </aside>
-          <section class="fit-profile-card">
-            <div class="fit-profile-card-title">
-              <div>
-                <h2>Hồ sơ cá nhân</h2>
-                <p>Thông tin được lấy trực tiếp từ tài khoản đã đăng nhập.</p>
-              </div>
-              <span>✓ Đã đăng nhập</span>
-            </div>
-            <div class="fit-profile-data">
-              <div class="fit-profile-data-item">
-                <span>Họ và tên</span
-                ><strong th:text="${accountInfo.fullName}">Họ tên</strong>
-              </div>
-              <div class="fit-profile-data-item">
-                <span>Địa chỉ email</span
-                ><strong th:text="${accountInfo.email}"
-                  >email@example.com</strong
-                >
-              </div>
-              <div class="fit-profile-data-item">
-                <span>Loại tài khoản</span
-                ><strong th:text="${accountInfo.role}">Khách hàng</strong>
-              </div>
-              <div class="fit-profile-data-item">
-                <span>Ngày tham gia</span
-                ><strong th:text="${accountInfo.joinedDate}">09/10/2026</strong>
-              </div>
-            </div>
-            <div class="fit-profile-action-row">
-              <a class="fit-profile-main-button" th:href="@{/tai-khoan/don-hang}"
-                >📦 Đơn hàng của tôi →</a
-              >
-              <a class="fit-profile-secondary-button" th:href="@{/menu}"
-                >Xem thực đơn →</a
-              >
-              <a
-                th:if="${isAdmin}"
-                class="fit-profile-secondary-button"
-                th:href="@{/admin}"
-                >Đến trang Admin →</a
-              >
-            </div>
-            <div class="fit-profile-security-note">
-              🔒 FITFOOD không hiển thị mật khẩu để bảo vệ tài khoản của bạn.
-            </div>
-          </section>
-        </div>
-      </div>
-    </main>
-    <footer class="fit-profile-footer">
-      © 2026 FITFOOD — Ăn ngon, sống khỏe 💚
-    </footer>
-  <script defer th:src="@{/js/site-motion.js}"></script>
+    </div>
+  </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 </body>
 </html>

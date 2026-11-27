@@ -3,70 +3,38 @@
 <html lang="vi"
       xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8" />
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1" />
-
-    <title>
-        Chat hỗ trợ | FITFOOD
-    </title>
-
-    <link rel="stylesheet"
-          th:href="@{/css/fitfood-modern.css}" />
-
-    <link rel="stylesheet"
-          th:href="@{/css/site-theme.css}" />
-
-    <link rel="stylesheet"
-          th:href="@{/css/support-chat.css}" />
+<head th:replace="~{fragments/layout :: head('Chat hỗ trợ')}">
 </head>
 
 <body>
 
-<!-- HEADER -->
-<header class="site-header">
+<div th:replace="~{fragments/layout :: header('support')}">
+</div>
 
-    <div class="nav-inner">
+<main id="main"
+      class="ff-chat-page-wrap">
 
-        <a class="site-brand"
-           th:href="@{/}">
+    <div class="container">
 
-            <img th:src="@{/images/leaf.svg}"
-                 alt="" />
-
-            <span>FITFOOD</span>
-        </a>
-
-        <nav class="nav-menu">
+        <nav class="breadcrumb"
+             aria-label="Đường dẫn">
 
             <a th:href="@{/}">
                 Trang chủ
             </a>
 
-            <a th:href="@{/menu}">
-                Thực đơn
-            </a>
+            <i>›</i>
 
-            <a th:href="@{/tai-khoan}">
-                Tài khoản
-            </a>
-
+            <span>
+                Chat hỗ trợ
+            </span>
         </nav>
-    </div>
-</header>
-
-<!-- TRANG CHAT -->
-<main class="ff-chat-page-wrap">
-
-    <div class="ff-chat-container">
 
         <div class="ff-chat-page-heading">
 
-            <a th:href="@{/tai-khoan}">
-                ← Quay lại tài khoản
-            </a>
+            <p class="eyebrow">
+                CHĂM SÓC KHÁCH HÀNG
+            </p>
 
             <h1>
                 Chat hỗ trợ FITFOOD
@@ -79,6 +47,7 @@
             </p>
         </div>
 
+        <!-- NOI DUNG CHAT -->
         <section class="ff-chat-screen"
                  data-support-chat
                  data-mode="page"
@@ -86,7 +55,6 @@
                     data-csrf=${_csrf.token},
                     data-csrf-header=${_csrf.headerName}">
 
-            <!-- TIEU DE CHAT -->
             <div class="ff-chat-screen-top">
 
                 <div class="ff-chat-brand-icon">
@@ -112,7 +80,7 @@
                 </button>
             </div>
 
-            <!-- LICH SU TIN NHAN -->
+            <!-- TIN NHAN -->
             <div class="ff-chat-messages"
                  data-chat-messages
                  role="log"
@@ -120,7 +88,7 @@
                  aria-label="Nội dung cuộc trò chuyện">
             </div>
 
-            <!-- FORM GUI TIN -->
+            <!-- GUI TIN NHAN -->
             <form class="ff-chat-form"
                   data-chat-form>
 
@@ -135,8 +103,7 @@
                           maxlength="1000"
                           rows="2"
                           placeholder="Hãy mô tả điều bạn cần hỗ trợ…"
-                          required>
-                </textarea>
+                          required></textarea>
 
                 <button type="submit"
                         data-chat-send>
@@ -145,7 +112,6 @@
                 </button>
             </form>
 
-            <!-- THONG BAO LOI -->
             <p class="ff-chat-error"
                data-chat-error
                role="alert"
@@ -160,6 +126,12 @@
         </section>
     </div>
 </main>
+
+<footer th:replace="~{fragments/layout :: footer}">
+</footer>
+
+<th:block th:replace="~{fragments/layout :: scripts}">
+</th:block>
 
 <script defer
         th:src="@{/js/support-chat.js}">

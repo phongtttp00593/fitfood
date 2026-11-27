@@ -18,7 +18,7 @@
         const resetButton = document.getElementById('resetMenuFilters');
 
         const tabs = Array.from(
-            document.querySelectorAll('#menuApp .cat-list .tab')
+            document.querySelectorAll('#menuApp .cat-list .tab:not(.tab-link)')
         );
 
         const priceOptions = Array.from(

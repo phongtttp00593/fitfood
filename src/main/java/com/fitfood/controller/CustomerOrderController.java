@@ -423,7 +423,7 @@ public class CustomerOrderController {
         model.addAttribute("selectedStatus", normalizedFilter);
         model.addAttribute("filterStatuses", FILTER_STATUSES);
         model.addAttribute("statusCounts", counts);
-        return "v2/my-orders";
+        return "my-orders";
     }
 
     /**
@@ -516,7 +516,7 @@ public class CustomerOrderController {
         }
 
         model.addAttribute("order", matches.get(0));
-        return "v2/order-tracking";
+        return "order-tracking";
     }
 
     /**

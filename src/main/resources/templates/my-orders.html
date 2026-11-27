@@ -1,11 +1,11 @@
 
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{v2/fragments/layout :: head('Đơn hàng của tôi')}"></head>
+<head th:replace="~{fragments/layout :: head('Đơn hàng của tôi')}"></head>
 <body style="background-color: #fcf9f2; margin: 0;">
 
 <!-- HEADER: ĐÁNH DẤU ĐÚNG MỤC ĐƠN HÀNG -->
-<div th:replace="~{v2/fragments/layout :: header('orders')}"></div>
+<div th:replace="~{fragments/layout :: header('orders')}"></div>
 
 <!-- MODAL XÁC NHẬN HỦY ĐẶT HÀNG -->
 <div id="cancelOrderModal"
@@ -383,9 +383,9 @@
 </main>
 
 <!-- FOOTER -->
-<footer th:replace="~{v2/fragments/layout :: footer}"></footer>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
 
-<th:block th:replace="~{v2/fragments/layout :: scripts}"></th:block>
+<th:block th:replace="~{fragments/layout :: scripts}"></th:block>
 
 <!-- JAVASCRIPT -->
 <script>
