@@ -10,23 +10,75 @@
         </div>
 
         <main id="main">
-            <header class="page-hero">
-                <div class="container">
-                    <nav class="breadcrumb" aria-label="Đường dẫn">
-                        <a th:href="@{/}">Trang chủ</a>
-                        <i>›</i>
-                        <span aria-current="page">Thực đơn</span>
-                    </nav>
+            <header class="mh" data-tilt>
+                <div class="container mh-inner">
 
-                    <p class="eyebrow">Nấu mới mỗi ngày</p>
-                    <h1>Thực đơn</h1>
+                    <div class="mh-text">
+                        <nav class="breadcrumb mh-crumbs" aria-label="Đường dẫn">
+                            <a th:href="@{/}">Trang chủ</a>
+                            <i>›</i>
+                            <span aria-current="page">Thực đơn</span>
+                        </nav>
 
-                    <p class="lead">
-                        Cơm healthy, salad và món cao cấp —
-                        nguyên liệu tươi, dinh dưỡng cân bằng.
-                    </p>
+                        <h1>Thực đơn hôm nay</h1>
+
+                        <p class="mh-lead">
+                            Nấu mới mỗi ngày từ nguyên liệu tươi, ghi rõ dinh dưỡng.
+                            Giao tận nơi, thanh toán khi nhận.
+                        </p>
+
+                        <ul class="mh-facts" data-reveal="0">
+                            <li><b th:text="${#lists.size(products)}" th:attr="data-count=${#lists.size(products)}">10</b> món đang bán</li>
+                            <li th:if="${minPriceLabel != null}">
+                                Từ <b th:text="${minPriceLabel}">35.000đ</b>
+                            </li>
+                            <li>Giao tận nơi trong nội thành</li>
+                        </ul>
+
+                        <!-- CHỌN NHANH DANH MỤC (bấm = bấm tab lọc tương ứng ở bên dưới) -->
+                        <div class="mh-cats" role="group" aria-label="Chọn nhanh danh mục">
+                            <button type="button" class="mh-chip" data-cat="">
+                                <img class="mh-chip-img" src="/images/hero-plate.jpg" alt="" width="44" height="44" />
+                                <span>Tất cả món</span>
+                            </button>
+
+                            <th:block th:each="cat : ${categories}">
+                                <button type="button"
+                                        class="mh-chip"
+                                        th:if="${!#strings.equalsIgnoreCase(cat, 'Gói ăn')}"
+                                        th:attr="data-cat=${cat}"
+                                        th:with="img=${#strings.containsIgnoreCase(cat, 'salad')} ? '/images/chicken-salad.jpg' : (${#strings.containsIgnoreCase(cat, 'uống')} ? '/images/mango-smoothie.jpg' : '/images/salmon-bowl.jpg')">
+                                    <img class="mh-chip-img" th:src="${img}" alt="" width="44" height="44" />
+                                    <span th:text="${cat}">Danh mục</span>
+                                </button>
+                            </th:block>
+                        </div>
+                    </div>
+
+                    <!-- BỘ ẢNH MÓN LỚN -->
+                    <div class="mh-art" aria-hidden="true">
+                        <img class="mh-art-main" src="/images/hero-bowl.jpg" alt="" width="900" height="1100" fetchpriority="high" />
+                        <img class="mh-art-a" src="/images/salmon-bowl.jpg" alt="" width="600" height="450" />
+                        <img class="mh-art-b" src="/images/mango-smoothie.jpg" alt="" width="500" height="600" />
+                    </div>
+
                 </div>
             </header>
+
+            <script>
+                // Ô chọn nhanh danh mục: bấm tab lọc tương ứng rồi cuộn xuống danh sách món
+                document.addEventListener('click', function (e) {
+                    var chip = e.target.closest('.mh-chip');
+                    if (!chip) return;
+                    var cat = chip.getAttribute('data-cat') || '';
+                    var tabs = document.querySelectorAll('#menuApp .cat-list .tab:not(.tab-link)');
+                    for (var i = 0; i < tabs.length; i++) {
+                        if ((tabs[i].getAttribute('data-filter') || '') === cat) { tabs[i].click(); break; }
+                    }
+                    var target = document.getElementById('menuApp');
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                });
+            </script>
 
             <style>
                 .meal-plans-area{
@@ -364,7 +416,7 @@
                 }
             </style>
 
-            <section class="meal-plans-area" id="goi-an">
+            <section class="meal-plans-area" id="goi-an" th:if="${!#lists.isEmpty(mealPlans)}">
                 <div class="meal-plans-wrap">
                     <div th:if="${mealPlanSuccess}" class="meal-plan-alert success" th:text="${mealPlanSuccess}"></div>
                     <div th:if="${mealPlanError}" class="meal-plan-alert error" th:text="${mealPlanError}"></div>
@@ -518,10 +570,6 @@
                                 <option value="price_desc">Giá cao → thấp</option>
                                 <option value="name_asc">Tên món A - Z</option>
                                 <option value="name_desc">Tên món Z - A</option>
-                            </select>
-                            <option value="">Nổi bật</option>
-                            <option value="price_asc">Giá thấp → cao</option>
-                            <option value="price_desc">Giá cao → thấp</option>
                             </select>
                         </div>
                     </div>

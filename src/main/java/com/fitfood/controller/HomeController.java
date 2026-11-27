@@ -112,6 +112,15 @@ public class HomeController {
             """, String.class));
 
         // Danh sách sản phẩm thực đơn V2
+        // Giá thấp nhất của các món đang bán (hiển thị ở đầu trang Thực đơn).
+        BigDecimal minPrice = jdbc.queryForObject(
+            "SELECT MIN(price) FROM dbo.fitfood_products WHERE active = 1",
+            BigDecimal.class);
+        model.addAttribute("minPriceLabel", minPrice == null ? null
+            : new DecimalFormat("#,##0",
+                DecimalFormatSymbols.getInstance(new java.util.Locale("vi", "VN")))
+                .format(minPrice) + "đ");
+
         model.addAttribute("products", jdbc.query("""
             SELECT
                 p.id,

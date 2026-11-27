@@ -62,7 +62,7 @@
   function runCount(el) {
     var to = parseFloat(el.dataset.count), t0 = performance.now(), dur = 1600;
     (function tick(t) {
-      var p = Math.min((t - t0) / dur, 1);
+      var p = Math.max(0, Math.min((t - t0) / dur, 1));
       fmt(el, to * (1 - Math.pow(1 - p, 3)));
       if (p < 1) requestAnimationFrame(tick);
     })(t0);
