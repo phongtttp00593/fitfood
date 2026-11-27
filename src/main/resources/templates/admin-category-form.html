@@ -1,145 +1,272 @@
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Thêm / Sửa danh mục | FITFOOD Admin</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-        <link
-            href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
-            rel="stylesheet"
-            />
-        <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
-        <link rel="stylesheet" th:href="@{/css/fitfood-categories.css}" />
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title
+      th:text="${categoryForm.id == null} ? 'Thêm danh mục | FITFOOD Admin' : 'Chỉnh sửa danh mục | FITFOOD Admin'"
+    >
+      Thêm / Sửa danh mục | FITFOOD Admin
+    </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
+    <link rel="stylesheet" th:href="@{/css/fitfood-categories.css}" />
     <link rel="stylesheet" th:href="@{/css/admin-theme.css}" />
-</head>
-    <body class="admin-body">
-        <div class="adm-layout">
-            <aside
-                class="adm-sidebar"
-                th:replace="~{fragments/admin-sidebar :: sidebar('categories')}"
-                ></aside>
-            <div class="adm-main">
-                <header class="adm-top cat-top">
-                    <div class="admin-breadcrumb">
-                        FITFOOD <span>/</span>
-                        <a th:href="@{/admin/categories}">Danh mục</a> <span>/</span>
-                        <b th:text="${categoryForm.id == null} ? 'Thêm mới' : 'Chỉnh sửa'"
-                           >Thêm mới</b
-                        >
-                    </div>
-                    <a class="cat-outline-btn" th:href="@{/admin/categories}"
-                       >← Danh sách</a
-                    >
-                
-                    <div class="fit-admin-top-actions">
-                      <span class="fit-admin-top-label">Khu vực quản trị</span>
-                      <form class="fit-admin-logout" method="post" th:action="@{/logout}">
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                        <button type="submit" aria-label="Đăng xuất khỏi trang quản trị"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5M15 12H3M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/></svg><span>Đăng xuất</span></button>
-                      </form>
-                    </div>
-                </header>
-                <main class="adm-content cat-content">
-                    <div class="cat-heading">
-                        <div>
-                            <span class="cat-overline">QUẢN LÝ DANH MỤC</span>
-                            <h1
-                                th:text="${categoryForm.id == null} ? 'Thêm danh mục mới' : 'Chỉnh sửa danh mục'"
-                                >
-                                Thêm danh mục mới
-                            </h1>
-                            <p>
-                                Điền thông tin bên dưới, thay đổi sẽ được lưu vào SQL Server.
-                            </p>
-                        </div>
-                    </div>
+  </head>
+  <body class="admin-body">
+    <div class="adm-layout">
+      <aside
+        class="adm-sidebar"
+        th:replace="~{fragments/admin-sidebar :: sidebar('categories')}"
+      ></aside>
 
-                    <section class="cat-card cat-form-card">
-                        <div class="cat-card-header">
-                            <div>
-                                <h2>Thông tin danh mục</h2>
-                                <p>Các trường có dấu * là bắt buộc.</p>
-                            </div>
-                        </div>
-                        <form
-                            th:action="@{/admin/categories/save}"
-                            th:object="${categoryForm}"
-                            method="post"
-                            class="cat-editor"
-                            >
-                            <input
-                                type="hidden"
-                                th:name="${_csrf.parameterName}"
-                                th:value="${_csrf.token}"
-                                />
-                            <input type="hidden" th:field="*{id}" />
-                            <div class="cat-field">
-                                <label for="categoryName">Tên danh mục <em>*</em></label>
-                                <input
-                                    id="categoryName"
-                                    type="text"
-                                    th:field="*{name}"
-                                    maxlength="120"
-                                    required
-                                    placeholder="Ví dụ: Cơm dinh dưỡng"
-                                    autofocus
-                                    />
-                                <small class="cat-hint"
-                                       >Tối đa 120 ký tự. Không được trùng tên danh mục khác.</small
-                                >
-                                <span
-                                    class="cat-error-text"
-                                    th:if="${#fields.hasErrors('name')}"
-                                    th:errors="*{name}"
-                                    >Lỗi</span
-                                >
-                            </div>
-                            <div class="cat-field">
-                                <label for="categoryDescription">Mô tả</label>
-                                <textarea
-                                    id="categoryDescription"
-                                    rows="4"
-                                    maxlength="500"
-                                    th:field="*{description}"
-                                    placeholder="Ví dụ: Những bữa cơm lành mạnh, cân bằng dinh dưỡng..."
-                                    ></textarea>
-                                <small class="cat-hint">Tối đa 500 ký tự.</small>
-                                <span
-                                    class="cat-error-text"
-                                    th:if="${#fields.hasErrors('description')}"
-                                    th:errors="*{description}"
-                                    >Lỗi</span
-                                >
-                            </div>
-                            <div class="cat-field">
-                                <label for="categoryActive">Trạng thái kinh doanh</label>
-                                <select id="categoryActive" th:field="*{active}">
-                                    <option value="true">Đang hoạt động</option>
-                                    <option value="false">Tạm ẩn</option>
-                                </select>
-                                <small class="cat-hint"
-                                       >Danh mục tạm ẩn sẽ được dùng để lọc sản phẩm khi triển khai
-                                    chức năng sản phẩm.</small
-                                >
-                            </div>
-                            <div class="cat-form-actions">
-                                <a class="cat-outline-btn" th:href="@{/admin/categories}"
-                                   >Hủy</a
-                                >
-                                <button
-                                    class="cat-primary-btn"
-                                    type="submit"
-                                    th:text="${categoryForm.id == null} ? '＋ Lưu danh mục' : '✓ Lưu thay đổi'"
-                                    >
-                                    Lưu
-                                </button>
-                            </div>
-                        </form>
-                    </section>
-                </main>
+      <div class="adm-main">
+        <header class="adm-top cat-top">
+          <div class="admin-breadcrumb">
+            FITFOOD <span>/</span>
+            <a th:href="@{/admin/categories}">Danh mục</a> <span>/</span>
+            <b th:text="${categoryForm.id == null} ? 'Thêm mới' : 'Chỉnh sửa'"
+              >Thêm mới</b
+            >
+          </div>
+
+          <div class="fit-admin-top-actions">
+            <span class="fit-admin-top-label">Khu vực quản trị</span>
+            <form class="fit-admin-logout" method="post" th:action="@{/logout}">
+              <input
+                type="hidden"
+                th:if="${_csrf != null}"
+                th:name="${_csrf.parameterName}"
+                th:value="${_csrf.token}"
+              />
+              <button type="submit" aria-label="Đăng xuất khỏi trang quản trị">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M10 17l5-5-5-5M15 12H3M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"
+                  />
+                </svg>
+                <span>Đăng xuất</span>
+              </button>
+            </form>
+          </div>
+        </header>
+
+        <main class="adm-content cat-content">
+          <div class="cat-heading">
+            <div>
+              <span class="cat-overline">QUẢN LÝ DANH MỤC</span>
+              <h1
+                th:text="${categoryForm.id == null} ? 'Thêm danh mục mới' : 'Chỉnh sửa danh mục'"
+              >
+                Thêm danh mục mới
+              </h1>
+              <p>
+                Điền thông tin bên dưới, thay đổi sẽ được lưu trực tiếp vào SQL
+                Server.
+              </p>
             </div>
-        </div>
-    </body>
-</html>,
+            <a class="cat-outline-btn" th:href="@{/admin/categories}"
+              >← Quay lại danh sách</a
+            >
+          </div>
+
+          <!-- Thông báo lỗi chung từ Controller (trùng tên, lỗi DB...) -->
+          <div
+            class="cat-alert cat-alert-error"
+            th:if="${error}"
+            th:text="${error}"
+            role="alert"
+          ></div>
+
+          <section class="cat-card cat-form-card">
+            <div class="cat-card-header">
+              <div>
+                <h2>
+                  Thông tin danh mục
+                  <span
+                    th:if="${categoryForm.id != null}"
+                    th:text="'(Mã: DM' + ${categoryForm.id} + ')'"
+                    style="font-size: 14px; font-weight: 600; opacity: 0.75"
+                  ></span>
+                </h2>
+                <p>Các trường có dấu * là bắt buộc.</p>
+              </div>
+            </div>
+
+            <form
+              id="categoryEditorForm"
+              th:action="@{/admin/categories/save}"
+              th:object="${categoryForm}"
+              method="post"
+              class="cat-editor"
+            >
+              <input
+                type="hidden"
+                th:if="${_csrf != null}"
+                th:name="${_csrf.parameterName}"
+                th:value="${_csrf.token}"
+              />
+              <input type="hidden" th:field="*{id}" />
+
+              <div
+                class="cat-alert cat-alert-error"
+                th:if="${#fields.hasGlobalErrors()}"
+                role="alert"
+              >
+                <p
+                  th:each="err : ${#fields.globalErrors()}"
+                  th:text="${err}"
+                  style="margin: 0"
+                ></p>
+              </div>
+
+              <div class="cat-field">
+                <label for="categoryName">Tên danh mục <em>*</em></label>
+                <input
+                  id="categoryName"
+                  type="text"
+                  th:field="*{name}"
+                  maxlength="120"
+                  required
+                  placeholder="Ví dụ: Cơm dinh dưỡng"
+                  autofocus
+                />
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 8px;
+                  "
+                >
+                  <small class="cat-hint"
+                    >Không được trùng với tên danh mục đã tồn tại.</small
+                  >
+                  <small class="cat-hint" id="nameCharCount">0 / 120</small>
+                </div>
+                <span
+                  class="cat-error-text"
+                  th:if="${#fields.hasErrors('name')}"
+                  th:errors="*{name}"
+                  >Lỗi</span
+                >
+              </div>
+
+              <div class="cat-field">
+                <label for="categoryDescription">Mô tả</label>
+                <textarea
+                  id="categoryDescription"
+                  rows="4"
+                  maxlength="500"
+                  th:field="*{description}"
+                  placeholder="Ví dụ: Những bữa cơm lành mạnh, cân bằng dinh dưỡng..."
+                ></textarea>
+                <div
+                  style="
+                    display: flex;
+                    justify-content: space-between;
+                    gap: 8px;
+                  "
+                >
+                  <small class="cat-hint"
+                    >Mô tả ngắn gọn giúp khách hàng dễ hiểu nhóm món ăn.</small
+                  >
+                  <small class="cat-hint" id="descCharCount">0 / 500</small>
+                </div>
+                <span
+                  class="cat-error-text"
+                  th:if="${#fields.hasErrors('description')}"
+                  th:errors="*{description}"
+                  >Lỗi</span
+                >
+              </div>
+
+              <div class="cat-field">
+                <label for="categoryActive">Trạng thái kinh doanh</label>
+                <select id="categoryActive" th:field="*{active}">
+                  <option th:value="true">Đang hoạt động</option>
+                  <option th:value="false">Tạm ẩn</option>
+                </select>
+                <small class="cat-hint"
+                  >Danh mục tạm ẩn sẽ không hiển thị món ăn thuộc nhóm này cho
+                  khách hàng.</small
+                >
+              </div>
+
+              <div class="cat-form-actions">
+                <a class="cat-outline-btn" th:href="@{/admin/categories}"
+                  >Hủy</a
+                >
+                <button
+                  id="submitCategoryBtn"
+                  class="cat-primary-btn"
+                  type="submit"
+                  th:text="${categoryForm.id == null} ? '＋ Lưu danh mục' : '✓ Lưu thay đổi'"
+                >
+                  Lưu
+                </button>
+              </div>
+            </form>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script>
+      (() => {
+        'use strict';
+        const form = document.getElementById('categoryEditorForm');
+        const nameInput = document.getElementById('categoryName');
+        const descInput = document.getElementById('categoryDescription');
+        const nameCounter = document.getElementById('nameCharCount');
+        const descCounter = document.getElementById('descCharCount');
+        const submitBtn = document.getElementById('submitCategoryBtn');
+
+        const updateCount = (input, counter, max) => {
+          if (input && counter) {
+            counter.textContent = `${input.value.length} / ${max}`;
+          }
+        };
+
+        if (nameInput) {
+          updateCount(nameInput, nameCounter, 120);
+          nameInput.addEventListener('input', () =>
+            updateCount(nameInput, nameCounter, 120)
+          );
+        }
+
+        if (descInput) {
+          updateCount(descInput, descCounter, 500);
+          descInput.addEventListener('input', () =>
+            updateCount(descInput, descCounter, 500)
+          );
+        }
+
+        if (form) {
+          form.addEventListener('submit', (e) => {
+            if (nameInput) {
+              nameInput.value = nameInput.value.trim();
+              if (!nameInput.value) {
+                e.preventDefault();
+                nameInput.focus();
+                return;
+              }
+            }
+            if (descInput) {
+              descInput.value = descInput.value.trim();
+            }
+            // Khóa nút tránh bấm đúp tạo 2 danh mục giống nhau
+            if (submitBtn) {
+              submitBtn.disabled = true;
+              submitBtn.textContent = 'Đang lưu...';
+            }
+          });
+        }
+      })();
+    </script>
+  </body>
+</html>
