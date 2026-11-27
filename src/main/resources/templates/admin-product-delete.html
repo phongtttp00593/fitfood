@@ -5,61 +5,143 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Xóa món ăn | FITFOOD Admin</title>
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" />
+    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
+    <link rel="stylesheet" th:href="@{/css/fitfood-categories.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin-theme.css}" />
     <link rel="stylesheet" th:href="@{/css/admin-product-delete.css}" />
 </head>
-<body>
+<body class="admin-body">
+<div class="adm-layout">
 
-<div class="container">
+    <aside class="adm-sidebar"
+           th:replace="~{fragments/admin-sidebar :: sidebar('products')}"></aside>
 
-    <div th:if="${errorMessage}"
-         class="message error"
-         th:text="${errorMessage}"></div>
-
-    <div class="message error">
-        Xác nhận xóa món ăn khỏi hệ thống. Hành động này không thể hoàn tác.
-    </div>
-
-    <div class="info-box">
-        <div class="thumb-wrap">
-            <img th:if="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
-                 th:src="${product.imageUrl}"
-                 alt="Ảnh món ăn" />
-            <div th:unless="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
-                 class="no-img">
-                No Image
+    <div class="adm-main">
+        <header class="adm-top cat-top">
+            <div class="admin-breadcrumb">
+                FITFOOD <span>/</span>
+                <a th:href="@{/admin/products}">Sản phẩm</a> <span>/</span>
+                <b>Xóa</b>
             </div>
-        </div>
 
-        <div class="info-content">
-            <h3 th:text="${product.name}">Tên sản phẩm</h3>
-            <p><strong>Mã món:</strong> #<span th:text="${product.id}"></span></p>
-            <p><strong>Danh mục:</strong> <span th:text="${categoryName != null ? categoryName : 'Chưa phân loại'}"></span></p>
-            <p><strong>Giá bán:</strong> <span th:text="${#numbers.formatDecimal(product.price, 0, 'POINT', 0, 'POINT') + ' VNĐ'}"></span></p>
-            <p>
-                <strong>Trạng thái:</strong>
-                <span th:if="${product.active}" class="status-badge active">Đang mở bán</span>
-                <span th:unless="${product.active}" class="status-badge inactive">Ngưng bán</span>
-            </p>
-        </div>
+            <div class="fit-admin-top-actions">
+                <span class="fit-admin-top-label">Khu vực quản trị</span>
+                <form class="fit-admin-logout" method="post" th:action="@{/logout}">
+                    <input type="hidden"
+                           th:if="${_csrf != null}"
+                           th:name="${_csrf.parameterName}"
+                           th:value="${_csrf.token}" />
+                    <button type="submit" aria-label="Đăng xuất khỏi trang quản trị">
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M10 17l5-5-5-5M15 12H3M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6" />
+                        </svg>
+                        <span>Đăng xuất</span>
+                    </button>
+                </form>
+            </div>
+        </header>
+
+        <main class="adm-content cat-content">
+            <div class="prod-del-wrapper">
+                <div class="cat-heading">
+                    <div>
+                        <span class="cat-overline">QUẢN LÝ SẢN PHẨM</span>
+                        <h1>Xóa món ăn</h1>
+                        <p>Kiểm tra kỹ thông tin món ăn trước khi xác nhận xóa khỏi hệ thống.</p>
+                    </div>
+                    <a class="cat-outline-btn" th:href="@{/admin/products}">← Quay lại danh sách</a>
+                </div>
+
+                <div class="cat-alert cat-alert-error"
+                     th:if="${errorMessage}"
+                     th:text="${errorMessage}"
+                     role="alert"></div>
+
+                <section class="cat-card prod-del-card">
+                    <div class="cat-card-header">
+                        <div>
+                            <h2>Xác nhận xóa sản phẩm</h2>
+                            <p>Hành động này không thể hoàn tác.</p>
+                        </div>
+                    </div>
+
+                    <div class="prod-del-body">
+                        <div class="prod-del-warn" role="alert">
+                            <strong>Cảnh báo:</strong> Món ăn sau khi xóa sẽ bị gỡ khỏi danh sách quản lý và thực đơn.
+                        </div>
+
+                        <div class="prod-del-info">
+                            <div class="prod-del-thumb">
+                                <span class="prod-del-tag">Món ăn</span>
+                                <img th:if="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
+                                     th:src="${product.imageUrl}"
+                                     alt="Ảnh món ăn" />
+                                <div th:unless="${product.imageUrl != null and !#strings.isEmpty(product.imageUrl)}"
+                                     class="prod-del-no-img">
+                                    No Image
+                                </div>
+                            </div>
+
+                            <div class="prod-del-meta">
+                                <h3 th:text="${product.name}">Tên sản phẩm</h3>
+                                <div class="prod-del-grid">
+                                    <div class="prod-del-cell">
+                                        <span class="prod-del-label">Mã món</span>
+                                        <strong class="prod-del-val">#<span th:text="${product.id}"></span></strong>
+                                    </div>
+                                    <div class="prod-del-cell">
+                                        <span class="prod-del-label">Danh mục</span>
+                                        <strong class="prod-del-val" th:text="${categoryName != null ? categoryName : 'Chưa phân loại'}"></strong>
+                                    </div>
+                                    <div class="prod-del-cell">
+                                        <span class="prod-del-label">Giá bán</span>
+                                        <strong class="prod-del-val" th:text="${#numbers.formatDecimal(product.price, 0, 'POINT', 0, 'POINT') + ' VNĐ'}"></strong>
+                                    </div>
+                                    <div class="prod-del-cell">
+                                        <span class="prod-del-label">Trạng thái</span>
+                                        <span class="prod-del-val">
+                                            <span th:if="${product.active}" class="prod-status active">Đang mở bán</span>
+                                            <span th:unless="${product.active}" class="prod-status inactive">Ngưng bán</span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <form id="productDeleteForm"
+                              th:action="@{/admin/products/delete/{id}(id=${product.id})}"
+                              method="post">
+                            <input type="hidden"
+                                   th:if="${_csrf != null}"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}" />
+
+                            <div class="cat-form-actions">
+                                <a class="cat-outline-btn" th:href="@{/admin/products}">Hủy</a>
+                                <button id="submitDeleteBtn" class="prod-btn-danger" type="submit">Xác nhận xóa</button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+            </div>
+        </main>
     </div>
-
-    <form th:action="@{/admin/products/delete/{id}(id=${product.id})}"
-          method="post">
-        <div class="actions">
-            <a class="btn cancel"
-               th:href="@{/admin/products}">
-                Hủy bỏ
-            </a>
-
-            <button type="submit" class="btn delete">
-                Xác nhận xóa
-            </button>
-        </div>
-    </form>
-
 </div>
 
+<script>
+    (() => {
+        const form = document.getElementById('productDeleteForm');
+        const submitBtn = document.getElementById('submitDeleteBtn');
+
+        if (form) {
+            form.addEventListener('submit', () => {
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Đang xóa...';
+                }
+            });
+        }
+    })();
+</script>
 </body>
 </html>
