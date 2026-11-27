@@ -101,11 +101,11 @@ public class AdminCategoryController {
     @PostMapping("/{id}/toggle")
     public String toggle(@PathVariable("id") Long id, RedirectAttributes redirect) {
         try {
-            FoodCategory category = service.findById(id);
             service.toggle(id);
-            String stateText = !category.isActive() ? "Đang hoạt động" : "Tạm ẩn";
+            FoodCategory updated = service.findById(id);
+            String stateText = updated.isActive() ? "Đang hoạt động" : "Tạm ẩn";
             redirect.addFlashAttribute("success",
-                    "Đã chuyển danh mục \"" + category.getName() + "\" (DM" + id + ") sang trạng thái: " + stateText + ".");
+                    "Đã chuyển danh mục \"" + updated.getName() + "\" (DM" + id + ") sang trạng thái: " + stateText + ".");
         } catch (ResponseStatusException ex) {
             redirect.addFlashAttribute("error", "Không tìm thấy danh mục DM" + id + ".");
         } catch (Exception ex) {
