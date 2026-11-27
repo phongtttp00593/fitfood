@@ -73,7 +73,7 @@
                             <circle cx="12" cy="12" r="9" />
                             <path d="M12 6v6l4 2" />
                             </svg>
-                            Tháng 10/2026
+                            <span th:text="|Tháng ${monthLabel}|">Tháng</span>
                         </div>
                         <span class="adm-bell"
                               ><svg
@@ -113,10 +113,10 @@
                     <div class="adm-page-header">
                         <div>
                             <span class="admin-eyebrow">DASHBOARD · TỔNG QUAN HỆ THỐNG</span>
-                            <h1>Chào buổi tối, Admin 👋</h1>
-                            <p>Đây là tình hình kinh doanh của cửa hàng FITFOOD hôm nay.</p>
+                            <h1>Chào Admin 👋</h1>
+                            <p>Đây là tình hình kinh doanh của cửa hàng FITFOOD hiện tại.</p>
                         </div>
-                        <span class="demo-tag">● DỮ LIỆU MẪU</span>
+                        <span class="demo-tag">● DỮ LIỆU THỰC TẾ</span>
                     </div>
                     <section class="adm-stats">
                         <div class="metric-card">
@@ -137,8 +137,8 @@
                                     <path d="M3 20h18M7 17v-5m5 5V7m5 10V4" /></svg
                                 ></i>
                             </div>
-                            <strong>42.650.000đ</strong>
-                            <div class="metric-desc"><b>↗ + 12.8%</b> so với kỳ trước</div>
+                            <strong th:text="${#numbers.formatDecimal(revenue,1,'POINT',0,'COMMA') + 'đ'}">0đ</strong>
+                            <div class="metric-desc">Tháng hiện tại</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-title">
@@ -160,8 +160,8 @@
                                     <path d="M2 3h2l2.3 12h13l2.1-9H5" /></svg
                                 ></i>
                             </div>
-                            <strong>128</strong>
-                            <div class="metric-desc"><b>↗ + 8.2%</b> so với kỳ trước</div>
+                            <strong th:text="${totalOrders}">0</strong>
+                            <div class="metric-desc">Tất cả thời gian</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-title">
@@ -183,8 +183,8 @@
                                         /></svg
                                 ></i>
                             </div>
-                            <strong>34</strong>
-                            <div class="metric-desc"><b>↗ + 6.4%</b> đang kinh doanh</div>
+                            <strong th:text="${totalProducts}">0</strong>
+                            <div class="metric-desc"><b th:text="${activeProducts}">0</b> đang kinh doanh</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-title">
@@ -207,8 +207,8 @@
                                         /></svg
                                 ></i>
                             </div>
-                            <strong>1.248</strong>
-                            <div class="metric-desc"><b>↗ + 15.3%</b> so với kỳ trước</div>
+                            <strong th:text="${totalCustomers}">0</strong>
+                            <div class="metric-desc">Tài khoản khách hàng</div>
                         </div>
                     </section>
                     <section class="adm-panels">
@@ -218,47 +218,21 @@
                                     <h3>Thống kê doanh thu</h3>
                                     <p>Doanh thu cửa hàng 7 ngày gần đây</p>
                                 </div>
-                                <span class="fake-select">7 ngày gần nhất ⌄</span>
+                                <span class="fake-select">7 ngày gần nhất</span>
                             </div>
                             <div class="chart-total">
-                                <strong>18.450.000đ</strong><span>↗ +12.5%</span>
+                                <strong th:text="${#numbers.formatDecimal(weekRevenue,1,'POINT',0,'COMMA') + 'đ'}">0đ</strong>
                             </div>
                             <div class="bar-chart">
                                 <div class="bar-axes">
-                                    <span>5tr</span><span>4tr</span><span>3tr</span>
-                                    <span>2tr</span><span>1tr</span><span>0</span>
+                                    <span th:each="axis : ${axes}" th:text="${#numbers.formatDecimal(axis,1,'POINT',0,'COMMA')}">0</span>
                                 </div>
                                 <div class="bar-chart-grid">
-                                    <div class="chart-column">
-                                        <div style="height: 40%" class="chart-fill"></div>
-                                        <span>T2</span>
-                                    </div>
-                                    <div class="chart-column">
-                                        <div style="height: 57%" class="chart-fill"></div>
-                                        <span>T3</span>
-                                    </div>
-                                    <div class="chart-column">
-                                        <div style="height: 48%" class="chart-fill"></div>
-                                        <span>T4</span>
-                                    </div>
-                                    <div class="chart-column">
-                                        <div style="height: 74%" class="chart-fill"></div>
-                                        <span>T5</span>
-                                    </div>
-                                    <div class="chart-column">
-                                        <div style="height: 62%" class="chart-fill"></div>
-                                        <span>T6</span>
-                                    </div>
-                                    <div class="chart-column">
-                                        <div
-                                            style="height: 95%"
-                                            class="chart-fill bar-special"
-                                            ></div>
-                                        <span>T7</span>
-                                    </div>
-                                    <div class="chart-column">
-                                        <div style="height: 83%" class="chart-fill"></div>
-                                        <span>CN</span>
+                                    <div class="chart-column" th:each="day : ${days}">
+                                        <div style="height:calc(100% - 23px);width:100%;display:flex;align-items:flex-end;justify-content:center">
+                                            <div class="chart-fill" th:style="|height:${day.height}%|" th:title="${#numbers.formatDecimal(day.value,1,'POINT',0,'COMMA') + 'đ'}"></div>
+                                        </div>
+                                        <span th:text="${day.label}"></span>
                                     </div>
                                 </div>
                             </div>
@@ -271,25 +245,13 @@
                                 </div>
                             </div>
                             <div class="donut-wrap">
-                                <div class="donut">
-                                    <div><strong>128</strong><span>Tổng đơn hàng</span></div>
+                                <div class="donut" th:style="|background:${donutBackground} !important|">
+                                    <div><strong th:text="${statusTotal}">0</strong><span>Tổng đơn hàng</span></div>
                                 </div>
                                 <div class="legend-list">
-                                    <div>
-                                        <i class="legend-dot green-dot"></i><span>Hoàn thành</span>
-                                        <strong>78</strong>
-                                    </div>
-                                    <div>
-                                        <i class="legend-dot blue-dot"></i><span>Đang giao</span>
-                                        <strong>24</strong>
-                                    </div>
-                                    <div>
-                                        <i class="legend-dot yellow-dot"></i>
-                                        <span>Chờ xác nhận</span><strong>18</strong>
-                                    </div>
-                                    <div>
-                                        <i class="legend-dot red-dot"></i><span>Đã hủy</span>
-                                        <strong>8</strong>
+                                    <div th:each="group : ${statusGroups}">
+                                        <i class="legend-dot" th:style="|background:${group.color}|"></i><span th:text="${group.name}"></span>
+                                        <strong th:text="${group.count}">0</strong>
                                     </div>
                                 </div>
                             </div>
@@ -301,7 +263,7 @@
                                 <h3>Đơn hàng gần đây</h3>
                                 <p>Những đơn hàng mới cập nhật</p>
                             </div>
-                            <span class="fake-link">Xem tất cả →</span>
+                            <a class="fake-link" th:href="@{/admin/orders}">Xem tất cả →</a>
                         </div>
                         <div class="adm-table-scroll">
                             <table class="adm-table">
@@ -315,63 +277,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td class="row-id">#FF00125</td>
-                                        <td>
-                                            <span class="customer-inline"
-                                                  ><b class="initials">NA</b>Nguyễn Văn An</span
-                                            >
-                                        </td>
-                                        <td>09/10/2026</td>
-                                        <td class="money-cell">159.000đ</td>
-                                        <td>
-                                            <span class="pill-status pending">Chờ xác nhận</span>
-                                        </td>
+                                    <tr th:each="order : ${recentOrders}">
+                                        <td class="row-id"><a th:href="@{/admin/orders/{id}(id=${order.orderId})}" th:text="|#FF${order.orderId}|">#FF</a></td>
+                                        <td th:text="${order.customerName}"></td>
+                                        <td th:text="${order.orderDate}"></td>
+                                        <td class="money-cell" th:text="${#numbers.formatDecimal(order.total,1,'POINT',0,'COMMA') + 'đ'}"></td>
+                                        <td><span class="pill-status" th:classappend="${order.status == 'Hoàn thành' ? 'done' : (order.status == 'Đã hủy' ? 'cancel' : (order.status == 'Đang giao' ? 'shipping' : 'pending'))}" th:text="${order.status}"></span></td>
                                     </tr>
-                                    <tr>
-                                        <td class="row-id">#FF00124</td>
-                                        <td>
-                                            <span class="customer-inline"
-                                                  ><b class="initials">LH</b>Lê Thu Hà</span
-                                            >
-                                        </td>
-                                        <td>09/10/2026</td>
-                                        <td class="money-cell">245.000đ</td>
-                                        <td><span class="pill-status shipping">Đang giao</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="row-id">#FF00123</td>
-                                        <td>
-                                            <span class="customer-inline"
-                                                  ><b class="initials">MT</b>Phạm Minh Tú</span
-                                            >
-                                        </td>
-                                        <td>08/10/2026</td>
-                                        <td class="money-cell">89.000đ</td>
-                                        <td><span class="pill-status done">Hoàn thành</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="row-id">#FF00122</td>
-                                        <td>
-                                            <span class="customer-inline"
-                                                  ><b class="initials">HK</b>Trần Hoàng Khánh</span
-                                            >
-                                        </td>
-                                        <td>08/10/2026</td>
-                                        <td class="money-cell">399.000đ</td>
-                                        <td><span class="pill-status done">Hoàn thành</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td class="row-id">#FF00121</td>
-                                        <td>
-                                            <span class="customer-inline"
-                                                  ><b class="initials">BN</b>Đỗ Bảo Ngọc</span
-                                            >
-                                        </td>
-                                        <td>07/10/2026</td>
-                                        <td class="money-cell">119.000đ</td>
-                                        <td><span class="pill-status cancel">Đã hủy</span></td>
-                                    </tr>
+                                    <tr th:if="${#lists.isEmpty(recentOrders)}"><td colspan="5">Chưa có đơn hàng.</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -384,49 +297,29 @@
                                     <p>Những sản phẩm được yêu thích</p>
                                 </div>
                             </div>
-                            <div class="tiny-food">
-                                <img src="/images/chicken-bowl.jpg" th:src="@{/images/chicken-bowl.jpg}" alt="Cơm gà sốt tiêu đen" />
-                                <div><b>Cơm gà sốt tiêu đen</b><small>Cơm healthy</small></div>
-                                <strong>59.000đ</strong>
+                            <div class="tiny-food" th:each="food : ${topFoods}">
+                                <img th:if="${food.imageUrl != null and !food.imageUrl.isEmpty()}" th:src="@{${food.imageUrl}}" th:alt="${food.name}" />
+                                <div><b th:text="${food.name}"></b><small>Đã bán (đơn đã thanh toán)</small></div>
+                                <strong th:text="${food.sold}"></strong>
                             </div>
-                            <div class="tiny-food">
-                                <img src="/images/chicken-salad.jpg" th:src="@{/images/chicken-salad.jpg}" alt="Salad ức gà" />
-                                <div><b>Salad ức gà</b><small>Salad</small></div>
-                                <strong>49.000đ</strong>
-                            </div>
-                            <div class="tiny-food">
-                                <img src="/images/salmon-bowl.jpg" th:src="@{/images/salmon-bowl.jpg}" alt="Cá hồi áp chảo" />
-                                <div><b>Cá hồi áp chảo</b><small>Món cao cấp</small></div>
-                                <strong>89.000đ</strong>
-                            </div>
+                            <p th:if="${#lists.isEmpty(topFoods)}">Chưa có dữ liệu bán hàng.</p>
                         </section>
                         <section class="white-panel">
                             <div class="panel-title">
                                 <div>
-                                    <h3>Nguyên liệu trong kho</h3>
-                                    <p>Mức tồn kho tham khảo</p>
+                                    <h3>Sản phẩm trong kho</h3>
+                                    <p>Tồn khả dụng thấp nhất</p>
                                 </div>
                             </div>
-                            <div class="inventory-line">
-                                <span>🥦</span>
-                                <div><b>Bông cải xanh</b><small>Kho nguyên liệu</small></div>
-                                <i class="pill-status pending">Sắp hết</i>
+                            <div class="inventory-line" th:each="item : ${inventory}">
+                                <div><b th:text="${item.name}"></b><small th:text="|Còn ${item.available} sản phẩm|"></small></div>
+                                <i class="pill-status" th:classappend="${item.available == 0 ? 'cancel' : (item.available <= item.threshold ? 'pending' : 'done')}" th:text="${item.available == 0 ? 'Hết hàng' : (item.available <= item.threshold ? 'Sắp hết' : 'Còn hàng')}"></i>
                             </div>
-                            <div class="inventory-line">
-                                <span>🥑</span>
-                                <div><b>Bơ tươi</b><small>Kho nguyên liệu</small></div>
-                                <i class="pill-status pending">Sắp hết</i>
-                            </div>
-                            <div class="inventory-line">
-                                <span>🍚</span>
-                                <div><b>Gạo lứt</b><small>Kho nguyên liệu</small></div>
-                                <i class="pill-status done">Còn hàng</i>
-                            </div>
+                            <p th:if="${#lists.isEmpty(inventory)}">Chưa có dữ liệu tồn kho.</p>
                         </section>
                     </div>
                     <p class="adm-footer">
-                        © FITFOOD · Bản giao diện quản trị minh họa · Chưa kết nối dữ liệu
-                        thực tế
+                        © FITFOOD · Tổng quan quản trị
                     </p>
                 </div>
             </div>
