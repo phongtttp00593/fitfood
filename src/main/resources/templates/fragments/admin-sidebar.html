@@ -286,6 +286,33 @@
 
             </div>
 
+            <script>
+                (() => {
+                    const nav = document.currentScript.closest('.adm-sidebar').querySelector('.adm-nav');
+                    const storageKey = 'fitfood.admin.sidebarScroll';
+
+                    try {
+                        const position = JSON.parse(sessionStorage.getItem(storageKey));
+                        if (position) {
+                            nav.scrollTop = position.top;
+                            nav.scrollLeft = position.left;
+                        }
+                    } catch {
+                        // Sidebar navigation is still available when session storage is blocked.
+                    }
+
+                    window.addEventListener('pagehide', () => {
+                        try {
+                            sessionStorage.setItem(storageKey, JSON.stringify({
+                                top: nav.scrollTop,
+                                left: nav.scrollLeft
+                            }));
+                        } catch {
+                            // Session storage may be unavailable.
+                        }
+                    });
+                })();
+            </script>
         </aside>
 
     </body>

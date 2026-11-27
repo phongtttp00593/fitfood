@@ -2,7 +2,7 @@
    FITFOOD ADMIN THEME — cùng tông đỏ sơn mài · vàng · giấy với trang khách.
    Nạp SAU các CSS cũ ở mọi trang admin nên chỉ cần ghi đè, không sửa CSS gốc.
    ============================================================ */
-@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&display=swap");
+@import url("fonts/fonts.css");
 @import url("admin-recolor.css");
 
 body.admin-body {
@@ -38,12 +38,12 @@ body.admin-body .adm-brand small { color: var(--gold-300); letter-spacing: .28em
 body.admin-body .adm-nav-cap { color: var(--gold-300); opacity: .7; letter-spacing: .24em; font-size: 9px; font-weight: 700; }
 body.admin-body .adm-sidebar .adm-nav { scrollbar-color: var(--gold-600) transparent; }
 body.admin-body .adm-sidebar .adm-nav-divider { background: rgba(220,192,126,.18); }
-body.admin-body .adm-nav > a { position: relative; color: #d9c9ac; font-size: 12.5px; font-weight: 500; border-radius: 10px; padding: 11px 14px; transition: background .2s, color .2s, transform .2s, padding .2s; }
-body.admin-body .adm-nav > a .ic { flex: none; opacity: .85; transition: transform .25s, color .2s; }
-body.admin-body .adm-nav > a:hover { background: rgba(220,192,126,.1); color: #fff3dc; transform: translateX(3px); }
-body.admin-body .adm-nav > a:hover .ic { transform: scale(1.12); color: var(--gold-300); }
-body.admin-body .adm-nav > a.adm-nav-on { background: linear-gradient(90deg, var(--red) 0%, #b23a2a 100%); color: #fff; font-weight: 700; box-shadow: 0 6px 16px rgba(155,44,31,.4); }
-body.admin-body .adm-nav > a.adm-nav-on::before { content: ""; position: absolute; left: -13px; top: 18%; bottom: 18%; width: 4px; border-radius: 0 4px 4px 0; background: var(--gold-300); animation: adm-bar .4s ease; }
+body.admin-body .adm-nav > a { position: relative; color: #d9c9ac; font: 500 12.5px/1.65 "Be Vietnam Pro", Arial, sans-serif; border-radius: 10px; padding: 11px 14px; transition: background .2s, color .2s; }
+body.admin-body .adm-nav > a .ic { flex: none; opacity: .85; transition: color .2s; }
+body.admin-body .adm-nav > a:hover { background: rgba(220,192,126,.1); color: #fff3dc; }
+body.admin-body .adm-nav > a:hover .ic { color: var(--gold-300); }
+body.admin-body .adm-nav > a.adm-nav-on { background: linear-gradient(90deg, var(--red) 0%, #b23a2a 100%); color: #fff; box-shadow: 0 6px 16px rgba(155,44,31,.4); }
+body.admin-body .adm-nav > a.adm-nav-on::before { content: ""; position: absolute; left: -13px; top: 18%; bottom: 18%; width: 4px; border-radius: 0 4px 4px 0; background: var(--gold-300); }
 body.admin-body .adm-nav > a.adm-nav-on .ic { color: var(--gold-100); opacity: 1; }
 body.admin-body .adm-nav-bottom > a { color: #d9c9ac; transition: color .2s, transform .2s; }
 body.admin-body .adm-nav-bottom > a:hover { color: var(--gold-300); }
@@ -201,18 +201,10 @@ body.admin-body tbody tr:nth-child(3) { animation-delay: .35s; }
 body.admin-body tbody tr:nth-child(4) { animation-delay: .4s; }
 body.admin-body tbody tr:nth-child(5) { animation-delay: .45s; }
 body.admin-body tbody tr:nth-child(n+6) { animation-delay: .5s; }
-body.admin-body .adm-nav > a { animation: adm-slide .5s ease both; }
-body.admin-body .adm-nav > a:nth-child(1) { animation-delay: .05s; } body.admin-body .adm-nav > a:nth-child(2) { animation-delay: .1s; }
-body.admin-body .adm-nav > a:nth-child(3) { animation-delay: .15s; } body.admin-body .adm-nav > a:nth-child(5) { animation-delay: .2s; }
-body.admin-body .adm-nav > a:nth-child(6) { animation-delay: .25s; } body.admin-body .adm-nav > a:nth-child(7) { animation-delay: .3s; }
-body.admin-body .adm-nav > a:nth-child(8) { animation-delay: .35s; } body.admin-body .adm-nav > a:nth-child(9) { animation-delay: .4s; }
-body.admin-body .adm-nav > a:nth-child(10) { animation-delay: .45s; } body.admin-body .adm-nav > a:nth-child(n+12) { animation-delay: .5s; }
 
 @keyframes adm-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 @keyframes adm-row { from { opacity: 0; transform: translateX(-12px); } to { opacity: 1; transform: none; } }
-@keyframes adm-slide { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
 @keyframes adm-drop { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: none; } }
-@keyframes adm-bar { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 
 @media (max-width: 900px) {
   body.admin-body .adm-main { margin-left: 0; }
