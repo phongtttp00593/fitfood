@@ -1,3 +1,4 @@
+
 package com.fitfood.controller;
 
 import com.fitfood.category.FoodCategory;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -47,6 +49,7 @@ public class ProductAddController {
         if (!model.containsAttribute("productForm")) {
             model.addAttribute("productForm", new ProductForm());
         }
+
         addCategoriesToModel(model);
         return "admin-product-add";
     }
@@ -55,13 +58,19 @@ public class ProductAddController {
     public String processAdd(
             @Valid @ModelAttribute("productForm") ProductForm form,
             BindingResult bindingResult,
-            Model model) {
+            Model model,
+            RedirectAttributes redirectAttributes) {
 
-        String trimmedName = form.getName() != null ? form.getName().trim() : "";
+        String trimmedName = form.getName() != null
+                ? form.getName().trim() : "";
 
-        // Kiểm tra nếu tên sản phẩm đã có trong database
-        if (!trimmedName.isEmpty() && productRepository.existsByNameIgnoreCase(trimmedName)) {
-            bindingResult.rejectValue("name", "duplicate.name", "Sản phẩm này đã có trong danh sách!");
+        if (!trimmedName.isEmpty()
+                && productRepository.existsByNameIgnoreCase(trimmedName)) {
+            bindingResult.rejectValue(
+                    "name",
+                    "duplicate.name",
+                    "Sản phẩm này đã có trong danh sách!"
+            );
         }
 
         if (bindingResult.hasErrors()) {
@@ -72,18 +81,26 @@ public class ProductAddController {
         Product product = new Product();
         product.setName(trimmedName);
         product.setCategoryId(form.getCategoryId());
-        product.setDescription(form.getDescription() != null ? form.getDescription().trim() : null);
+        product.setDescription(
+                form.getDescription() != null
+                        ? form.getDescription().trim() : null
+        );
         product.setPrice(form.getPrice());
         product.setStock(form.getStock() != null ? form.getStock() : 0);
         product.setActive(form.isActive());
 
         MultipartFile file = form.getImageFile();
+
         if (file != null && !file.isEmpty()) {
             try {
                 String filename = saveImage(file);
                 product.setImageUrl("/uploads/products/" + filename);
             } catch (IOException e) {
-                bindingResult.rejectValue("imageFile", "upload.failed", "Không thể lưu tệp ảnh, vui lòng thử lại.");
+                bindingResult.rejectValue(
+                        "imageFile",
+                        "upload.failed",
+                        "Không thể lưu tệp ảnh, vui lòng thử lại."
+                );
                 addCategoriesToModel(model);
                 return "admin-product-add";
             }
@@ -91,10 +108,12 @@ public class ProductAddController {
 
         productRepository.save(product);
 
-        // Thành công: gửi successMessage để iframe gửi postMessage đóng popup và hiển thị thông báo
-        model.addAttribute("successMessage", "Đã thêm món ăn thành công!");
-        addCategoriesToModel(model);
-        return "admin-product-add";
+        redirectAttributes.addFlashAttribute(
+                "successMessage",
+                "Đã thêm món ăn thành công!"
+        );
+
+        return "redirect:/admin/products";
     }
 
     private void addCategoriesToModel(Model model) {
@@ -104,19 +123,29 @@ public class ProductAddController {
 
     private String saveImage(MultipartFile file) throws IOException {
         Path uploadPath = Paths.get(uploadDir);
+
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
 
         String originalName = file.getOriginalFilename();
         String extension = "";
+
         if (originalName != null && originalName.contains(".")) {
-            extension = originalName.substring(originalName.lastIndexOf("."));
+            extension = originalName.substring(
+                    originalName.lastIndexOf(".")
+            );
         }
 
-        String filename = UUID.randomUUID().toString() + extension;
+        String filename = UUID.randomUUID() + extension;
         Path filePath = uploadPath.resolve(filename);
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+        Files.copy(
+                file.getInputStream(),
+                filePath,
+                StandardCopyOption.REPLACE_EXISTING
+        );
+
         return filename;
     }
 }
