@@ -11,28 +11,46 @@ body {
     font-size: 14px;
 }
 
-.edit-product-container {
+.container {
     max-width: 100%;
     margin: 0 auto;
 }
 
-.form-group {
+.message.error {
+    background: #fdf2f2;
+    color: #9b1c1c;
+    border: 1px solid #f8b4b4;
+    padding: 10px 14px;
+    border-radius: 8px;
     margin-bottom: 16px;
+    font-size: 13px;
+    font-weight: 600;
 }
 
-.form-group label {
+.message.success {
+    background: #def7ec;
+    color: #03543f;
+    border: 1px solid #bcf0da;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+label {
     display: block;
     font-weight: 700;
     font-size: 13px;
-    margin-bottom: 6px;
+    margin: 14px 0 6px;
     color: var(--lacquer, #3a2217);
 }
 
-.required {
-    color: var(--red, #9b2c1f);
-}
-
-.form-control {
+input[type="text"],
+input[type="number"],
+input[type="file"],
+select,
+textarea {
     width: 100%;
     padding: 10px 14px;
     border: 1px solid var(--line, #e6d8bc);
@@ -44,47 +62,33 @@ body {
     transition: 0.2s;
 }
 
-.form-control:focus {
+textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
     border-color: var(--gold-300, #dcc07e);
     box-shadow: 0 0 0 3px rgba(220, 192, 126, 0.25);
     background: #ffffff;
 }
 
-.form-row {
+.current-image-box {
     display: flex;
-    gap: 16px;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
 }
 
-.col-half {
-    flex: 1;
-}
-
-textarea.form-control {
-    resize: vertical;
-    min-height: 80px;
-}
-
-.text-error {
-    color: var(--red, #9b2c1f);
-    font-size: 12px;
-    margin-top: 4px;
-    font-weight: 500;
-}
-
-.alert-box {
-    background: #fdf2f2;
-    border: 1px solid #f8b4b4;
-    padding: 10px 14px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-}
-
-.current-image-preview img.preview-img {
-    width: 80px;
-    height: 80px;
+.current-img {
+    width: 100px;
+    height: 100px;
     border-radius: 8px;
     object-fit: cover;
     border: 1px solid var(--line, #e6d8bc);
+    display: block;
 }
 
 .no-img-text {
@@ -92,33 +96,36 @@ textarea.form-control {
     color: var(--muted, #6e5d4f);
 }
 
-.file-input {
-    padding: 8px;
-    cursor: pointer;
-}
-
-.checkbox-group {
-    margin-top: 14px;
-}
-
-.switch-label {
-    display: inline-flex;
+.active-row {
+    display: flex;
     align-items: center;
     gap: 10px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--lacquer, #3a2217);
+    margin-top: 16px;
 }
 
-.switch-label input[type="checkbox"] {
-    width: 17px;
-    height: 17px;
+.active-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
     accent-color: var(--lacquer, #3a2217);
     cursor: pointer;
 }
 
-.form-actions {
+.active-row label {
+    margin: 0;
+    cursor: pointer;
+}
+
+#preview {
+    max-width: 100px;
+    max-height: 100px;
+    border-radius: 8px;
+    margin-top: 10px;
+    display: none;
+    object-fit: cover;
+    border: 1px solid var(--line, #e6d8bc);
+}
+
+.actions {
     margin-top: 24px;
     padding-top: 16px;
     border-top: 1px solid var(--line, #e6d8bc);
@@ -127,36 +134,36 @@ textarea.form-control {
     gap: 12px;
 }
 
-.btn-primary {
-    background: var(--lacquer, #3a2217);
-    color: #ffffff;
-    border: 1px solid var(--lacquer, #3a2217);
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.btn-primary:hover {
-    background: #503123;
-}
-
-.btn-cancel {
-    background: #e2e8f0;
-    color: #4a5568;
-    border: none;
-    padding: 10px 20px;
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 10px 22px;
     border-radius: 8px;
     font-size: 14px;
     font-weight: 700;
     cursor: pointer;
     text-decoration: none;
-    display: inline-flex;
-    align-items: center;
+    transition: 0.2s;
 }
 
-.btn-cancel:hover {
+.btn.save {
+    background: var(--lacquer, #3a2217);
+    color: #ffffff;
+    border: none;
+}
+
+.btn.save:hover {
+    background: #503123;
+}
+
+.btn.cancel {
+    background: #e2e8f0;
+    color: #4a5568;
+    border: none;
+}
+
+.btn.cancel:hover {
     background: #cbd5e0;
 }
