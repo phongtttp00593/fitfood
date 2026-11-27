@@ -37,9 +37,10 @@ public class HomeController {
                 p.image_url,
                 c.name AS category_name
             FROM dbo.fitfood_products p
-            LEFT JOIN dbo.fitfood_categories c
+            INNER JOIN dbo.fitfood_categories c
                 ON c.id = p.category_id
             WHERE p.active = 1
+              AND c.active = 1
             ORDER BY p.created_at DESC, p.id DESC
             """, (rs, rowNum) -> {
 
@@ -114,7 +115,12 @@ public class HomeController {
         // Danh sách sản phẩm thực đơn V2
         // Giá thấp nhất của các món đang bán (hiển thị ở đầu trang Thực đơn).
         BigDecimal minPrice = jdbc.queryForObject(
-            "SELECT MIN(price) FROM dbo.fitfood_products WHERE active = 1",
+            """
+            SELECT MIN(p.price)
+            FROM dbo.fitfood_products p
+            INNER JOIN dbo.fitfood_categories c ON c.id = p.category_id
+            WHERE p.active = 1 AND c.active = 1
+            """,
             BigDecimal.class);
         model.addAttribute("minPriceLabel", minPrice == null ? null
             : new DecimalFormat("#,##0",
@@ -186,6 +192,7 @@ public class HomeController {
                 ON c.id = p.category_id
             WHERE p.id = ?
               AND p.active = 1
+              AND c.active = 1
             """, (rs, rowNum) -> {
 
                 BigDecimal price = rs.getBigDecimal("price");
