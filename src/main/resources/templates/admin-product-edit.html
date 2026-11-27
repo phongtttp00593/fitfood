@@ -1,107 +1,110 @@
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Chỉnh sửa sản phẩm | FITFOOD Admin</title>
+    <meta charset="UTF-8">
+    <title>Xóa Sản Phẩm - FitFood Admin</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" />
-    <link rel="stylesheet" th:href="@{/css/admin-product-edit.css}" />
+    <link rel="stylesheet" th:href="@{/css/admin.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-product-delete.css}">
 </head>
-<body>
 
-<div class="edit-product-container">
-    <div th:if="${errorMessage}" class="alert-box" th:text="${errorMessage}"></div>
+<body class="admin-body">
 
-    <form th:action="@{/admin/products/edit/{id}(id=${productForm.id})}"
-          th:object="${productForm}"
-          method="post"
-          enctype="multipart/form-data">
+<div class="admin-layout">
 
-        <input type="hidden" th:field="*{id}">
-        <input type="hidden" th:field="*{imageUrl}">
+    <aside class="adm-sidebar"
+           th:replace="~{fragments/admin-sidebar :: sidebar('products')}">
+    </aside>
 
-        <div class="form-group">
-            <label for="name">Tên món ăn <span class="required">*</span></label>
-            <input type="text" id="name" th:field="*{name}" class="form-control" required />
-            <div class="text-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></div>
-        </div>
+    <main class="admin-main-content">
 
-        <div class="form-group">
-            <label for="categoryId">Danh mục <span class="required">*</span></label>
-            <select id="categoryId" th:field="*{categoryId}" class="form-control" required>
-                <option value="">-- Chọn danh mục --</option>
-                <option th:each="cat : ${categories}" th:value="${cat.id}" th:text="${cat.name}"></option>
-            </select>
-            <div class="text-error" th:if="${#fields.hasErrors('categoryId')}" th:errors="*{categoryId}"></div>
-        </div>
+        <div class="delete-product-container">
 
-        <div class="form-row">
-            <div class="form-group col-half">
-                <label for="price">Giá bán (VNĐ) <span class="required">*</span></label>
-                <input type="number" id="price" th:field="*{price}" step="1000" min="0" class="form-control" required />
-                <div class="text-error" th:if="${#fields.hasErrors('price')}" th:errors="*{price}"></div>
+            <div class="delete-card">
+
+                <div class="delete-icon">⚠️</div>
+
+                <h2>Xác Nhận Xóa Sản Phẩm</h2>
+
+                <p class="delete-warning">
+                    Bạn có chắc chắn muốn xóa sản phẩm này khỏi hệ thống?
+                </p>
+
+                <div class="product-info-box">
+
+                    <div class="info-thumb">
+
+                        <img th:if="${product.imageUrl}"
+                             th:src="${product.imageUrl}"
+                             alt="Ảnh món ăn">
+
+                        <div th:unless="${product.imageUrl}"
+                             class="no-img">
+                            No Image
+                        </div>
+
+                    </div>
+
+                    <div class="info-detail">
+
+                        <h3 th:text="${product.name}">
+                            Tên sản phẩm
+                        </h3>
+
+                        <p>
+                            <strong>Mã món:</strong>
+                            #<span th:text="${product.id}"></span>
+                        </p>
+
+                        <p>
+                            <strong>Danh mục:</strong>
+                            <span th:text="${categoryName != null ? categoryName : 'Chưa phân loại'}"></span>
+                        </p>
+
+                        <p>
+                            <strong>Giá bán:</strong>
+                            <span th:text="${#numbers.formatDecimal(product.price, 0, 'POINT', 0, 'POINT') + ' VNĐ'}"></span>
+                        </p>
+
+                        <p>
+                            <strong>Trạng thái:</strong>
+
+                            <span th:if="${product.active}"
+                                  class="badge badge-success">
+                                Đang kinh doanh
+                            </span>
+
+                            <span th:unless="${product.active}"
+                                  class="badge badge-danger">
+                                Ngưng kinh doanh
+                            </span>
+                        </p>
+
+                    </div>
+                </div>
+
+                <form th:action="@{/admin/products/delete/{id}(id=${product.id})}"
+                      method="post"
+                      class="delete-action-form">
+
+                    <button type="submit" class="btn btn-danger">
+                        Xác Nhận Xóa
+                    </button>
+
+                    <a th:href="@{/admin/products}"
+                       class="btn btn-secondary">
+                        Hủy Bỏ
+                    </a>
+
+                </form>
+
             </div>
-
-            <div class="form-group col-half">
-                <label for="stock">Số lượng hiện có <span class="required">*</span></label>
-                <input type="number" id="stock" th:field="*{stock}" min="0" class="form-control" required />
-                <div class="text-error" th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}"></div>
-            </div>
         </div>
 
-        <div class="form-group">
-            <label for="description">Mô tả món ăn</label>
-            <textarea id="description" th:field="*{description}" class="form-control" rows="3"></textarea>
-            <div class="text-error" th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></div>
-        </div>
-
-        <div class="form-group">
-            <label>Hình ảnh hiện tại</label>
-            <div class="current-image-preview">
-                <img th:if="${productForm.imageUrl != null and !productForm.imageUrl.isEmpty()}"
-                     th:src="${productForm.imageUrl}" class="preview-img" alt="Product Image" />
-                <span th:unless="${productForm.imageUrl != null and !productForm.imageUrl.isEmpty()}"
-                      class="no-img-text">Chưa có ảnh</span>
-            </div>
-
-            <label for="imageFile" style="margin-top: 10px;">Thay đổi hình ảnh</label>
-            <input type="file" id="imageFile" th:field="*{imageFile}" class="form-control file-input" accept="image/*" />
-            <div class="text-error" th:if="${#fields.hasErrors('imageFile')}" th:errors="*{imageFile}"></div>
-        </div>
-
-        <div class="form-group checkbox-group">
-            <label class="switch-label">
-                <input type="checkbox" th:field="*{active}" />
-                <span>Đang mở bán trên thực đơn</span>
-            </label>
-        </div>
-
-        <div class="form-actions">
-            <button type="button" class="btn-cancel" onclick="closeModal()">Hủy bỏ</button>
-            <button type="submit" class="btn-primary">Lưu thay đổi</button>
-        </div>
-    </form>
+    </main>
 </div>
-
-<script th:inline="javascript">
-    function closeModal() {
-        if (window.parent) {
-            window.parent.postMessage({ type: 'FITFOOD_CLOSE_MODAL' }, window.location.origin);
-        }
-    }
-
-    /*<![CDATA[*/
-    var updatedSuccess = /*[[${successMessage != null}]]*/ false;
-    if (updatedSuccess && window.parent) {
-        window.parent.postMessage({ 
-            type: 'FITFOOD_PRODUCT_UPDATED',
-            message: 'Đã cập nhật sản phẩm vào danh sách'
-        }, window.location.origin);
-    }
-    /*]]>*/
-</script>
 
 </body>
 </html>
