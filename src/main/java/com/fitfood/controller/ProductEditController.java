@@ -1,4 +1,3 @@
-
 package com.fitfood.controller;
 
 import com.fitfood.category.FoodCategory;
@@ -24,8 +23,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/admin/products")
@@ -71,6 +70,7 @@ public class ProductEditController {
         form.setImageUrl(product.getImageUrl());
         form.setActive(product.isActive());
 
+        model.addAttribute("productId", product.getId());
         model.addAttribute("productForm", form);
         addCategoriesToModel(model);
 
@@ -96,19 +96,19 @@ public class ProductEditController {
         }
 
         if (bindingResult.hasErrors()) {
+            form.setId(product.getId());
             form.setImageUrl(product.getImageUrl());
+            model.addAttribute("productId", product.getId());
             addCategoriesToModel(model);
             return "admin-product-edit";
         }
 
         product.setName(form.getName().trim());
         product.setCategoryId(form.getCategoryId());
-
         product.setDescription(
                 form.getDescription() != null
                         ? form.getDescription().trim() : null
         );
-
         product.setPrice(form.getPrice());
         product.setStock(form.getStock() != null ? form.getStock() : 0);
         product.setActive(form.isActive());
@@ -120,15 +120,15 @@ public class ProductEditController {
                 String filename = saveImage(file);
                 product.setImageUrl("/uploads/products/" + filename);
                 form.setImageUrl(product.getImageUrl());
-
             } catch (IOException e) {
                 bindingResult.rejectValue(
                         "imageFile",
                         "upload.failed",
                         "Không thể lưu tệp ảnh, vui lòng thử lại."
                 );
-
+                form.setId(product.getId());
                 form.setImageUrl(product.getImageUrl());
+                model.addAttribute("productId", product.getId());
                 addCategoriesToModel(model);
                 return "admin-product-edit";
             }
