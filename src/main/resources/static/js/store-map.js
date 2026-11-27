@@ -9,6 +9,7 @@
 
   var btn = document.getElementById('storeMapLocate');
   var statusEl = document.getElementById('storeMapStatus');
+  var dirLink = document.querySelector('.f-map-link');
   var address = el.getAttribute('data-address') || 'Hải Phòng, Việt Nam';
   var query = (el.getAttribute('data-query') || address).trim();
   var DEFAULT_CENTER = [20.8449, 106.6881]; // Hải Phòng
@@ -50,8 +51,21 @@
     return String(t).replace(/[&<>"]/g, function (c) { return table[c]; });
   }
 
+  // Nút "Chỉ đường trên Google Maps" dùng đúng toạ độ đang ghim (không để Google tự đoán từ chữ)
+  function updateDirLink() {
+    if (!dirLink || !storePos) return;
+    var url = 'https://www.google.com/maps/dir/?api=1&travelmode=driving&destination=' +
+              storePos[0].toFixed(6) + ',' + storePos[1].toFixed(6);
+    if (meMarker) {
+      var m = meMarker.getLatLng();
+      url += '&origin=' + m.lat.toFixed(6) + ',' + m.lng.toFixed(6);
+    }
+    dirLink.href = url;
+  }
+
   function setStore(pos) {
     storePos = pos;
+    updateDirLink();
     if (storeMarker) {
       storeMarker.setLatLng(pos);
     } else {
@@ -101,6 +115,7 @@
         .addTo(map).bindPopup('Vị trí của bạn');
     }
     accuracyM = accuracy;
+    updateDirLink();
     if (storePos) map.fitBounds(L.latLngBounds([pos, storePos]).pad(0.25), { maxZoom: 17 });
     else map.setView(pos, 16);
     if (storePos) updateRoute();
