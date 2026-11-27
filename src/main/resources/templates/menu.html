@@ -625,61 +625,644 @@
             </div>
         </main>
 
-        <!-- HỘP THOẠI POPUP CHI TIẾT SẢN PHẨM & TÙY CHỌN BIẾN THỂ -->
-        <div id="quickAddModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); align-items: center; justify-content: center; z-index: 99999; padding: 16px; box-sizing: border-box;">
-            <div style="background: #ffffff; width: 450px; max-width: 95%; max-height: 85vh; border-radius: 16px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); display: flex; flex-direction: column; overflow: hidden; text-align: left; font-family: inherit;">
 
-                <!-- HEADER POPUP: ẢNH + TÊN + GIÁ -->
-                <div style="display: flex; gap: 14px; padding: 16px 18px; border-bottom: 1px solid #f1f2f6; align-items: center; position: relative;">
-                    <img id="modalProductImg" src="/images/hero-bowl.jpg" alt="" style="width: 80px; height: 80px; border-radius: 10px; object-fit: cover; border: 1px solid #e2e8f0; flex-shrink: 0;" />
-                    <div style="flex: 1; min-width: 0; padding-right: 25px;">
-                        <span id="modalCategoryBadge" style="display: inline-block; font-size: 11px; font-weight: 700; color: #166534; background: #dcfce7; padding: 2px 8px; border-radius: 6px; margin-bottom: 4px;">Danh mục</span>
-                        <h3 id="modalName" style="margin: 0 0 4px; font-size: 1.1rem; color: #2c3e50; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Tên món</h3>
-                        <div style="color: #27ae60; font-size: 1.05rem; font-weight: 800;">
-                            <span id="modalUnitPriceDisplay">0</span> đ
+        <!-- HỘP THOẠI POPUP CHI TIẾT SẢN PHẨM & TÙY CHỌN BIẾN THỂ (ĐỒNG BỘ TÔNG MÀU FITFOOD & CÔ LẬP #quickAddModal) -->
+        <div id="quickAddModal" class="ff-qam-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalName" style="display: none;">
+            <div class="ff-qam-dialog">
+
+                <!-- HEADER POPUP: ẢNH LỚN + TÊN MÓN LỚN + GIÁ -->
+                <div class="ff-qam-header">
+                    <img id="modalProductImg" class="ff-qam-thumb" src="/images/hero-bowl.jpg" alt="" />
+                    <div class="ff-qam-header-info">
+                        <div class="ff-qam-badges">
+                            <span id="modalCategoryBadge" class="ff-qam-cat-badge">Danh mục</span>
+                            <span id="modalBasePriceBadge" class="ff-qam-base-badge">Giá gốc: 0 đ</span>
+                        </div>
+                        <h3 id="modalName" class="ff-qam-title">Tên món</h3>
+                        <div class="ff-qam-unit-row">
+                            <span class="ff-qam-unit-label">Đơn giá hiện tại:</span>
+                            <span class="ff-qam-unit-price"><span id="modalUnitPriceDisplay">0</span> đ</span>
                         </div>
                     </div>
-                    <button type="button" onclick="closeQuickAddModal()" style="position: absolute; top: 12px; right: 12px; width: 28px; height: 28px; border-radius: 50%; background: #f1f2f6; border: none; font-size: 18px; line-height: 1; cursor: pointer; color: #7f8c8d;">×</button>
+                    <button type="button" class="ff-qam-close" onclick="closeQuickAddModal()" aria-label="Đóng cửa sổ">&times;</button>
                 </div>
 
-                <form th:action="@{/cart/add}" th:data-login-url="@{/dang-nhap}" method="post" id="quickAddForm" onsubmit="handleQuickAddSubmit(event);" style="display: flex; flex-direction: column; flex: 1; overflow: hidden; margin: 0;">
+                <form th:action="@{/cart/add}" th:data-login-url="@{/dang-nhap}" method="post" id="quickAddForm" onsubmit="handleQuickAddSubmit(event);" class="ff-qam-form">
                     <input type="hidden" name="productId" id="modalProductId" />
                     <input type="hidden" name="variantName" id="modalVariantName" />
                     <input type="hidden" name="unitPrice" id="modalCalculatedUnitPrice" />
 
-                    <!-- NỘI DUNG CUỘN: MÔ TẢ & BIẾN THỂ -->
-                    <div style="padding: 16px 18px; overflow-y: auto; flex: 1;">
-                        <div style="margin-bottom: 12px;">
-                            <strong style="font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Mô tả món ăn</strong>
-                            <p id="modalDescDisplay" style="font-size: 13px; color: #475569; line-height: 1.5; margin: 0;"></p>
+                    <!-- NỘI DUNG CUỘN: MÔ TẢ, NHÓM BIẾN THỂ, TÓM TẮT & GHI CHÚ -->
+                    <div class="ff-qam-body">
+                        <div class="ff-qam-desc-box">
+                            <span class="ff-qam-section-kicker">Mô tả món ăn</span>
+                            <p id="modalDescDisplay" class="ff-qam-desc-text"></p>
                         </div>
 
-                        <div id="modalVariantsContainer" style="margin-top: 10px;"></div>
+                        <div id="modalVariantsContainer" class="ff-qam-variants-wrap"></div>
 
-                        <div style="margin-top: 12px;">
-                            <label for="modalFoodNote" style="font-size: 12px; font-weight: 700; color: #475569; display: block; margin-bottom: 4px;">Ghi chú cho bếp:</label>
-                            <input type="text" id="modalFoodNote" name="foodNote" placeholder="Ví dụ: Ít cay, không hành, để riêng sốt..." 
-                                   style="width: 100%; box-sizing: border-box; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px; outline: none;" />
+                        <div id="modalSelectedSummary" class="ff-qam-summary-bar">
+                            <span class="ff-qam-summary-label">Đang chọn:</span>
+                            <span id="modalSelectedSummaryText" class="ff-qam-summary-value">Mặc định theo món</span>
+                        </div>
+
+                        <div class="ff-qam-note-box">
+                            <label for="modalFoodNote" class="ff-qam-note-label">Ghi chú cho bếp</label>
+                            <textarea id="modalFoodNote" name="foodNote" rows="2" class="ff-qam-note-input" placeholder="Ví dụ: Ít cay, không hành, để riêng sốt..."></textarea>
                         </div>
                     </div>
 
-                    <!-- FOOTER: SỐ LƯỢNG & NÚT THÊM -->
-                    <div style="padding: 12px 18px; border-top: 1px solid #f1f2f6; background: #fafafa; display: flex; align-items: center; justify-content: space-between; gap: 12px;">
-                        <div style="display: flex; align-items: center; border: 1px solid #cbd5e1; border-radius: 8px; overflow: hidden; background: #fff;">
-                            <button type="button" onclick="modifyQty(-1)" style="width: 36px; height: 36px; border: none; background: #fff; font-weight: bold; font-size: 18px; cursor: pointer;">−</button>
-                            <input type="number" id="modalQtyInput" name="quantity" value="1" min="1" readonly 
-                                   style="width: 44px; height: 36px; text-align: center; font-size: 15px; font-weight: 700; border: none; outline: none; background: #fff;" />
-                            <button type="button" onclick="modifyQty(1)" style="width: 36px; height: 36px; border: none; background: #fff; font-weight: bold; font-size: 18px; cursor: pointer;">+</button>
+                    <!-- FOOTER: SỐ LƯỢNG & NÚT THÊM VÀO GIỎ -->
+                    <div class="ff-qam-footer">
+                        <div class="ff-qam-qty" aria-label="Số lượng món">
+                            <button type="button" class="ff-qam-qty-btn" onclick="modifyQty(-1)" aria-label="Giảm số lượng">&minus;</button>
+                            <input type="number" id="modalQtyInput" name="quantity" value="1" min="1" readonly class="ff-qam-qty-input" />
+                            <button type="button" class="ff-qam-qty-btn" onclick="modifyQty(1)" aria-label="Tăng số lượng">+</button>
                         </div>
 
-                        <button type="submit" id="modalSubmitBtn" style="flex: 1; background: #27ae60; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 14px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-                            <span>Thêm vào giỏ</span>
-                            <span id="modalTotalDisplay">0 đ</span>
+                        <button type="submit" id="modalSubmitBtn" class="ff-qam-submit">
+                            <span class="ff-qam-submit-left">
+                                <span class="ff-qam-submit-title">Thêm vào giỏ</span>
+                                <small id="modalSubmitMeta" class="ff-qam-submit-sub">1 phần</small>
+                            </span>
+                            <span id="modalTotalDisplay" class="ff-qam-submit-total">0 đ</span>
                         </button>
                     </div>
                 </form>
             </div>
         </div>
+
+        <style>
+            /* Badge số lượng hiển thị ngay cạnh nút/chữ Giỏ bên cạnh tài khoản (cô lập .ff-cart-badge) */
+            .ff-cart-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 20px;
+                height: 20px;
+                padding: 0 6px;
+                margin-left: 5px;
+                border-radius: 999px;
+                background: #9b2c1f;
+                color: #fff8ec;
+                font-size: 11.5px;
+                font-weight: 800;
+                line-height: 1;
+                box-shadow: 0 2px 6px rgba(58, 34, 23, 0.22);
+                vertical-align: middle;
+                box-sizing: border-box;
+                transition: transform 0.2s ease, background-color 0.2s ease;
+            }
+
+            .ff-cart-badge[hidden] {
+                display: none !important;
+            }
+
+            .ff-cart-badge.is-bump {
+                transform: scale(1.28);
+                background: #7a2016;
+            }
+
+            /* Cô lập toàn bộ giao diện modal chọn biến thể trong #quickAddModal & đồng bộ bảng màu FITFOOD */
+            #quickAddModal.ff-qam-backdrop {
+                --qam-red: var(--red, #9b2c1f);
+                --qam-red-700: var(--red-700, #7a2016);
+                --qam-red-50: var(--red-50, #f8e9e4);
+                --qam-gold: var(--gold, #b8862b);
+                --qam-gold-600: var(--gold-600, #86601b);
+                --qam-gold-300: var(--qam-gold-300, #dcc07e);
+                --qam-gold-100: var(--qam-gold-100, #efdfb4);
+                --qam-gold-50: var(--qam-gold-50, #f7eed6);
+                --qam-lacquer: var(--lacquer, #3a2217);
+                --qam-lacquer-900: var(--lacquer-900, #23140d);
+                --qam-paper: var(--paper, #f8f1e3);
+                --qam-paper-2: var(--paper-2, #f1e6cf);
+                --qam-surface: var(--surface, #fffcf5);
+                --qam-ink: var(--ink, #2b1e16);
+                --qam-muted: var(--muted, #6e5d4f);
+                --qam-line: var(--line, #e6d8bc);
+                --qam-line-strong: var(--line-strong, #d6c29a);
+                --qam-display: var(--display, "Playfair Display", Georgia, "Times New Roman", serif);
+
+                position: fixed;
+                inset: 0;
+                width: 100vw;
+                height: 100vh;
+                background: rgba(35, 20, 13, 0.64);
+                backdrop-filter: blur(4px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 99999;
+                padding: 20px;
+                box-sizing: border-box;
+            }
+
+            #quickAddModal .ff-qam-dialog {
+                background: var(--qam-surface);
+                width: 820px;
+                max-width: 96vw;
+                max-height: 91vh;
+                border-radius: 22px;
+                box-shadow: 0 26px 68px rgba(35, 20, 13, 0.34);
+                border: 1.5px solid var(--qam-line-strong);
+                display: flex;
+                flex-direction: column;
+                overflow: hidden;
+                text-align: left;
+                font-family: inherit;
+                color: var(--qam-ink);
+                box-sizing: border-box;
+            }
+
+            #quickAddModal .ff-qam-dialog * {
+                box-sizing: border-box;
+            }
+
+            #quickAddModal .ff-qam-header {
+                display: flex;
+                gap: 22px;
+                padding: 22px 26px;
+                border-bottom: 1px solid var(--qam-line);
+                align-items: center;
+                position: relative;
+                background: linear-gradient(135deg, var(--qam-paper) 0%, var(--qam-paper-2) 100%);
+            }
+
+            #quickAddModal .ff-qam-thumb {
+                width: 124px;
+                height: 124px;
+                border-radius: 18px;
+                object-fit: cover;
+                border: 2px solid var(--qam-gold-300);
+                box-shadow: 0 10px 24px rgba(58, 34, 23, 0.16);
+                flex-shrink: 0;
+                background: var(--qam-paper-2);
+            }
+
+            #quickAddModal .ff-qam-header-info {
+                flex: 1;
+                min-width: 0;
+                padding-right: 40px;
+            }
+
+            #quickAddModal .ff-qam-badges {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 8px;
+            }
+
+            #quickAddModal .ff-qam-cat-badge {
+                display: inline-flex;
+                align-items: center;
+                font-size: 12px;
+                font-weight: 700;
+                color: var(--qam-gold-600);
+                background: var(--qam-gold-50);
+                border: 1px solid var(--qam-gold-300);
+                padding: 3px 11px;
+                border-radius: 999px;
+            }
+
+            #quickAddModal .ff-qam-base-badge {
+                display: inline-flex;
+                align-items: center;
+                font-size: 12px;
+                font-weight: 600;
+                color: var(--qam-muted);
+                background: var(--qam-surface);
+                border: 1px solid var(--qam-line);
+                padding: 3px 11px;
+                border-radius: 999px;
+            }
+
+            #quickAddModal .ff-qam-title {
+                margin: 0 0 8px;
+                font-family: var(--qam-display);
+                font-size: 1.7rem;
+                line-height: 1.2;
+                color: var(--qam-lacquer-900);
+                font-weight: 800;
+            }
+
+            #quickAddModal .ff-qam-unit-row {
+                display: flex;
+                align-items: baseline;
+                gap: 8px;
+            }
+
+            #quickAddModal .ff-qam-unit-label {
+                font-size: 13.5px;
+                color: var(--qam-muted);
+                font-weight: 500;
+            }
+
+            #quickAddModal .ff-qam-unit-price {
+                color: var(--qam-red);
+                font-size: 1.32rem;
+                font-weight: 800;
+            }
+
+            #quickAddModal .ff-qam-close {
+                position: absolute;
+                top: 16px;
+                right: 16px;
+                width: 38px;
+                height: 38px;
+                border-radius: 12px;
+                background: var(--qam-surface);
+                border: 1px solid var(--qam-line-strong);
+                font-size: 22px;
+                line-height: 1;
+                cursor: pointer;
+                color: var(--qam-lacquer);
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.15s ease;
+            }
+
+            #quickAddModal .ff-qam-close:hover {
+                background: var(--qam-gold-50);
+                color: var(--qam-red);
+                border-color: var(--qam-gold);
+            }
+
+            #quickAddModal .ff-qam-form {
+                display: flex;
+                flex-direction: column;
+                flex: 1;
+                min-height: 0;
+                margin: 0;
+            }
+
+            #quickAddModal .ff-qam-body {
+                padding: 22px 26px 24px;
+                overflow-y: auto;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                gap: 18px;
+                background: var(--qam-surface);
+            }
+
+            #quickAddModal .ff-qam-desc-box {
+                background: var(--qam-paper);
+                border: 1px solid var(--qam-line);
+                border-radius: 14px;
+                padding: 13px 16px;
+            }
+
+            #quickAddModal .ff-qam-section-kicker {
+                font-size: 11px;
+                font-weight: 800;
+                color: var(--qam-gold-600);
+                text-transform: uppercase;
+                letter-spacing: 0.08em;
+                display: block;
+                margin-bottom: 4px;
+            }
+
+            #quickAddModal .ff-qam-desc-text {
+                font-size: 13.5px;
+                color: var(--qam-ink);
+                line-height: 1.55;
+                margin: 0;
+            }
+
+            #quickAddModal .ff-qam-variants-wrap {
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            #quickAddModal .ff-qam-group {
+                background: var(--qam-paper);
+                border: 1px solid var(--qam-line);
+                border-radius: 16px;
+                padding: 16px 18px;
+            }
+
+            #quickAddModal .ff-qam-group.is-missing-required {
+                border-color: var(--qam-red);
+                background: var(--qam-red-50);
+            }
+
+            #quickAddModal .ff-qam-group-head {
+                display: flex;
+                align-items: flex-start;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 12px;
+            }
+
+            #quickAddModal .ff-qam-group-title {
+                margin: 0;
+                font-family: var(--qam-display);
+                font-weight: 700;
+                font-size: 1.05rem;
+                color: var(--qam-lacquer-900);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            #quickAddModal .ff-qam-group-sub {
+                margin: 3px 0 0;
+                font-size: 12px;
+                color: var(--qam-muted);
+            }
+
+            #quickAddModal .ff-qam-req-tag {
+                font-size: 12px;
+                font-weight: 700;
+                padding: 4px 11px;
+                border-radius: 999px;
+                white-space: nowrap;
+            }
+
+            #quickAddModal .ff-qam-req-tag.is-required {
+                background: var(--qam-red-50);
+                color: var(--qam-red);
+                border: 1px solid rgba(155, 44, 31, 0.25);
+            }
+
+            #quickAddModal .ff-qam-req-tag.is-optional {
+                background: var(--qam-gold-50);
+                color: var(--qam-gold-600);
+                border: 1px solid var(--qam-line-strong);
+            }
+
+            #quickAddModal .ff-qam-options-list {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            #quickAddModal .ff-qam-option-card {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 12px;
+                background: var(--qam-surface);
+                border: 1.5px solid var(--qam-line-strong);
+                border-radius: 12px;
+                padding: 12px 14px;
+                cursor: pointer;
+                font-size: 13.5px;
+                transition: all 0.15s ease;
+                margin: 0;
+            }
+
+            #quickAddModal .ff-qam-option-card:hover {
+                border-color: var(--qam-gold);
+                background: var(--qam-gold-50);
+            }
+
+            #quickAddModal .ff-qam-option-card.is-selected {
+                border-color: var(--qam-red);
+                background: var(--qam-red-50);
+                box-shadow: 0 0 0 1px var(--qam-red);
+            }
+
+            #quickAddModal .ff-qam-option-left {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                min-width: 0;
+                flex: 1;
+            }
+
+            #quickAddModal .ff-qam-option-left input[type="radio"],
+            #quickAddModal .ff-qam-option-left input[type="checkbox"] {
+                width: 17px;
+                height: 17px;
+                margin: 0;
+                accent-color: var(--qam-red);
+                cursor: pointer;
+                flex-shrink: 0;
+            }
+
+            #quickAddModal .ff-qam-option-name {
+                font-weight: 600;
+                color: var(--qam-ink);
+                line-height: 1.35;
+                word-break: break-word;
+            }
+
+            #quickAddModal .ff-qam-option-price {
+                color: var(--qam-red);
+                font-weight: 800;
+                font-size: 13px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            #quickAddModal .ff-qam-option-price.is-zero {
+                color: var(--qam-muted);
+                font-weight: 600;
+            }
+
+            #quickAddModal .ff-qam-summary-bar {
+                display: flex;
+                align-items: baseline;
+                gap: 8px;
+                padding: 12px 15px;
+                border-radius: 12px;
+                background: var(--qam-gold-50);
+                border: 1px solid var(--qam-gold-300);
+                font-size: 13px;
+            }
+
+            #quickAddModal .ff-qam-summary-label {
+                font-weight: 700;
+                color: var(--qam-lacquer);
+                white-space: nowrap;
+            }
+
+            #quickAddModal .ff-qam-summary-value {
+                color: var(--qam-ink);
+                font-weight: 600;
+                line-height: 1.45;
+            }
+
+            #quickAddModal .ff-qam-note-label {
+                font-size: 13px;
+                font-weight: 700;
+                color: var(--qam-lacquer);
+                display: block;
+                margin-bottom: 6px;
+            }
+
+            #quickAddModal .ff-qam-note-input {
+                width: 100%;
+                padding: 11px 14px;
+                border: 1.5px solid var(--qam-line-strong);
+                border-radius: 12px;
+                font-size: 13.5px;
+                font-family: inherit;
+                color: var(--qam-ink);
+                background: var(--qam-surface);
+                resize: vertical;
+                min-height: 54px;
+                outline: none;
+                transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            }
+
+            #quickAddModal .ff-qam-note-input:focus {
+                border-color: var(--qam-gold);
+                box-shadow: 0 0 0 3px rgba(184, 134, 43, 0.16);
+            }
+
+            #quickAddModal .ff-qam-footer {
+                padding: 16px 26px;
+                border-top: 1px solid var(--qam-line);
+                background: var(--qam-paper);
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 16px;
+            }
+
+            #quickAddModal .ff-qam-qty {
+                display: inline-flex;
+                align-items: center;
+                border: 1.5px solid var(--qam-line-strong);
+                border-radius: 12px;
+                overflow: hidden;
+                background: var(--qam-surface);
+                height: 50px;
+                flex-shrink: 0;
+            }
+
+            #quickAddModal .ff-qam-qty-btn {
+                width: 44px;
+                height: 100%;
+                border: none;
+                background: var(--qam-paper-2);
+                font-weight: 700;
+                font-size: 20px;
+                color: var(--qam-lacquer);
+                cursor: pointer;
+                transition: background 0.15s ease;
+            }
+
+            #quickAddModal .ff-qam-qty-btn:hover {
+                background: var(--qam-gold-100);
+            }
+
+            #quickAddModal .ff-qam-qty-input {
+                width: 48px;
+                height: 100%;
+                text-align: center;
+                font-size: 16px;
+                font-weight: 800;
+                color: var(--qam-lacquer-900);
+                border: none;
+                outline: none;
+                background: var(--qam-surface);
+            }
+
+            #quickAddModal .ff-qam-submit {
+                flex: 1;
+                height: 50px;
+                background: var(--qam-red);
+                color: #fff8ec;
+                border: none;
+                padding: 0 22px;
+                border-radius: 14px;
+                font-weight: 700;
+                font-size: 15px;
+                cursor: pointer;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 14px;
+                box-shadow: 0 8px 20px rgba(155, 44, 31, 0.25);
+                transition: background 0.15s ease, transform 0.12s ease;
+            }
+
+            #quickAddModal .ff-qam-submit:hover:not(:disabled) {
+                background: var(--qam-red-700);
+            }
+
+            #quickAddModal .ff-qam-submit:active:not(:disabled) {
+                transform: translateY(1px);
+            }
+
+            #quickAddModal .ff-qam-submit:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+            }
+
+            #quickAddModal .ff-qam-submit-left {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                line-height: 1.15;
+            }
+
+            #quickAddModal .ff-qam-submit-title {
+                font-size: 15px;
+                font-weight: 800;
+            }
+
+            #quickAddModal .ff-qam-submit-sub {
+                font-size: 11.5px;
+                font-weight: 500;
+                color: var(--qam-gold-100);
+            }
+
+            #quickAddModal .ff-qam-submit-total {
+                font-size: 16.5px;
+                font-weight: 800;
+                white-space: nowrap;
+                color: #fff8ec;
+            }
+
+            @media (max-width: 680px) {
+                #quickAddModal .ff-qam-dialog {
+                    width: 100%;
+                    max-width: 100vw;
+                    max-height: 94vh;
+                    border-radius: 18px;
+                }
+
+                #quickAddModal .ff-qam-options-list {
+                    grid-template-columns: 1fr;
+                }
+
+                #quickAddModal .ff-qam-header {
+                    padding: 16px 18px;
+                    gap: 16px;
+                }
+
+                #quickAddModal .ff-qam-thumb {
+                    width: 96px;
+                    height: 96px;
+                    border-radius: 14px;
+                }
+
+                #quickAddModal .ff-qam-title {
+                    font-size: 1.35rem;
+                }
+
+                #quickAddModal .ff-qam-body {
+                    padding: 16px 18px;
+                }
+
+                #quickAddModal .ff-qam-footer {
+                    padding: 14px 18px;
+                    flex-wrap: wrap;
+                }
+
+                #quickAddModal .ff-qam-submit {
+                    min-width: 210px;
+                }
+            }
+        </style>
 
         <footer th:replace="~{fragments/layout :: footer}"></footer>
     <th:block th:replace="~{fragments/layout :: scripts}"></th:block>
@@ -690,6 +1273,200 @@
         let currentLoadedGroups = [];
         let quickAddTrigger;
         let menuCartToastTimer;
+        const FF_CART_COUNT_STORAGE_PREFIX = 'fitfood_cart_added_count_';
+        const FF_CART_MAX_COUNT = 100;
+
+        function getLoggedInAccountKey() {
+            const accPopEmail = document.querySelector('.head-actions .acc-menu .acc-pop .acc-id small, .acc-menu .acc-pop .acc-id small');
+            const email = accPopEmail ? accPopEmail.textContent.trim().toLowerCase() : '';
+            if (email) return 'user:' + email;
+
+            const accSummaryLbl = document.querySelector('.head-actions .acc-menu summary .lbl, .acc-menu summary .lbl');
+            const fullName = accSummaryLbl ? accSummaryLbl.textContent.trim().toLowerCase() : '';
+            if (fullName) return 'name:' + fullName;
+
+            return null;
+        }
+
+        function getCartStorageKey() {
+            const accountKey = getLoggedInAccountKey();
+            return accountKey ? (FF_CART_COUNT_STORAGE_PREFIX + encodeURIComponent(accountKey)) : null;
+        }
+
+        function normalizeCartBadgeCount(rawCount) {
+            const parsed = parseInt(rawCount, 10);
+            if (!Number.isFinite(parsed) || parsed <= 0) return 0;
+            return Math.min(FF_CART_MAX_COUNT, parsed);
+        }
+
+        function getCartHeaderTargets() {
+            const actionContainers = Array.from(document.querySelectorAll('.head-actions, .header-actions'));
+            const scopedLinks = [];
+            actionContainers.forEach(box => {
+                box.querySelectorAll('a[href*="/cart"]').forEach(link => {
+                    try {
+                        const p = new URL(link.href, window.location.origin).pathname.replace(/\/$/, '');
+                        if (p.endsWith('/cart') && !scopedLinks.includes(link)) {
+                            scopedLinks.push(link);
+                        }
+                    } catch {}
+                });
+            });
+            if (scopedLinks.length > 0) return scopedLinks;
+
+            return Array.from(document.querySelectorAll('a.icon-btn[href*="/cart"], a[href*="/cart"]')).filter(link => {
+                try {
+                    const p = new URL(link.href, window.location.origin).pathname.replace(/\/$/, '');
+                    return p.endsWith('/cart');
+                } catch {
+                    return false;
+                }
+            });
+        }
+
+        function ensureCartCountBadges() {
+            const links = getCartHeaderTargets();
+            const badges = [];
+            links.forEach((link, idx) => {
+                let badge = link.querySelector('.ff-cart-badge');
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'ff-cart-badge';
+                    badge.id = idx === 0 ? 'ffHeaderCartBadge' : ('ffHeaderCartBadge_' + idx);
+                    badge.hidden = true;
+                    badge.setAttribute('aria-label', 'Số lượng sản phẩm trong giỏ hàng');
+                    const lbl = link.querySelector('.lbl');
+                    if (lbl) {
+                        lbl.insertAdjacentElement('afterend', badge);
+                    } else {
+                        link.appendChild(badge);
+                    }
+                }
+                badges.push(badge);
+            });
+            return badges;
+        }
+
+        function renderCartBadgeCount(count, shouldBump = false) {
+            const storageKey = getCartStorageKey();
+            const isLoggedIn = Boolean(storageKey);
+            const normalizedCount = isLoggedIn ? normalizeCartBadgeCount(count) : 0;
+
+            if (isLoggedIn) {
+                try {
+                    if (normalizedCount > 0) {
+                        sessionStorage.setItem(storageKey, String(normalizedCount));
+                    } else {
+                        sessionStorage.removeItem(storageKey);
+                    }
+                } catch {}
+            }
+
+            const badges = ensureCartCountBadges();
+            badges.forEach(badge => {
+                if (!isLoggedIn || normalizedCount <= 0) {
+                    badge.textContent = '';
+                    badge.hidden = true;
+                    badge.classList.remove('is-bump');
+                    return;
+                }
+
+                badge.hidden = false;
+                badge.textContent = String(normalizedCount);
+                if (shouldBump) {
+                    badge.classList.remove('is-bump');
+                    void badge.offsetWidth;
+                    badge.classList.add('is-bump');
+                    setTimeout(() => badge.classList.remove('is-bump'), 280);
+                }
+            });
+        }
+
+        function readStoredCartCount() {
+            const storageKey = getCartStorageKey();
+            if (!storageKey) return 0;
+            try {
+                return normalizeCartBadgeCount(sessionStorage.getItem(storageKey));
+            } catch {
+                return 0;
+            }
+        }
+
+        async function syncCartBadgeFromServer() {
+            const storageKey = getCartStorageKey();
+            if (!storageKey) {
+                renderCartBadgeCount(0, false);
+                return;
+            }
+
+            // Khi người dùng mới mở / thực đơn, hiển thị trạng thái chuẩn từ giỏ hàng hiện tại (không dùng số cũ khi giỏ trống)
+            renderCartBadgeCount(0, false);
+
+            try {
+                const resp = await fetch('/cart', {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (!resp.ok || resp.redirected) {
+                    renderCartBadgeCount(0, false);
+                    return;
+                }
+                const htmlText = await resp.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(htmlText, 'text/html');
+
+                let totalQty = 0;
+                const qtyInputs = doc.querySelectorAll('input[name="quantity"], input.qty-input, input[type="number"]');
+                qtyInputs.forEach(inp => {
+                    const val = parseInt(inp.value, 10);
+                    if (Number.isFinite(val) && val > 0) {
+                        totalQty += val;
+                    }
+                });
+
+                renderCartBadgeCount(totalQty, false);
+            } catch {
+                renderCartBadgeCount(0, false);
+            }
+        }
+
+        function incrementCartBadgeBy(addedQty) {
+            if (!getCartStorageKey()) {
+                renderCartBadgeCount(0, false);
+                return;
+            }
+            const delta = Math.max(1, parseInt(addedQty, 10) || 1);
+            const current = readStoredCartCount();
+            renderCartBadgeCount(current + delta, true);
+        }
+
+        function syncQuickVariantSelectionStyles() {
+            const container = document.getElementById('modalVariantsContainer');
+            if (!container) return;
+
+            container.querySelectorAll('.ff-qam-option-card').forEach(card => {
+                const input = card.querySelector('input[type="radio"], input[type="checkbox"]');
+                card.classList.toggle('is-selected', Boolean(input && input.checked));
+            });
+
+            container.querySelectorAll('.ff-qam-group').forEach(groupEl => {
+                groupEl.classList.remove('is-missing-required');
+            });
+
+            const summaryEl = document.getElementById('modalSelectedSummaryText');
+            if (summaryEl) {
+                const selectedNames = [];
+                container.querySelectorAll('input:checked').forEach(input => {
+                    const optName = (input.dataset.optionName || '').trim();
+                    const extra = Number(input.dataset.price || 0);
+                    if (optName) {
+                        selectedNames.push(extra > 0 ? `${optName} (+${extra.toLocaleString('vi-VN')} đ)` : optName);
+                    }
+                });
+                summaryEl.textContent = selectedNames.length > 0 ? selectedNames.join(' • ') : 'Mặc định theo món';
+            }
+        }
 
         async function openQuickAddModal(button) {
             quickAddTrigger = button;
@@ -719,6 +1496,7 @@
             document.getElementById('modalProductId').value = id;
             document.getElementById('modalName').innerText = name;
             document.getElementById('modalDescDisplay').innerText = desc;
+            document.getElementById('modalBasePriceBadge').innerText = 'Giá gốc: ' + price.toLocaleString('vi-VN') + ' đ';
             document.getElementById('modalUnitPriceDisplay').innerText = price.toLocaleString('vi-VN');
             document.getElementById('modalCategoryBadge').innerText = category;
             document.getElementById('modalProductImg').src = img;
@@ -726,9 +1504,10 @@
             document.getElementById('modalFoodNote').value = '';
             document.getElementById('modalVariantName').value = '';
             document.getElementById('modalCalculatedUnitPrice').value = price;
+            document.getElementById('modalSelectedSummaryText').innerText = 'Mặc định theo món';
 
             const container = document.getElementById('modalVariantsContainer');
-            container.innerHTML = '<div style="font-size: 12px; color: #94a3b8; font-style: italic;">Đang tải tùy chọn món ăn...</div>';
+            container.innerHTML = '<div style="font-size: 13px; color: #6e5d4f; font-style: italic; padding: 6px 2px;">Đang tải tùy chọn món ăn...</div>';
 
             currentLoadedGroups = [];
             try {
@@ -755,6 +1534,7 @@
                 container.innerHTML = '';
             }
 
+            syncQuickVariantSelectionStyles();
             calculateModalTotal();
             document.getElementById('quickAddModal').style.display = 'flex';
         }
@@ -765,22 +1545,47 @@
             if (!groups || groups.length === 0)
                 return;
 
-            groups.forEach(group => {
+            groups.forEach((group, groupIdx) => {
                 const box = document.createElement('div');
-                box.style.cssText = 'margin-bottom: 10px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px;';
+                box.className = 'ff-qam-group';
+                box.dataset.groupId = group.id;
 
-                const title = document.createElement('div');
-                title.style.cssText = 'font-weight: 700; font-size: 12px; color: #1e293b; margin-bottom: 6px; display: flex; justify-content: space-between;';
-                title.innerHTML = `<span>⚙️ ${group.group_name}</span> <small style="color: #64748b;">${group.is_required ? '(Bắt buộc)' : '(Tùy chọn)'}</small>`;
-                box.appendChild(title);
+                const isMultiple = Boolean(group.allow_multiple);
+                const maxSelect = isMultiple ? Math.max(1, Number(group.max_select) || 1) : 1;
+
+                const head = document.createElement('div');
+                head.className = 'ff-qam-group-head';
+
+                const titleWrap = document.createElement('div');
+                const title = document.createElement('h4');
+                title.className = 'ff-qam-group-title';
+                title.innerHTML = `<span>${groupIdx + 1}. ${group.group_name}</span>`;
+
+                const sub = document.createElement('p');
+                sub.className = 'ff-qam-group-sub';
+                sub.textContent = isMultiple
+                    ? `Có thể chọn tối đa ${maxSelect} tùy chọn`
+                    : 'Chọn 1 tùy chọn cho nhóm này';
+
+                titleWrap.appendChild(title);
+                titleWrap.appendChild(sub);
+
+                const badge = document.createElement('span');
+                badge.className = 'ff-qam-req-tag ' + (group.is_required ? 'is-required' : 'is-optional');
+                badge.textContent = group.is_required ? 'Bắt buộc' : 'Tùy chọn';
+
+                head.appendChild(titleWrap);
+                head.appendChild(badge);
+                box.appendChild(head);
+
+                const optionsList = document.createElement('div');
+                optionsList.className = 'ff-qam-options-list';
 
                 const options = (group.options || []).filter(o => o.is_available === 1 || o.is_available === true);
-                const isMultiple = group.allow_multiple;
-                const maxSelect = isMultiple ? Math.max(1, Number(group.max_select) || 1) : 1;
 
                 options.forEach((opt, idx) => {
                     const label = document.createElement('label');
-                    label.style.cssText = 'display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 10px; margin-bottom: 5px; cursor: pointer; font-size: 12px;';
+                    label.className = 'ff-qam-option-card';
 
                     const input = document.createElement('input');
                     input.type = isMultiple ? 'checkbox' : 'radio';
@@ -795,35 +1600,40 @@
                     }
 
                     input.addEventListener('change', function () {
-                        if (isMultiple && box.querySelectorAll('input:checked').length > maxSelect) {
+                        if (isMultiple && optionsList.querySelectorAll('input:checked').length > maxSelect) {
                             input.checked = false;
                             alert('Chỉ được chọn tối đa ' + maxSelect + ' tùy chọn.');
+                            syncQuickVariantSelectionStyles();
+                            return;
                         }
+                        syncQuickVariantSelectionStyles();
                         calculateModalTotal();
                     });
 
                     const left = document.createElement('div');
-                    left.style.display = 'flex';
-                    left.style.alignItems = 'center';
-                    left.style.gap = '6px';
+                    left.className = 'ff-qam-option-left';
                     left.appendChild(input);
 
                     const nameText = document.createElement('span');
+                    nameText.className = 'ff-qam-option-name';
                     nameText.innerText = opt.option_name;
                     left.appendChild(nameText);
 
                     const extra = Number(opt.extra_price || 0);
-                    const right = document.createElement('strong');
-                    right.style.color = '#27ae60';
+                    const right = document.createElement('span');
+                    right.className = 'ff-qam-option-price' + (extra <= 0 ? ' is-zero' : '');
                     right.innerText = extra > 0 ? ('+' + extra.toLocaleString('vi-VN') + ' đ') : '0 đ';
 
                     label.appendChild(left);
                     label.appendChild(right);
-                    box.appendChild(label);
+                    optionsList.appendChild(label);
                 });
 
+                box.appendChild(optionsList);
                 container.appendChild(box);
             });
+
+            syncQuickVariantSelectionStyles();
         }
 
         function closeQuickAddModal() {
@@ -847,6 +1657,7 @@
         function calculateModalTotal() {
             const qtyInput = document.getElementById('modalQtyInput');
             const totalDisplay = document.getElementById('modalTotalDisplay');
+            const submitMeta = document.getElementById('modalSubmitMeta');
             if (!qtyInput || !totalDisplay)
                 return;
 
@@ -859,6 +1670,10 @@
             const unitPrice = selectedProductPrice + extra;
             const total = unitPrice * qty;
             totalDisplay.innerText = total.toLocaleString('vi-VN') + ' đ';
+
+            if (submitMeta) {
+                submitMeta.innerText = qty + (qty > 1 ? ' phần • ' : ' phần • ') + unitPrice.toLocaleString('vi-VN') + ' đ/phần';
+            }
 
             const unitDisplay = document.getElementById('modalUnitPriceDisplay');
             if (unitDisplay) {
@@ -877,6 +1692,11 @@
                 if (group.is_required) {
                     const checked = document.querySelectorAll(`input[name="quick_variant_${group.id}"]:checked`);
                     if (checked.length === 0) {
+                        const groupBox = document.querySelector(`#modalVariantsContainer .ff-qam-group[data-group-id="${group.id}"]`);
+                        if (groupBox) {
+                            groupBox.classList.add('is-missing-required');
+                            groupBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                        }
                         alert('Vui lòng chọn: ' + group.group_name);
                         return;
                     }
@@ -905,6 +1725,7 @@
                 unitPriceInput.value = selectedProductPrice + extra;
             }
 
+            const addedQty = Math.max(1, parseInt(document.getElementById('modalQtyInput')?.value, 10) || 1);
             const body = new URLSearchParams(new FormData(form));
             body.set('stayOnMenu', 'true');
             const loginUrl = new URL(form.dataset.loginUrl, window.location.href);
@@ -927,6 +1748,8 @@
                 submitBtn.disabled = false;
             }
 
+            incrementCartBadgeBy(addedQty);
+
             try {
                 window.flyToCart?.(document.getElementById('modalProductImg'));
             } finally {
@@ -943,6 +1766,14 @@
             menuCartToastTimer = setTimeout(() => { toast.textContent = ''; }, 3000);
         }
 
+        window.addEventListener('DOMContentLoaded', function () {
+            syncCartBadgeFromServer();
+        });
+
+        window.addEventListener('pageshow', function () {
+            syncCartBadgeFromServer();
+        });
+
         window.addEventListener('click', function (event) {
             const modal = document.getElementById('quickAddModal');
             if (event.target === modal)
@@ -952,6 +1783,7 @@
         const initialCartMessage = document.getElementById('menuCartToast').textContent;
         if (initialCartMessage) showMenuCartToast(initialCartMessage);
     </script>
+
 
     <style>
         #menuCartToast:not(:empty) {
