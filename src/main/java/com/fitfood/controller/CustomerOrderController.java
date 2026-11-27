@@ -520,6 +520,55 @@ public class CustomerOrderController {
     }
 
     /**
+     * Khách xóa một đơn hàng ĐÃ HỦY khỏi lịch sử của mình.
+     *  - Chỉ chủ đơn mới xóa được, và chỉ khi trạng thái là "Đã hủy".
+     *  - Xóa theo thứ tự bảng con -> bảng cha trong cùng một giao dịch.
+     */
+    @PostMapping("/tai-khoan/don-hang/{id}/xoa")
+    @Transactional
+    public String deleteCancelledOrder(
+            @PathVariable("id") long orderId,
+            @AuthenticationPrincipal UserDetails userDetails,
+            RedirectAttributes redirect) {
+
+        AppUser user = getCurrentUser(userDetails);
+        if (user == null) {
+            return "redirect:/dang-nhap";
+        }
+
+        List<String> statuses = jdbc.query("""
+            SELECT o.status
+            FROM dbo.fitfood_orders o WITH (UPDLOCK, HOLDLOCK)
+            WHERE o.id = ? AND o.user_id = ?
+            """, (rs, rowNum) -> rs.getString("status"), orderId, user.getId());
+
+        if (statuses.isEmpty()) {
+            redirect.addFlashAttribute("orderError", "Không tìm thấy đơn hàng cần xóa.");
+            return "redirect:/tai-khoan/don-hang";
+        }
+
+        if (!"Đã hủy".equalsIgnoreCase(statuses.get(0))) {
+            redirect.addFlashAttribute("orderError",
+                    "Chỉ xóa được đơn hàng đã hủy. Hãy hủy đơn trước nếu bạn không muốn nhận nữa.");
+            return "redirect:/tai-khoan/don-hang";
+        }
+
+        jdbc.update("""
+            DELETE ii FROM dbo.fitfood_invoice_items ii
+            JOIN dbo.fitfood_invoices i ON i.id = ii.invoice_id
+            WHERE i.order_id = ?
+            """, orderId);
+        jdbc.update("DELETE FROM dbo.fitfood_invoices WHERE order_id = ?", orderId);
+        jdbc.update("DELETE FROM dbo.fitfood_payments WHERE order_id = ?", orderId);
+        jdbc.update("DELETE FROM dbo.fitfood_deliveries WHERE order_id = ?", orderId);
+        jdbc.update("DELETE FROM dbo.fitfood_order_items WHERE order_id = ?", orderId);
+        jdbc.update("DELETE FROM dbo.fitfood_orders WHERE id = ? AND user_id = ?", orderId, user.getId());
+
+        redirect.addFlashAttribute("orderSuccess", "Đã xóa đơn hàng #" + orderId + " khỏi lịch sử.");
+        return "redirect:/tai-khoan/don-hang";
+    }
+
+    /**
      * POST /tai-khoan/don-hang/{id}/huy
      * Khách hàng hủy đặt hàng.
      * Chỉ cho phép khi:
