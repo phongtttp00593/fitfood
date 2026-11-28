@@ -145,7 +145,13 @@ BigDecimal totalRevenue = jdbcTemplate.queryForObject(
         FROM dbo.fitfood_orders o
         WHERE o.placed_at >= ?
           AND o.placed_at < ?
-          AND o.status <> N'Đã hủy'
+          AND o.status = N'Hoàn thành'
+          AND EXISTS (
+              SELECT 1
+              FROM dbo.fitfood_deliveries d
+              WHERE d.order_id = o.id
+                AND d.status = N'Đã giao'
+          )
           AND EXISTS (
               SELECT 1
               FROM dbo.fitfood_payments p

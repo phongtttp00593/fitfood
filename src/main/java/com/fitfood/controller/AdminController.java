@@ -47,7 +47,21 @@ public class AdminController {
         LocalDate month = today.withDayOfMonth(1);
         LocalDate end = today.plusDays(1);
         LocalDate week = today.minusDays(6);
-        String paid = " o.status <> N'Đã hủy' AND EXISTS (SELECT 1 FROM dbo.fitfood_payments p WHERE p.order_id = o.id AND p.status = N'Đã thanh toán') ";
+        String paid = """
+    o.status = N'Hoàn thành'
+    AND EXISTS (
+        SELECT 1
+        FROM dbo.fitfood_deliveries d
+        WHERE d.order_id = o.id
+          AND d.status = N'Đã giao'
+    )
+    AND EXISTS (
+        SELECT 1
+        FROM dbo.fitfood_payments p
+        WHERE p.order_id = o.id
+          AND p.status = N'Đã thanh toán'
+    )
+    """;
         model.addAttribute("monthLabel", today.format(DateTimeFormatter.ofPattern("MM/yyyy")));
         model.addAttribute("revenue", revenue(month, end, paid));
         model.addAttribute("totalOrders", jdbc.queryForObject("SELECT COUNT(*) FROM dbo.fitfood_orders", Integer.class));
