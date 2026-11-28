@@ -1,1229 +1,1370 @@
 
 <!doctype html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quản lý đơn hàng | FITFOOD Admin</title>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Quản lý đơn hàng | FITFOOD Admin</title>
 
 
-    <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
-    <link rel="stylesheet" th:href="@{/css/fitfood-categories.css}" />
-    <link rel="stylesheet" th:href="@{/css/admin-theme.css}" />
+        <link rel="stylesheet" th:href="@{/css/fitfood-modern.css}" />
+        <link rel="stylesheet" th:href="@{/css/fitfood-categories.css}" />
+        <link rel="stylesheet" th:href="@{/css/admin-theme.css}" />
 
-    <style>
-        /* ================= LAYOUT ================= */
+        <style>
+            /* ================= LAYOUT ================= */
 
-        .adm-main {
-            min-width: 0;
-        }
-
-        .orders-page {
-            min-width: 0;
-            font-family: "Be Vietnam Pro", sans-serif;
-        }
-
-        .orders-page .cat-heading {
-            margin-bottom: 24px;
-        }
-
-        .orders-page .cat-heading h1 {
-            font-size: 28px;
-            font-weight: 800;
-            margin: 8px 0;
-        }
-
-        .orders-page .cat-heading p {
-            font-size: 14px;
-            color: #78716c;
-        }
-
-        /* ================= SUMMARY ================= */
-
-        .order-summary {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-
-        .order-summary-card {
-            background: #ffffff;
-            border: 1px solid #e7e5e4;
-            border-radius: 16px;
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
-        }
-
-        .order-summary-icon {
-            width: 48px;
-            height: 48px;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 13px;
-        }
-
-        .order-summary-icon svg {
-            width: 24px;
-            height: 24px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.8;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .summary-green {
-            color: #078058;
-            background: #dcfce7;
-        }
-
-        .summary-yellow {
-            color: #b45309;
-            background: #fef3c7;
-        }
-
-        .summary-blue {
-            color: #2563eb;
-            background: #dbeafe;
-        }
-
-        .summary-red {
-            color: #dc2626;
-            background: #fee2e2;
-        }
-
-        .order-summary-info {
-            min-width: 0;
-        }
-
-        .order-summary-info span {
-            display: block;
-            color: #78716c;
-            font-size: 12px;
-            font-weight: 500;
-            margin-bottom: 6px;
-        }
-
-        .order-summary-info strong {
-            display: block;
-            color: #1c1917;
-            font-size: 25px;
-            font-weight: 800;
-        }
-
-        /* ================= CARD ================= */
-
-        .orders-page .cat-card {
-            background: #ffffff;
-            border: 1px solid #e7e5e4;
-            border-radius: 18px;
-            overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
-            min-width: 0;
-        }
-
-        .orders-page .cat-card-header {
-            padding: 22px 24px;
-        }
-
-        .orders-page .cat-card-header h2 {
-            color: #292524;
-            font-size: 19px;
-            font-weight: 750;
-            margin-bottom: 6px;
-        }
-
-        .orders-page .cat-card-header p {
-            color: #78716c;
-            font-size: 13px;
-        }
-
-        /* ================= FILTER ================= */
-
-        .order-filters {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-            padding: 0 24px 20px;
-        }
-
-        .order-search {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            min-width: 180px;
-            background: #fafaf9;
-            border: 1px solid #e7e5e4;
-            border-radius: 10px;
-            padding: 0 13px;
-        }
-
-        .order-search svg {
-            width: 19px;
-            height: 19px;
-            flex-shrink: 0;
-            stroke: #78716c;
-            stroke-width: 1.8;
-            fill: none;
-        }
-
-        .orders-page .order-search input {
-            width: 100%;
-            min-width: 0;
-            height: 43px;
-            padding: 0;
-            border: none;
-            outline: none;
-            background: transparent;
-            box-shadow: none;
-            font: inherit;
-            font-size: 13px;
-            color: #292524;
-        }
-
-        .order-search:focus-within {
-            border-color: #078058;
-            box-shadow: 0 0 0 3px rgba(7, 128, 88, 0.08);
-        }
-
-        .order-filter-select {
-            height: 45px;
-            padding: 0 12px;
-            border: 1px solid #e7e5e4;
-            border-radius: 10px;
-            background: #fff;
-            color: #44403c;
-            font: inherit;
-            font-size: 13px;
-            outline: none;
-        }
-
-        .order-filter-btn,
-        .order-clear-btn {
-            height: 45px;
-            padding: 0 18px;
-            border-radius: 10px;
-            font: inherit;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            white-space: nowrap;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .order-filter-btn {
-            border: none;
-            background: #078058;
-            color: #ffffff;
-        }
-
-        .order-filter-btn:hover {
-            background: #056344;
-        }
-
-        .order-clear-btn {
-            background: #ffffff;
-            color: #57534e;
-            border: 1px solid #e7e5e4;
-        }
-
-        .order-clear-btn:hover {
-            background: #f5f5f4;
-            color: #292524;
-        }
-
-        /* ================= TABLE ================= */
-
-        .orders-page .order-table-wrap {
-            width: 100%;
-            max-width: 100%;
-            overflow-x: auto;
-            padding: 0;
-            scrollbar-width: thin;
-        }
-
-        .orders-page .order-table {
-            width: 100%;
-            min-width: 1100px;
-            border-collapse: collapse;
-            table-layout: fixed;
-            margin: 0;
-            background: #ffffff;
-        }
-
-        .orders-page .order-table th {
-            padding: 14px 12px;
-            text-align: left;
-            background: #f5f7f6;
-            border-top: 1px solid #e7e5e4;
-            border-bottom: 1px solid #e7e5e4;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.03em;
-            text-transform: uppercase;
-            color: #57534e;
-            white-space: nowrap;
-        }
-
-        .orders-page .order-table td {
-            padding: 16px 12px;
-            vertical-align: middle;
-            border-bottom: 1px solid #eeeeee;
-            font-size: 13px;
-            line-height: 1.65;
-            color: #44403c;
-            word-break: normal;
-            overflow-wrap: normal;
-        }
-
-        .orders-page .order-table tbody tr {
-            background: #ffffff;
-            transition: background 0.15s ease;
-        }
-
-        .orders-page .order-table tbody tr:hover {
-            background: #f4faf7;
-        }
-
-        .orders-page .order-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .order-code {
-            color: #078058;
-            font-size: 15px;
-            font-weight: 800;
-            white-space: nowrap;
-        }
-
-        /* ================= CUSTOMER ================= */
-
-        .order-customer {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 3px;
-            min-width: 0;
-        }
-
-        .order-customer-name {
-            font-weight: 700;
-            color: #292524;
-            overflow-wrap: anywhere;
-        }
-
-        .order-customer-email {
-            font-size: 11px;
-            color: #78716c;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .order-customer-phone {
-            font-size: 12px;
-            font-weight: 500;
-            color: #57534e;
-        }
-
-        .order-address {
-            display: -webkit-box;
-            -webkit-box-orient: vertical;
-            -webkit-line-clamp: 3;
-            overflow: hidden;
-            overflow-wrap: anywhere;
-            word-break: normal;
-            font-size: 12px;
-            line-height: 1.7;
-            color: #57534e;
-        }
-
-        .order-date {
-            display: block;
-            color: #44403c;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .order-time {
-            display: block;
-            color: #6f6a66;
-            font-size: 12px;
-            margin-top: 3px;
-        }
-
-        .order-count {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 29px;
-            height: 29px;
-            padding: 0 6px;
-            background: #f5f5f4;
-            border-radius: 8px;
-            color: #57534e;
-            font-weight: 700;
-        }
-
-        .order-total {
-            color: #292524;
-            font-weight: 750;
-            white-space: nowrap;
-            font-size: 13px;
-        }
-
-        /* ================= STATUS ================= */
-
-        .order-status-badge,
-        .payment-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            padding: 6px 9px;
-            border-radius: 7px;
-            font-size: 11px;
-            font-weight: 650;
-            line-height: 1.5;
-            white-space: nowrap;
-        }
-
-        .order-status-badge::before,
-        .payment-badge::before {
-            content: "";
-            width: 6px;
-            height: 6px;
-            flex-shrink: 0;
-            border-radius: 50%;
-            background: currentColor;
-        }
-
-        .status-pending {
-            background: #fff7df;
-            color: #a16207;
-        }
-
-        .status-processing {
-            background: #eff6ff;
-            color: #2563eb;
-        }
-
-        .status-shipping {
-            background: #f3e8ff;
-            color: #7e22ce;
-        }
-
-        .status-complete {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .status-cancel {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        .status-default {
-            background: #f5f5f4;
-            color: #57534e;
-        }
-
-        .payment-paid {
-            background: #dcfce7;
-            color: #15803d;
-        }
-
-        .payment-unpaid {
-            background: #fff7df;
-            color: #b45309;
-        }
-
-        .payment-cancelled {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
-
-        /* ================= ACTIONS ================= */
-
-        .order-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            min-width: 0;
-        }
-
-        .order-detail-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            width: 100%;
-            height: 34px;
-            padding: 0 10px;
-            box-sizing: border-box;
-            border: 1px solid #cce7d8;
-            border-radius: 8px;
-            background: #edf8f1;
-            color: #078058;
-            font-size: 12px;
-            font-weight: 650;
-            text-decoration: none;
-            white-space: nowrap;
-            transition: all 0.15s ease;
-        }
-
-        .order-detail-btn svg {
-            width: 16px;
-            height: 16px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.8;
-        }
-
-        .order-detail-btn:hover {
-            background: #078058;
-            border-color: #078058;
-            color: #ffffff;
-        }
-
-        .orders-page .order-status-form {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            min-width: 0;
-            width: 100%;
-            margin: 0;
-        }
-
-        .orders-page .order-status-form select {
-            flex: 1;
-            width: 0;
-            min-width: 0;
-            height: 33px;
-            padding: 0 5px;
-            border: 1px solid #e7e5e4;
-            border-radius: 7px;
-            background: #ffffff;
-            color: #44403c;
-            font: inherit;
-            font-size: 11px;
-            outline: none;
-        }
-
-        .orders-page .order-status-form select:focus {
-            border-color: #078058;
-        }
-
-        .orders-page .order-status-form button {
-            height: 33px;
-            flex-shrink: 0;
-            border: none;
-            border-radius: 7px;
-            padding: 0 8px;
-            background: #078058;
-            color: #ffffff;
-            font: inherit;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .orders-page .order-status-form button:hover {
-            background: #056344;
-        }
-
-        .order-delete-form {
-            margin: 0;
-        }
-
-        .order-delete-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
-            width: 100%;
-            height: 31px;
-            border: 1px solid #fecaca;
-            border-radius: 7px;
-            background: #fff;
-            color: #dc2626;
-            font: inherit;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .order-delete-btn:hover {
-            background: #fee2e2;
-        }
-
-        .order-delete-btn svg {
-            width: 14px;
-            height: 14px;
-            stroke: currentColor;
-            stroke-width: 1.8;
-            fill: none;
-        }
-
-        /* ================= EMPTY ================= */
-
-        .order-empty {
-            padding: 65px 20px;
-            text-align: center;
-            color: #78716c;
-        }
-
-        .order-empty svg {
-            width: 48px;
-            height: 48px;
-            fill: none;
-            stroke: #a8a29e;
-            stroke-width: 1.4;
-            margin-bottom: 12px;
-        }
-
-        .order-empty h3 {
-            color: #44403c;
-            font-size: 16px;
-            margin-bottom: 8px;
-        }
-
-        .order-empty p {
-            font-size: 13px;
-        }
-
-        .order-table-footer {
-            padding: 15px 24px;
-            border-top: 1px solid #e7e5e4;
-            color: #78716c;
-            font-size: 12px;
-        }
-
-        .orders-page .sr-only {
-            position: absolute !important;
-            width: 1px !important;
-            height: 1px !important;
-            padding: 0 !important;
-            margin: -1px !important;
-            overflow: hidden !important;
-            clip: rect(0, 0, 0, 0) !important;
-            white-space: nowrap !important;
-            border: 0 !important;
-        }
-
-        /* ================= RESPONSIVE ================= */
-
-        @media (max-width: 1200px) {
-            .order-summary {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+            .adm-main {
+                min-width: 0;
             }
-        }
 
-        @media (max-width: 600px) {
+            .orders-page {
+                min-width: 0;
+                font-family: "Be Vietnam Pro", sans-serif;
+            }
+
+            .orders-page .cat-heading {
+                margin-bottom: 24px;
+            }
+
+            .orders-page .cat-heading h1 {
+                font-size: 28px;
+                font-weight: 800;
+                margin: 8px 0;
+            }
+
+            .orders-page .cat-heading p {
+                font-size: 14px;
+                color: #78716c;
+            }
+
+            /* ================= SUMMARY ================= */
+
             .order-summary {
-                gap: 10px;
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 16px;
+                margin-bottom: 24px;
             }
 
             .order-summary-card {
-                padding: 12px;
-                gap: 10px;
+                background: #ffffff;
+                border: 1px solid #e7e5e4;
+                border-radius: 16px;
+                padding: 20px;
+                display: flex;
+                align-items: center;
+                gap: 14px;
+                box-shadow: 0 3px 12px rgba(0, 0, 0, 0.03);
             }
 
             .order-summary-icon {
-                width: 36px;
-                height: 36px;
+                width: 48px;
+                height: 48px;
+                flex-shrink: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 13px;
             }
 
-            .order-summary-info strong {
-                font-size: 20px;
+            .order-summary-icon svg {
+                width: 24px;
+                height: 24px;
+                fill: none;
+                stroke: currentColor;
+                stroke-width: 1.8;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+            }
+
+            .summary-green {
+                color: #078058;
+                background: #dcfce7;
+            }
+
+            .summary-yellow {
+                color: #b45309;
+                background: #fef3c7;
+            }
+
+            .summary-blue {
+                color: #2563eb;
+                background: #dbeafe;
+            }
+
+            .summary-red {
+                color: #dc2626;
+                background: #fee2e2;
+            }
+
+            .order-summary-info {
+                min-width: 0;
             }
 
             .order-summary-info span {
-                font-size: 10px;
+                display: block;
+                color: #78716c;
+                font-size: 12px;
+                font-weight: 500;
+                margin-bottom: 6px;
+            }
+
+            .order-summary-info strong {
+                display: block;
+                color: #1c1917;
+                font-size: 25px;
+                font-weight: 800;
+            }
+
+            /* ================= CARD ================= */
+
+            .orders-page .cat-card {
+                background: #ffffff;
+                border: 1px solid #e7e5e4;
+                border-radius: 18px;
+                overflow: hidden;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+                min-width: 0;
+            }
+
+            .orders-page .cat-card-header {
+                padding: 22px 24px;
+            }
+
+            .orders-page .cat-card-header h2 {
+                color: #292524;
+                font-size: 19px;
+                font-weight: 750;
+                margin-bottom: 6px;
+            }
+
+            .orders-page .cat-card-header p {
+                color: #78716c;
+                font-size: 13px;
+            }
+
+            /* ================= FILTER ================= */
+
+            .order-filters {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 10px;
+                padding: 0 24px 20px;
             }
 
             .order-search {
-                flex-basis: 100%;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                flex: 1;
+                min-width: 180px;
+                background: #fafaf9;
+                border: 1px solid #e7e5e4;
+                border-radius: 10px;
+                padding: 0 13px;
             }
 
-            .order-filters {
-                padding: 0 16px 16px;
+            .order-search svg {
+                width: 19px;
+                height: 19px;
+                flex-shrink: 0;
+                stroke: #78716c;
+                stroke-width: 1.8;
+                fill: none;
             }
-        }
-    </style>
-</head>
 
-<body class="admin-body">
+            .orders-page .order-search input {
+                width: 100%;
+                min-width: 0;
+                height: 43px;
+                padding: 0;
+                border: none;
+                outline: none;
+                background: transparent;
+                box-shadow: none;
+                font: inherit;
+                font-size: 13px;
+                color: #292524;
+            }
 
-<div class="adm-layout">
+            .order-search:focus-within {
+                border-color: #078058;
+                box-shadow: 0 0 0 3px rgba(7, 128, 88, 0.08);
+            }
 
-    <!-- SIDEBAR -->
+            .order-filter-select {
+                height: 45px;
+                padding: 0 12px;
+                border: 1px solid #e7e5e4;
+                border-radius: 10px;
+                background: #fff;
+                color: #44403c;
+                font: inherit;
+                font-size: 13px;
+                outline: none;
+            }
 
-    <aside class="adm-sidebar"
-           th:replace="~{fragments/admin-sidebar :: sidebar('orders')}">
-    </aside>
+            .order-filter-btn,
+            .order-clear-btn {
+                height: 45px;
+                padding: 0 18px;
+                border-radius: 10px;
+                font: inherit;
+                font-size: 13px;
+                font-weight: 600;
+                cursor: pointer;
+                white-space: nowrap;
+                text-decoration: none;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+            }
 
-    <div class="adm-main">
+            .order-filter-btn {
+                border: none;
+                background: #078058;
+                color: #ffffff;
+            }
 
-        <!-- HEADER -->
+            .order-filter-btn:hover {
+                background: #056344;
+            }
 
-        <header class="adm-top cat-top">
+            .order-clear-btn {
+                background: #ffffff;
+                color: #57534e;
+                border: 1px solid #e7e5e4;
+            }
 
-            <div class="admin-breadcrumb">
-                FITFOOD <span>/</span>
-                <b>Quản lý đơn hàng</b>
+            .order-clear-btn:hover {
+                background: #f5f5f4;
+                color: #292524;
+            }
+
+            /* ================= TABLE ================= */
+
+            .orders-page .order-table-wrap {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: auto;
+                padding: 0;
+                scrollbar-width: thin;
+            }
+
+            .orders-page .order-table {
+                width: 100%;
+                min-width: 1100px;
+                border-collapse: collapse;
+                table-layout: fixed;
+                margin: 0;
+                background: #ffffff;
+            }
+
+            .orders-page .order-table th {
+                padding: 14px 12px;
+                text-align: left;
+                background: #f5f7f6;
+                border-top: 1px solid #e7e5e4;
+                border-bottom: 1px solid #e7e5e4;
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: 0.03em;
+                text-transform: uppercase;
+                color: #57534e;
+                white-space: nowrap;
+            }
+
+            .orders-page .order-table td {
+                padding: 16px 12px;
+                vertical-align: middle;
+                border-bottom: 1px solid #eeeeee;
+                font-size: 13px;
+                line-height: 1.65;
+                color: #44403c;
+                word-break: normal;
+                overflow-wrap: normal;
+            }
+
+            .orders-page .order-table tbody tr {
+                background: #ffffff;
+                transition: background 0.15s ease;
+            }
+
+            .orders-page .order-table tbody tr:hover {
+                background: #f4faf7;
+            }
+
+            .orders-page .order-table tbody tr:last-child td {
+                border-bottom: none;
+            }
+
+            .order-code {
+                color: #078058;
+                font-size: 15px;
+                font-weight: 800;
+                white-space: nowrap;
+            }
+
+            /* ================= CUSTOMER ================= */
+
+            .order-customer {
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 3px;
+                min-width: 0;
+            }
+
+            .order-customer-name {
+                font-weight: 700;
+                color: #292524;
+                overflow-wrap: anywhere;
+            }
+
+            .order-customer-email {
+                font-size: 11px;
+                color: #78716c;
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .order-customer-phone {
+                font-size: 12px;
+                font-weight: 500;
+                color: #57534e;
+            }
+
+            .order-address {
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                -webkit-line-clamp: 3;
+                overflow: hidden;
+                overflow-wrap: anywhere;
+                word-break: normal;
+                font-size: 12px;
+                line-height: 1.7;
+                color: #57534e;
+            }
+
+            .order-date {
+                display: block;
+                color: #44403c;
+                font-weight: 500;
+                white-space: nowrap;
+            }
+
+            .order-time {
+                display: block;
+                color: #6f6a66;
+                font-size: 12px;
+                margin-top: 3px;
+            }
+
+            .order-count {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 29px;
+                height: 29px;
+                padding: 0 6px;
+                background: #f5f5f4;
+                border-radius: 8px;
+                color: #57534e;
+                font-weight: 700;
+            }
+
+            .order-total {
+                color: #292524;
+                font-weight: 750;
+                white-space: nowrap;
+                font-size: 13px;
+            }
+
+            /* ================= STATUS ================= */
+
+            .order-status-badge,
+            .payment-badge {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
+                padding: 6px 9px;
+                border-radius: 7px;
+                font-size: 11px;
+                font-weight: 650;
+                line-height: 1.5;
+                white-space: nowrap;
+            }
+
+            .order-status-badge::before,
+            .payment-badge::before {
+                content: "";
+                width: 6px;
+                height: 6px;
+                flex-shrink: 0;
+                border-radius: 50%;
+                background: currentColor;
+            }
+
+            .status-pending {
+                background: #fff7df;
+                color: #a16207;
+            }
+
+            .status-processing {
+                background: #eff6ff;
+                color: #2563eb;
+            }
+
+            .status-shipping {
+                background: #f3e8ff;
+                color: #7e22ce;
+            }
+
+            .status-complete {
+                background: #dcfce7;
+                color: #15803d;
+            }
+
+            .status-cancel {
+                background: #fee2e2;
+                color: #b91c1c;
+            }
+
+            .status-default {
+                background: #f5f5f4;
+                color: #57534e;
+            }
+
+            .payment-paid {
+                background: #dcfce7;
+                color: #15803d;
+            }
+
+            .payment-unpaid {
+                background: #fff7df;
+                color: #b45309;
+            }
+
+            .payment-cancelled {
+                background: #fee2e2;
+                color: #b91c1c;
+            }
+
+            /* ================= ACTIONS ================= */
+
+            .order-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                min-width: 0;
+            }
+
+            .order-detail-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                gap: 7px;
+                width: 100%;
+                height: 34px;
+                padding: 0 10px;
+                box-sizing: border-box;
+                border: 1px solid #cce7d8;
+                border-radius: 8px;
+                background: #edf8f1;
+                color: #078058;
+                font-size: 12px;
+                font-weight: 650;
+                text-decoration: none;
+                white-space: nowrap;
+                transition: all 0.15s ease;
+            }
+
+            .order-detail-btn svg {
+                width: 16px;
+                height: 16px;
+                fill: none;
+                stroke: currentColor;
+                stroke-width: 1.8;
+            }
+
+            .order-detail-btn:hover {
+                background: #078058;
+                border-color: #078058;
+                color: #ffffff;
+            }
+
+            .orders-page .order-status-form {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+                min-width: 0;
+                width: 100%;
+                margin: 0;
+            }
+
+            .orders-page .order-status-form select {
+                flex: 1;
+                width: 0;
+                min-width: 0;
+                height: 33px;
+                padding: 0 5px;
+                border: 1px solid #e7e5e4;
+                border-radius: 7px;
+                background: #ffffff;
+                color: #44403c;
+                font: inherit;
+                font-size: 11px;
+                outline: none;
+            }
+
+            .orders-page .order-status-form select:focus {
+                border-color: #078058;
+            }
+
+            .orders-page .order-status-form button {
+                height: 33px;
+                flex-shrink: 0;
+                border: none;
+                border-radius: 7px;
+                padding: 0 8px;
+                background: #078058;
+                color: #ffffff;
+                font: inherit;
+                font-size: 11px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
+            .orders-page .order-status-form button:hover {
+                background: #056344;
+            }
+
+            .order-delete-form {
+                margin: 0;
+            }
+
+            .order-delete-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 5px;
+                width: 100%;
+                height: 31px;
+                border: 1px solid #fecaca;
+                border-radius: 7px;
+                background: #fff;
+                color: #dc2626;
+                font: inherit;
+                font-size: 11px;
+                font-weight: 600;
+                cursor: pointer;
+            }
+
+            .order-delete-btn:hover {
+                background: #fee2e2;
+            }
+
+            .order-delete-btn svg {
+                width: 14px;
+                height: 14px;
+                stroke: currentColor;
+                stroke-width: 1.8;
+                fill: none;
+            }
+
+            /* ================= EMPTY ================= */
+
+            .order-empty {
+                padding: 65px 20px;
+                text-align: center;
+                color: #78716c;
+            }
+
+            .order-empty svg {
+                width: 48px;
+                height: 48px;
+                fill: none;
+                stroke: #a8a29e;
+                stroke-width: 1.4;
+                margin-bottom: 12px;
+            }
+
+            .order-empty h3 {
+                color: #44403c;
+                font-size: 16px;
+                margin-bottom: 8px;
+            }
+
+            .order-empty p {
+                font-size: 13px;
+            }
+
+            .order-table-footer {
+                padding: 15px 24px;
+                border-top: 1px solid #e7e5e4;
+                color: #78716c;
+                font-size: 12px;
+            }
+
+            .orders-page .sr-only {
+                position: absolute !important;
+                width: 1px !important;
+                height: 1px !important;
+                padding: 0 !important;
+                margin: -1px !important;
+                overflow: hidden !important;
+                clip: rect(0, 0, 0, 0) !important;
+                white-space: nowrap !important;
+                border: 0 !important;
+            }
+
+            /* ================= RESPONSIVE ================= */
+
+            @media (max-width: 1200px) {
+                .order-summary {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+            }
+
+            @media (max-width: 600px) {
+                .order-summary {
+                    gap: 10px;
+                }
+
+                .order-summary-card {
+                    padding: 12px;
+                    gap: 10px;
+                }
+
+                .order-summary-icon {
+                    width: 36px;
+                    height: 36px;
+                }
+
+                .order-summary-info strong {
+                    font-size: 20px;
+                }
+
+                .order-summary-info span {
+                    font-size: 10px;
+                }
+
+                .order-search {
+                    flex-basis: 100%;
+                }
+
+                .order-filters {
+                    padding: 0 16px 16px;
+                }
+            }
+            /* Giữ các thao tác trong phạm vi cột */
+            .orders-page .order-actions {
+                width: 100%;
+                min-width: 0;
+            }
+            .orders-page .order-status-form {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) auto;
+                gap: 5px;
+            }
+            .orders-page .order-status-form select {
+                width: 100%;
+                min-width: 0;
+                box-sizing: border-box;
+            }
+            .orders-page .order-status-form button {
+                padding: 0 8px;
+                min-width: 38px;
+                box-sizing: border-box;
+            }
+            .orders-page .order-delete-form {
+                width: 100%;
+                min-width: 0;
+            }
+            .orders-page .order-delete-btn {
+                box-sizing: border-box;
+            }
+
+            /* PHÂN TRANG ĐƠN HÀNG */
+
+            .order-pagination {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                flex-wrap: wrap;
+                gap: 8px;
+                padding: 24px 10px 12px;
+            }
+
+            .order-pagination .page-btn {
+                display: inline-flex;
+                justify-content: center;
+                align-items: center;
+                min-width: 38px;
+                height: 38px;
+                padding: 0 12px;
+                border: 1px solid #dce7df;
+                border-radius: 8px;
+                background: #ffffff;
+                color: #176b43;
+                font-size: 14px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: 0.2s;
+            }
+
+            .order-pagination .page-btn:hover {
+                background: #eaf5ee;
+                border-color: #16834f;
+            }
+
+            .order-pagination .page-btn.active {
+                background: #16834f;
+                color: #ffffff;
+                border-color: #16834f;
+            }
+
+            .order-page-info {
+                text-align: center;
+                font-size: 13px;
+                color: #64748b;
+                padding: 10px 0 20px;
+            }
+        </style>
+    </head>
+
+    <body class="admin-body">
+
+        <div class="adm-layout">
+
+            <!-- SIDEBAR -->
+
+            <aside class="adm-sidebar"
+                   th:replace="~{fragments/admin-sidebar :: sidebar('orders')}">
+            </aside>
+
+            <div class="adm-main">
+
+                <!-- HEADER -->
+
+                <header class="adm-top cat-top">
+
+                    <div class="admin-breadcrumb">
+                        FITFOOD <span>/</span>
+                        <b>Quản lý đơn hàng</b>
+                    </div>
+
+                    <div class="cat-header-tools">
+                        <span class="cat-admin-label">
+                            Quản trị viên
+                        </span>
+                    </div>
+
+                    <div class="fit-admin-top-actions">
+
+                        <span class="fit-admin-top-label">
+                            Khu vực quản trị
+                        </span>
+
+                        <form class="fit-admin-logout"
+                              method="post"
+                              th:action="@{/logout}">
+
+                            <input type="hidden"
+                                   th:name="${_csrf.parameterName}"
+                                   th:value="${_csrf.token}" />
+
+                            <button type="submit"
+                                    aria-label="Đăng xuất khỏi trang quản trị">
+
+                                <svg viewBox="0 0 24 24"
+                                     aria-hidden="true">
+                                <path d="M10 17l5-5-5-5M15 12H3M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/>
+                                </svg>
+
+                                <span>Đăng xuất</span>
+
+                            </button>
+                        </form>
+                    </div>
+
+                </header>
+
+                <!-- MAIN CONTENT -->
+
+                <main class="adm-content cat-content orders-page">
+
+                    <div class="cat-heading">
+
+                        <div>
+                            <span class="cat-overline">
+                                FITFOOD / ĐƠN HÀNG
+                            </span>
+
+                            <h1>Quản lý đơn hàng</h1>
+
+                            <p>
+                                Theo dõi đơn hàng, thanh toán
+                                và hóa đơn của khách hàng.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <!-- THÔNG BÁO -->
+
+                    <div class="cat-alert cat-alert-ok"
+                         th:if="${success}"
+                         th:text="${success}"
+                         role="status">
+                    </div>
+
+                    <div class="cat-alert cat-alert-error"
+                         th:if="${error}"
+                         th:text="${error}"
+                         role="alert">
+                    </div>
+
+                    <!-- THỐNG KÊ NHANH -->
+
+                    <div class="order-summary">
+
+                        <!-- TỔNG ĐƠN -->
+
+                        <div class="order-summary-card">
+
+                            <div class="order-summary-icon summary-green">
+                                <svg viewBox="0 0 24 24">
+                                <rect x="5" y="4" width="14" height="17" rx="2"/>
+                                <path d="M9 4V2h6v2M9 10h6M9 14h6M9 18h4"/>
+                                </svg>
+                            </div>
+
+                            <div class="order-summary-info">
+                                <span>Tổng đơn đang xem</span>
+                                <strong th:text="${#lists.size(orders)}">0</strong>
+                            </div>
+
+                        </div>
+
+                        <!-- CHỜ XÁC NHẬN -->
+
+                        <div class="order-summary-card">
+
+                            <div class="order-summary-icon summary-yellow">
+                                <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="9"/>
+                                <path d="M12 7v5l3 2"/>
+                                </svg>
+                            </div>
+
+                            <div class="order-summary-info">
+
+                                <span>Chờ xác nhận</span>
+
+                                <strong th:text="${#lists.size(orders.?[status == 'Chờ xác nhận'])}">
+                                    0
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                        <!-- ĐANG GIAO -->
+
+                        <div class="order-summary-card">
+
+                            <div class="order-summary-icon summary-blue">
+                                <svg viewBox="0 0 24 24">
+                                <path d="M3 5h12v12H3zM15 9h4l3 4v4h-7"/>
+                                <circle cx="7" cy="18" r="2"/>
+                                <circle cx="18" cy="18" r="2"/>
+                                </svg>
+                            </div>
+
+                            <div class="order-summary-info">
+
+                                <span>Đang giao</span>
+
+                                <strong th:text="${#lists.size(orders.?[status == 'Đang giao'])}">
+                                    0
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                        <!-- HOÀN THÀNH -->
+
+                        <div class="order-summary-card">
+
+                            <div class="order-summary-icon summary-green">
+                                <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="9"/>
+                                <path d="m8 12 3 3 5-6"/>
+                                </svg>
+                            </div>
+
+                            <div class="order-summary-info">
+
+                                <span>Hoàn thành</span>
+
+                                <strong th:text="${#lists.size(orders.?[status == 'Hoàn thành'])}">
+                                    0
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- DANH SÁCH ĐƠN HÀNG -->
+
+                    <section class="cat-card">
+
+                        <div class="cat-card-header">
+
+                            <div>
+
+                                <h2>Danh sách đơn hàng</h2>
+
+                                <p th:text="|Tìm thấy ${totalOrders} đơn hàng.|">
+                                    Danh sách đơn hàng.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                        <!-- TÌM KIẾM VÀ LỌC -->
+
+                        <form class="order-filters"
+                              method="get"
+                              th:action="@{/admin/orders}">
+
+                            <div class="order-search">
+
+                                <svg viewBox="0 0 24 24">
+                                <circle cx="10.5" cy="10.5" r="6.5"/>
+                                <path d="m16 16 5 5"/>
+                                </svg>
+
+                                <input type="search"
+                                       id="orderKeyword"
+                                       name="keyword"
+                                       th:value="${keyword}"
+                                       aria-label="Tìm kiếm đơn hàng"
+                                       placeholder="Tìm mã đơn, tên, email, số điện thoại..." />
+
+                            </div>
+
+                            <select class="order-filter-select"
+                                    id="orderFilter"
+                                    name="filter"
+                                    aria-label="Lọc trạng thái đơn hàng">
+
+                                <option value="all"
+                                        th:selected="${filter == 'all'}">
+                                    Tất cả trạng thái
+                                </option>
+
+                                <option th:each="status : ${orderStatuses}"
+                                        th:value="${status}"
+                                        th:text="${status}"
+                                        th:selected="${filter == status}">
+                                    Chờ xác nhận
+                                </option>
+
+                            </select>
+
+                            <button class="order-filter-btn"
+                                    type="submit">
+                                Tìm kiếm
+                            </button>
+
+                            <a class="order-clear-btn"
+                               th:href="@{/admin/orders}">
+                                Xóa lọc
+                            </a>
+
+                        </form>
+
+                        <!-- BẢNG ĐƠN HÀNG -->
+
+                        <div class="order-table-wrap"
+                             th:if="${!#lists.isEmpty(orders)}">
+
+                            <table class="order-table">
+
+                                <colgroup>
+                                    <col style="width: 6%;" />
+                                    <col style="width: 17%;" />
+                                    <col style="width: 19%;" />
+                                    <col style="width: 10%;" />
+                                    <col style="width: 5%;" />
+                                    <col style="width: 9%;" />
+                                    <col style="width: 10%;" />
+                                    <col style="width: 11%;" />
+                                    <col style="width: 13%;" />
+                                </colgroup>
+
+                                <thead>
+
+                                    <tr>
+                                        <th>Mã đơn</th>
+                                        <th>Khách hàng</th>
+                                        <th>Địa chỉ nhận hàng</th>
+                                        <th>Ngày đặt</th>
+                                        <th>SL</th>
+                                        <th>Tổng tiền</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thanh toán</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    <tr th:each="order : ${orders}">
+
+                                        <!-- MÃ ĐƠN -->
+
+                                        <td>
+
+                                            <a class="order-code"
+                                               th:href="@{/admin/orders/{id}(id=${order.id})}"
+                                               th:text="'#' + ${order.id}">
+                                                #10
+                                            </a>
+
+                                        </td>
+
+                                        <!-- KHÁCH HÀNG -->
+
+                                        <td>
+
+                                            <div class="order-customer">
+
+                                                <span class="order-customer-name"
+                                                      th:text="${order.customerName}">
+                                                    Tên khách hàng
+                                                </span>
+
+                                                <span class="order-customer-email"
+                                                      th:text="${order.email}"
+                                                      th:title="${order.email}">
+                                                    email@example.com
+                                                </span>
+
+                                                <span class="order-customer-phone"
+                                                      th:text="${order.phone != null and !#strings.isEmpty(order.phone) ? order.phone : 'Chưa cập nhật'}">
+                                                    0901234567
+                                                </span>
+
+                                            </div>
+
+                                        </td>
+
+                                        <!-- ĐỊA CHỈ -->
+
+                                        <td>
+
+                                            <div class="order-address"
+                                                 th:title="${order.address}"
+                                                 th:text="${order.address != null and !#strings.isEmpty(order.address) ? order.address : 'Chưa cập nhật'}">
+                                                Địa chỉ nhận hàng
+                                            </div>
+
+                                        </td>
+
+                                        <!-- NGÀY ĐẶT -->
+
+                                        <td>
+
+                                            <span class="order-date"
+                                                  th:text="${order.placedAt != null ? #temporals.format(order.placedAt, 'dd/MM/yyyy') : '—'}">
+                                                25/11/2026
+                                            </span>
+
+                                            <span class="order-time"
+                                                  th:text="${order.placedAt != null ? #temporals.format(order.placedAt, 'HH:mm') : ''}">
+                                                17:30
+                                            </span>
+
+                                        </td>
+
+                                        <!-- SỐ SẢN PHẨM -->
+
+                                        <td>
+
+                                            <span class="order-count"
+                                                  title="Số dòng sản phẩm trong đơn"
+                                                  th:text="${order.itemCount}">
+                                                1
+                                            </span>
+
+                                        </td>
+
+                                        <!-- TỔNG TIỀN -->
+
+                                        <td>
+
+                                            <span class="order-total"
+                                                  th:text="${#numbers.formatDecimal(order.total, 0, 'POINT', 0, 'COMMA')} + ' đ'">
+                                                82.500 đ
+                                            </span>
+
+                                        </td>
+
+                                        <!-- TRẠNG THÁI ĐƠN -->
+
+                                        <td>
+
+                                            <span class="order-status-badge"
+                                                  th:classappend="${
+                                                  order.status == 'Chờ xác nhận' ? ' status-pending' :
+                                                  order.status == 'Đang xử lý' ? ' status-processing' :
+                                                  order.status == 'Đang giao' ? ' status-shipping' :
+                                                  order.status == 'Hoàn thành' ? ' status-complete' :
+                                                  order.status == 'Đã hủy' ? ' status-cancel' :
+                                                  ' status-default'
+                                                  }"
+                                                  th:text="${order.status}">
+                                                Hoàn thành
+                                            </span>
+
+                                        </td>
+
+                                        <!-- TRẠNG THÁI THANH TOÁN -->
+
+                                        <td>
+
+                                            <span class="payment-badge"
+                                                  th:classappend="${
+                                                  order.paymentStatus == 'Đã thanh toán' ? ' payment-paid' :
+                                                  order.paymentStatus == 'Đã hủy' ? ' payment-cancelled' :
+                                                  ' payment-unpaid'
+                                                  }"
+                                                  th:text="${order.paymentStatus != null ? order.paymentStatus : 'Chưa thanh toán'}">
+                                                Chưa thanh toán
+                                            </span>
+
+                                        </td>
+
+                                        <!-- THAO TÁC -->
+
+                                        <td>
+
+                                            <div class="order-actions">
+
+                                                <!-- XEM CHI TIẾT -->
+
+                                                <a class="order-detail-btn"
+                                                   th:href="@{/admin/orders/{id}(id=${order.id})}">
+
+                                                    <svg viewBox="0 0 24 24">
+                                                    <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
+                                                    <circle cx="12" cy="12" r="3"/>
+                                                    </svg>
+
+                                                    Chi tiết
+
+                                                </a>
+
+                                                <!-- CẬP NHẬT TRẠNG THÁI -->
+
+                                                <form class="order-status-form"
+                                                      th:if="${order.status != 'Hoàn thành' and order.status != 'Đã hủy'}"
+                                                      method="post"
+                                                      th:action="@{/admin/orders/{id}/status(id=${order.id})}">
+
+                                                    <input type="hidden"
+                                                           th:name="${_csrf.parameterName}"
+                                                           th:value="${_csrf.token}" />
+
+                                                    <input type="hidden"
+                                                           name="keyword"
+                                                           th:value="${keyword}" />
+
+                                                    <input type="hidden"
+                                                           name="filter"
+                                                           th:value="${filter}" />
+
+                                                    <label class="sr-only"
+                                                           th:for="'status-' + ${order.id}">
+                                                        Trạng thái đơn hàng
+                                                    </label>
+
+                                                    <select name="status"
+                                                            th:id="'status-' + ${order.id}"
+                                                            required>
+                                                        <option value="" disabled selected
+                                                                th:text="${order.status}"></option>
+                                                        <option th:if="${order.status == 'Chờ xác nhận'}" value="Đang xử lý">Đang xử lý</option>
+                                                        <option th:if="${order.status == 'Đang xử lý'}" value="Đang giao">Đang giao</option>
+                                                        <option th:if="${order.status == 'Đang giao'}" value="Hoàn thành">Hoàn thành</option>
+                                                        <option th:if="${order.status == 'Chờ xác nhận' or order.status == 'Đang xử lý'}" value="Đã hủy">Đã hủy</option>
+                                                    </select>
+                                                    <button type="submit">Lưu</button>
+
+                                                </form>
+
+                                                <!-- XÓA ĐƠN HÀNG -->
+
+                                                <form class="order-delete-form"
+                                                      method="post"
+                                                      th:if="${order.status == 'Chờ xác nhận'
+                                                      or order.status == 'Đã hủy'
+                                                      or order.status == 'Hoàn thành'}"
+                                                      th:action="@{/admin/orders/{id}/delete(id=${order.id})}"
+                                                      onsubmit="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này? Thao tác không thể hoàn tác.');">
+
+                                                    <input type="hidden"
+                                                           th:name="${_csrf.parameterName}"
+                                                           th:value="${_csrf.token}" />
+
+                                                    <input type="hidden"
+                                                           name="keyword"
+                                                           th:value="${keyword}" />
+
+                                                    <input type="hidden"
+                                                           name="filter"
+                                                           th:value="${filter}" />
+
+                                                    <button type="submit"
+                                                            class="order-delete-btn">
+
+                                                        <svg viewBox="0 0 24 24">
+                                                        <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>
+                                                        </svg>
+
+                                                        Xóa đơn
+
+                                                    </button>
+
+                                                </form>
+
+                                            </div>
+
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+
+                            <!-- PHÂN TRANG ĐƠN HÀNG -->
+                            <div class="order-pagination"
+                                 th:if="${totalPages > 1}">
+
+                                <!-- Nút về trang đầu -->
+                                <a class="page-btn"
+                                   th:if="${currentPage > 1}"
+                                   th:href="@{/admin/orders(
+                                   page=1,
+                                   keyword=${keyword},
+                                   filter=${filter}
+                                   )}">
+                                    Đầu
+                                </a>
+
+                                <!-- Nút trang trước -->
+                                <a class="page-btn"
+                                   th:if="${currentPage > 1}"
+                                   th:href="@{/admin/orders(
+                                   page=${currentPage - 1},
+                                   keyword=${keyword},
+                                   filter=${filter}
+                                   )}">
+                                    ‹
+                                </a>
+
+                                <!-- Danh sách số trang -->
+                                <a th:each="p : ${#numbers.sequence(1, totalPages)}"
+                                   class="page-btn"
+                                   th:classappend="${p == currentPage} ? 'active' : ''"
+                                   th:href="@{/admin/orders(
+                                   page=${p},
+                                   keyword=${keyword},
+                                   filter=${filter}
+                                   )}"
+                                   th:text="${p}">
+                                    1
+                                </a>
+
+                                <!-- Nút trang tiếp theo -->
+                                <a class="page-btn"
+                                   th:if="${currentPage < totalPages}"
+                                   th:href="@{/admin/orders(
+                                   page=${currentPage + 1},
+                                   keyword=${keyword},
+                                   filter=${filter}
+                                   )}">
+                                    ›
+                                </a>
+
+                                <!-- Nút đến trang cuối -->
+                                <a class="page-btn"
+                                   th:if="${currentPage < totalPages}"
+                                   th:href="@{/admin/orders(
+                                   page=${totalPages},
+                                   keyword=${keyword},
+                                   filter=${filter}
+                                   )}">
+                                    Cuối
+                                </a>
+
+                            </div>
+
+                            <div class="order-page-info"
+                                 th:text="|Trang ${currentPage}/${totalPages} - Tổng ${totalOrders} đơn hàng|">
+                            </div>
+
+
+                        </div>
+
+                        <!-- KHÔNG CÓ DỮ LIỆU -->
+
+                        <div class="order-empty"
+                             th:if="${#lists.isEmpty(orders)}">
+
+                            <svg viewBox="0 0 24 24">
+                            <rect x="5" y="3" width="14" height="18" rx="2"/>
+                            <path d="M9 8h6M9 12h6M9 16h4"/>
+                            </svg>
+
+                            <h3>Không tìm thấy đơn hàng</h3>
+
+                            <p>
+                                Thử thay đổi từ khóa hoặc bộ lọc
+                                để tìm kiếm lại.
+                            </p>
+
+                        </div>
+
+                        <!-- FOOTER -->
+
+                        <div class="order-table-footer"
+                             th:text="'Đang hiển thị ' + ${#lists.size(orders)} + ' đơn hàng'">
+                            Đang hiển thị 0 đơn hàng
+                        </div>
+
+                    </section>
+
+                </main>
+
             </div>
 
-            <div class="cat-header-tools">
-                <span class="cat-admin-label">
-                    Quản trị viên
-                </span>
-            </div>
+        </div>
 
-            <div class="fit-admin-top-actions">
-
-                <span class="fit-admin-top-label">
-                    Khu vực quản trị
-                </span>
-
-                <form class="fit-admin-logout"
-                      method="post"
-                      th:action="@{/logout}">
-
-                    <input type="hidden"
-                           th:name="${_csrf.parameterName}"
-                           th:value="${_csrf.token}" />
-
-                    <button type="submit"
-                            aria-label="Đăng xuất khỏi trang quản trị">
-
-                        <svg viewBox="0 0 24 24"
-                             aria-hidden="true">
-                            <path d="M10 17l5-5-5-5M15 12H3M12 3h6a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-6"/>
-                        </svg>
-
-                        <span>Đăng xuất</span>
-
-                    </button>
-                </form>
-            </div>
-
-        </header>
-
-        <!-- MAIN CONTENT -->
-
-        <main class="adm-content cat-content orders-page">
-
-            <div class="cat-heading">
-
-                <div>
-                    <span class="cat-overline">
-                        FITFOOD / ĐƠN HÀNG
-                    </span>
-
-                    <h1>Quản lý đơn hàng</h1>
-
-                    <p>
-                        Theo dõi đơn hàng, thanh toán
-                        và hóa đơn của khách hàng.
-                    </p>
-                </div>
-
-            </div>
-
-            <!-- THÔNG BÁO -->
-
-            <div class="cat-alert cat-alert-ok"
-                 th:if="${success}"
-                 th:text="${success}"
-                 role="status">
-            </div>
-
-            <div class="cat-alert cat-alert-error"
-                 th:if="${error}"
-                 th:text="${error}"
-                 role="alert">
-            </div>
-
-            <!-- THỐNG KÊ NHANH -->
-
-            <div class="order-summary">
-
-                <!-- TỔNG ĐƠN -->
-
-                <div class="order-summary-card">
-
-                    <div class="order-summary-icon summary-green">
-                        <svg viewBox="0 0 24 24">
-                            <rect x="5" y="4" width="14" height="17" rx="2"/>
-                            <path d="M9 4V2h6v2M9 10h6M9 14h6M9 18h4"/>
-                        </svg>
-                    </div>
-
-                    <div class="order-summary-info">
-                        <span>Tổng đơn đang xem</span>
-                        <strong th:text="${#lists.size(orders)}">0</strong>
-                    </div>
-
-                </div>
-
-                <!-- CHỜ XÁC NHẬN -->
-
-                <div class="order-summary-card">
-
-                    <div class="order-summary-icon summary-yellow">
-                        <svg viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="9"/>
-                            <path d="M12 7v5l3 2"/>
-                        </svg>
-                    </div>
-
-                    <div class="order-summary-info">
-
-                        <span>Chờ xác nhận</span>
-
-                        <strong th:text="${#lists.size(orders.?[status == 'Chờ xác nhận'])}">
-                            0
-                        </strong>
-
-                    </div>
-
-                </div>
-
-                <!-- ĐANG GIAO -->
-
-                <div class="order-summary-card">
-
-                    <div class="order-summary-icon summary-blue">
-                        <svg viewBox="0 0 24 24">
-                            <path d="M3 5h12v12H3zM15 9h4l3 4v4h-7"/>
-                            <circle cx="7" cy="18" r="2"/>
-                            <circle cx="18" cy="18" r="2"/>
-                        </svg>
-                    </div>
-
-                    <div class="order-summary-info">
-
-                        <span>Đang giao</span>
-
-                        <strong th:text="${#lists.size(orders.?[status == 'Đang giao'])}">
-                            0
-                        </strong>
-
-                    </div>
-
-                </div>
-
-                <!-- HOÀN THÀNH -->
-
-                <div class="order-summary-card">
-
-                    <div class="order-summary-icon summary-green">
-                        <svg viewBox="0 0 24 24">
-                            <circle cx="12" cy="12" r="9"/>
-                            <path d="m8 12 3 3 5-6"/>
-                        </svg>
-                    </div>
-
-                    <div class="order-summary-info">
-
-                        <span>Hoàn thành</span>
-
-                        <strong th:text="${#lists.size(orders.?[status == 'Hoàn thành'])}">
-                            0
-                        </strong>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- DANH SÁCH ĐƠN HÀNG -->
-
-            <section class="cat-card">
-
-                <div class="cat-card-header">
-
-                    <div>
-
-                        <h2>Danh sách đơn hàng</h2>
-
-                        <p th:text="'Tìm thấy ' + ${#lists.size(orders)} + ' đơn hàng.'">
-                            Danh sách đơn hàng.
-                        </p>
-
-                    </div>
-
-                </div>
-
-                <!-- TÌM KIẾM VÀ LỌC -->
-
-                <form class="order-filters"
-                      method="get"
-                      th:action="@{/admin/orders}">
-
-                    <div class="order-search">
-
-                        <svg viewBox="0 0 24 24">
-                            <circle cx="10.5" cy="10.5" r="6.5"/>
-                            <path d="m16 16 5 5"/>
-                        </svg>
-
-                        <input type="search"
-                               id="orderKeyword"
-                               name="keyword"
-                               th:value="${keyword}"
-                               aria-label="Tìm kiếm đơn hàng"
-                               placeholder="Tìm mã đơn, tên, email, số điện thoại..." />
-
-                    </div>
-
-                    <select class="order-filter-select"
-                            id="orderFilter"
-                            name="filter"
-                            aria-label="Lọc trạng thái đơn hàng">
-
-                        <option value="all"
-                                th:selected="${filter == 'all'}">
-                            Tất cả trạng thái
-                        </option>
-
-                        <option th:each="status : ${orderStatuses}"
-                                th:value="${status}"
-                                th:text="${status}"
-                                th:selected="${filter == status}">
-                            Chờ xác nhận
-                        </option>
-
-                    </select>
-
-                    <button class="order-filter-btn"
-                            type="submit">
-                        Tìm kiếm
-                    </button>
-
-                    <a class="order-clear-btn"
-                       th:href="@{/admin/orders}">
-                        Xóa lọc
-                    </a>
-
-                </form>
-
-                <!-- BẢNG ĐƠN HÀNG -->
-
-                <div class="order-table-wrap"
-                     th:if="${!#lists.isEmpty(orders)}">
-
-                    <table class="order-table">
-
-                        <colgroup>
-                            <col style="width: 6%;" />
-                            <col style="width: 17%;" />
-                            <col style="width: 19%;" />
-                            <col style="width: 10%;" />
-                            <col style="width: 5%;" />
-                            <col style="width: 9%;" />
-                            <col style="width: 10%;" />
-                            <col style="width: 11%;" />
-                            <col style="width: 13%;" />
-                        </colgroup>
-
-                        <thead>
-
-                            <tr>
-                                <th>Mã đơn</th>
-                                <th>Khách hàng</th>
-                                <th>Địa chỉ nhận hàng</th>
-                                <th>Ngày đặt</th>
-                                <th>SL</th>
-                                <th>Tổng tiền</th>
-                                <th>Trạng thái</th>
-                                <th>Thanh toán</th>
-                                <th>Thao tác</th>
-                            </tr>
-
-                        </thead>
-
-                        <tbody>
-
-                            <tr th:each="order : ${orders}">
-
-                                <!-- MÃ ĐƠN -->
-
-                                <td>
-
-                                    <a class="order-code"
-                                       th:href="@{/admin/orders/{id}(id=${order.id})}"
-                                       th:text="'#' + ${order.id}">
-                                        #10
-                                    </a>
-
-                                </td>
-
-                                <!-- KHÁCH HÀNG -->
-
-                                <td>
-
-                                    <div class="order-customer">
-
-                                        <span class="order-customer-name"
-                                              th:text="${order.customerName}">
-                                            Tên khách hàng
-                                        </span>
-
-                                        <span class="order-customer-email"
-                                              th:text="${order.email}"
-                                              th:title="${order.email}">
-                                            email@example.com
-                                        </span>
-
-                                        <span class="order-customer-phone"
-                                              th:text="${order.phone != null and !#strings.isEmpty(order.phone) ? order.phone : 'Chưa cập nhật'}">
-                                            0901234567
-                                        </span>
-
-                                    </div>
-
-                                </td>
-
-                                <!-- ĐỊA CHỈ -->
-
-                                <td>
-
-                                    <div class="order-address"
-                                         th:title="${order.address}"
-                                         th:text="${order.address != null and !#strings.isEmpty(order.address) ? order.address : 'Chưa cập nhật'}">
-                                        Địa chỉ nhận hàng
-                                    </div>
-
-                                </td>
-
-                                <!-- NGÀY ĐẶT -->
-
-                                <td>
-
-                                    <span class="order-date"
-                                          th:text="${order.placedAt != null ? #temporals.format(order.placedAt, 'dd/MM/yyyy') : '—'}">
-                                        25/11/2026
-                                    </span>
-
-                                    <span class="order-time"
-                                          th:text="${order.placedAt != null ? #temporals.format(order.placedAt, 'HH:mm') : ''}">
-                                        17:30
-                                    </span>
-
-                                </td>
-
-                                <!-- SỐ SẢN PHẨM -->
-
-                                <td>
-
-                                    <span class="order-count"
-                                          title="Số dòng sản phẩm trong đơn"
-                                          th:text="${order.itemCount}">
-                                        1
-                                    </span>
-
-                                </td>
-
-                                <!-- TỔNG TIỀN -->
-
-                                <td>
-
-                                    <span class="order-total"
-                                          th:text="${#numbers.formatDecimal(order.total, 0, 'POINT', 0, 'COMMA')} + ' đ'">
-                                        82.500 đ
-                                    </span>
-
-                                </td>
-
-                                <!-- TRẠNG THÁI ĐƠN -->
-
-                                <td>
-
-                                    <span class="order-status-badge"
-                                          th:classappend="${
-                                            order.status == 'Chờ xác nhận' ? ' status-pending' :
-                                            order.status == 'Đang xử lý' ? ' status-processing' :
-                                            order.status == 'Đang giao' ? ' status-shipping' :
-                                            order.status == 'Hoàn thành' ? ' status-complete' :
-                                            order.status == 'Đã hủy' ? ' status-cancel' :
-                                            ' status-default'
-                                          }"
-                                          th:text="${order.status}">
-                                        Hoàn thành
-                                    </span>
-
-                                </td>
-
-                                <!-- TRẠNG THÁI THANH TOÁN -->
-
-                                <td>
-
-                                    <span class="payment-badge"
-                                          th:classappend="${
-                                            order.paymentStatus == 'Đã thanh toán' ? ' payment-paid' :
-                                            order.paymentStatus == 'Đã hủy' ? ' payment-cancelled' :
-                                            ' payment-unpaid'
-                                          }"
-                                          th:text="${order.paymentStatus != null ? order.paymentStatus : 'Chưa thanh toán'}">
-                                        Chưa thanh toán
-                                    </span>
-
-                                </td>
-
-                                <!-- THAO TÁC -->
-
-                                <td>
-
-                                    <div class="order-actions">
-
-                                        <!-- XEM CHI TIẾT -->
-
-                                        <a class="order-detail-btn"
-                                           th:href="@{/admin/orders/{id}(id=${order.id})}">
-
-                                            <svg viewBox="0 0 24 24">
-                                                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
-                                                <circle cx="12" cy="12" r="3"/>
-                                            </svg>
-
-                                            Chi tiết
-
-                                        </a>
-
-                                        <!-- CẬP NHẬT TRẠNG THÁI -->
-
-                                        <form class="order-status-form"
-                                              method="post"
-                                              th:action="@{/admin/orders/{id}/status(id=${order.id})}">
-
-                                            <input type="hidden"
-                                                   th:name="${_csrf.parameterName}"
-                                                   th:value="${_csrf.token}" />
-
-                                            <input type="hidden"
-                                                   name="keyword"
-                                                   th:value="${keyword}" />
-
-                                            <input type="hidden"
-                                                   name="filter"
-                                                   th:value="${filter}" />
-
-                                            <label class="sr-only"
-                                                   th:for="'status-' + ${order.id}">
-                                                Trạng thái đơn hàng
-                                            </label>
-
-                                            <select name="status"
-                                                    th:id="'status-' + ${order.id}">
-
-                                                <option th:each="status : ${orderStatuses}"
-                                                        th:value="${status}"
-                                                        th:text="${status}"
-                                                        th:selected="${order.status == status}">
-                                                    Chờ xác nhận
-                                                </option>
-
-                                            </select>
-
-                                            <button type="submit">
-                                                Lưu
-                                            </button>
-
-                                        </form>
-
-                                        <!-- XÓA ĐƠN HÀNG -->
-
-                                        <form class="order-delete-form"
-                                              method="post"
-                                              th:if="${order.status == 'Chờ xác nhận' or order.status == 'Đã hủy'}"
-                                              th:action="@{/admin/orders/{id}/delete(id=${order.id})}"
-                                              onsubmit="return confirm('Bạn có chắc chắn muốn xóa đơn hàng này? Thao tác không thể hoàn tác.');">
-
-                                            <input type="hidden"
-                                                   th:name="${_csrf.parameterName}"
-                                                   th:value="${_csrf.token}" />
-
-                                            <input type="hidden"
-                                                   name="keyword"
-                                                   th:value="${keyword}" />
-
-                                            <input type="hidden"
-                                                   name="filter"
-                                                   th:value="${filter}" />
-
-                                            <button type="submit"
-                                                    class="order-delete-btn">
-
-                                                <svg viewBox="0 0 24 24">
-                                                    <path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/>
-                                                </svg>
-
-                                                Xóa đơn
-
-                                            </button>
-
-                                        </form>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                        </tbody>
-
-                    </table>
-
-                </div>
-
-                <!-- KHÔNG CÓ DỮ LIỆU -->
-
-                <div class="order-empty"
-                     th:if="${#lists.isEmpty(orders)}">
-
-                    <svg viewBox="0 0 24 24">
-                        <rect x="5" y="3" width="14" height="18" rx="2"/>
-                        <path d="M9 8h6M9 12h6M9 16h4"/>
-                    </svg>
-
-                    <h3>Không tìm thấy đơn hàng</h3>
-
-                    <p>
-                        Thử thay đổi từ khóa hoặc bộ lọc
-                        để tìm kiếm lại.
-                    </p>
-
-                </div>
-
-                <!-- FOOTER -->
-
-                <div class="order-table-footer"
-                     th:text="'Đang hiển thị ' + ${#lists.size(orders)} + ' đơn hàng'">
-                    Đang hiển thị 0 đơn hàng
-                </div>
-
-            </section>
-
-        </main>
-
-    </div>
-
-</div>
-
-</body>
+    </body>
 </html>
