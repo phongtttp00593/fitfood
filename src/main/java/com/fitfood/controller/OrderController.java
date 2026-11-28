@@ -43,8 +43,34 @@ public class OrderController {
             "Chờ xác nhận", "Đang xử lý", "Đang giao", "Hoàn thành", "Đã hủy");
     // Set để kiểm tra "status có hợp lệ không" nhanh hơn List (O(1) thay vì O(n))
     private static final Set<String> VALID_STATUSES = Set.copyOf(ORDER_STATUSES);
+    private boolean canUpdateStatus(String currentStatus, String newStatus) {
+
+    if (currentStatus == null || newStatus == null) {
+        return false;
+    }
+
+    return switch (currentStatus) {
+
+        case "Chờ xác nhận" ->
+            "Đang xử lý".equals(newStatus)
+            || "Đã hủy".equals(newStatus);
+
+        case "Đang xử lý" ->
+            "Đang giao".equals(newStatus)
+            || "Đã hủy".equals(newStatus);
+
+        case "Đang giao" ->
+            "Hoàn thành".equals(newStatus);
+
+        case "Hoàn thành", "Đã hủy" ->
+            false;
+
+        default -> false;
+    };
+}
     // Chỉ đơn ở các trạng thái này mới được xóa (xem method delete()).
-    private static final Set<String> DELETABLE_STATUSES = Set.of("Chờ xác nhận", "Đã hủy");
+    private static final Set<String> DELETABLE_STATUSES =
+        Set.of("Chờ xác nhận", "Đã hủy", "Hoàn thành");
 
     // Gom các chuỗi lặp lại nhiều lần thành hằng số (giống DeliveryController).
     private static final String FLASH_ERROR = "error";
@@ -70,8 +96,9 @@ public class OrderController {
      */
     @GetMapping
     public String list(@RequestParam(defaultValue = "") String keyword,
-                       @RequestParam(defaultValue = "all") String filter,
-                       Model model) {
+                   @RequestParam(defaultValue = "all") String filter,
+                   @RequestParam(defaultValue = "1") int page,
+                   Model model) {
         // Bỏ khoảng trắng dư ở đầu/cuối từ khóa tìm kiếm
         String normalizedKeyword = keyword.strip();
         // Nếu filter không nằm trong danh sách trạng thái hợp lệ -> coi như "all" (không lọc)
@@ -135,7 +162,7 @@ public class OrderController {
              GROUP BY o.id, o.placed_at, u.full_name, u.email,
                       d.receiver_phone, cp.phone, d.delivery_address, cp.address,
                       o.status, o.total
-             ORDER BY o.placed_at DESC, o.id DESC
+             ORDER BY o.placed_at ASC, o.id ASC
             """);
 
         // Thực thi câu SQL đã build, với tham số theo đúng thứ tự trong "parameters".
@@ -158,7 +185,35 @@ public class OrderController {
         }, parameters.toArray());
 
         // Đưa dữ liệu vào Model để template Thymeleaf (admin-orders.html) đọc và render ra HTML.
-        model.addAttribute("orders", orders);
+        // Số đơn hàng trên mỗi trang
+        int pageSize = 10;
+
+        // Tổng số đơn hàng sau khi tìm kiếm và lọc
+        int totalOrders = orders.size();
+
+        // Tính tổng số trang
+        int totalPages = Math.max(
+                1,
+                (int) Math.ceil((double) totalOrders / pageSize)
+        );
+
+        // Đảm bảo số trang hợp lệ
+        page = Math.max(1, Math.min(page, totalPages));
+
+        // Xác định vị trí bắt đầu và kết thúc
+        int start = (page - 1) * pageSize;
+
+        int end = Math.min(start + pageSize, totalOrders);
+
+        // Lấy danh sách đơn hàng của trang hiện tại
+        List<OrderRow> paginatedOrders = orders.subList(start, end);
+
+        // Truyền dữ liệu sang giao diện
+        model.addAttribute("orders", paginatedOrders);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("totalOrders", totalOrders);
+        model.addAttribute("pageSize", pageSize);
         model.addAttribute(PARAM_KEYWORD, normalizedKeyword);
         model.addAttribute(PARAM_FILTER, normalizedFilter);
         model.addAttribute("orderStatuses", ORDER_STATUSES);
@@ -249,67 +304,123 @@ public String detail(@PathVariable long id, Model model) {
 
     return "admin-invoice-detail";
 }
-    @PostMapping("/{id}/status")
-    @Transactional
-    public String updateStatus(@PathVariable long id,
-                               @RequestParam String status,
-                               @RequestParam(defaultValue = "") String keyword,
-                               @RequestParam(defaultValue = "all") String filter,
-                               RedirectAttributes redirect) {
-        // Validate: status gửi lên phải là 1 trong 5 giá trị ở ORDER_STATUSES.
-        // (Phòng trường hợp request bị sửa tay / gửi sai từ bên ngoài form.)
-        if (!VALID_STATUSES.contains(status)) {
-            // addFlashAttribute: lưu thông báo tạm, chỉ hiển thị được ở request redirect
-            // TIẾP THEO (sau khi chuyển trang), rồi tự xoá - tránh thông báo bị lặp lại khi F5.
-            redirect.addFlashAttribute(FLASH_ERROR, "Trạng thái đơn hàng không hợp lệ.");
-        } else {
-            // UPDATE đơn giản theo id. jdbc.update() trả về số dòng bị ảnh hưởng.
-            int updated = jdbc.update(
-                    "UPDATE dbo.fitfood_orders SET status = ? WHERE id = ?", status, id);
-            if (updated == 0) {
-                // updated == 0 nghĩa là không có đơn hàng nào khớp id này (đã bị xoá / sai id).
-                redirect.addFlashAttribute(FLASH_ERROR, "Không tìm thấy đơn hàng cần cập nhật.");
-            } else {
-                // Đồng bộ tự động sang phiếu giao hàng (fitfood_deliveries) nếu đơn có phiếu giao
-                if ("Đang giao".equals(status)) {
-                    jdbc.update("""
-                        UPDATE dbo.fitfood_deliveries
-                        SET status = N'Đang giao',
-                            sent_at = COALESCE(sent_at, SYSDATETIME())
-                        WHERE order_id = ? AND status <> N'Đã giao'
-                        """, id);
-                } else if ("Hoàn thành".equals(status)) {
-                    jdbc.update("""
-                        UPDATE dbo.fitfood_deliveries
-                        SET status = N'Đã giao',
-                            sent_at = COALESCE(sent_at, SYSDATETIME()),
-                            delivered_at = COALESCE(delivered_at, SYSDATETIME())
-                        WHERE order_id = ?
-                        """, id);
-                } else if ("Đã hủy".equals(status)) {
-                    jdbc.update("""
-                        UPDATE dbo.fitfood_deliveries
-                        SET status = N'Giao thất bại'
-                        WHERE order_id = ? AND status <> N'Đã giao'
-                        """, id);
-                } else if ("Đang xử lý".equals(status)) {
-                    jdbc.update("""
-                        UPDATE dbo.fitfood_deliveries
-                        SET status = N'Chờ giao',
-                            delivered_at = NULL
-                        WHERE order_id = ? AND status NOT IN (N'Đã giao', N'Giao thất bại')
-                        """, id);
-                }
-                redirect.addFlashAttribute(FLASH_SUCCESS, "Đã cập nhật trạng thái đơn hàng và đồng bộ giao hàng.");
-            }
-        }
-        // addAttribute (khác addFlashAttribute): gắn vào QUERY STRING của URL redirect,
-        // ví dụ redirect:/admin/orders?keyword=...&filter=... để trang danh sách sau khi
-        // load lại vẫn đang ở đúng bộ lọc/tìm kiếm trước khi bấm "Lưu".
-        redirect.addAttribute(PARAM_KEYWORD, keyword);
-        redirect.addAttribute(PARAM_FILTER, filter);
+    
+@PostMapping("/{id}/status")
+@Transactional
+public String updateStatus(
+        @PathVariable long id,
+        @RequestParam String status,
+        @RequestParam(defaultValue = "") String keyword,
+        @RequestParam(defaultValue = "all") String filter,
+        RedirectAttributes redirect) {
+
+    // Giữ nguyên bộ lọc và từ khóa tìm kiếm
+    redirect.addAttribute(PARAM_KEYWORD, keyword);
+    redirect.addAttribute(PARAM_FILTER, filter);
+
+    // Kiểm tra trạng thái gửi lên
+    if (!VALID_STATUSES.contains(status)) {
+        redirect.addFlashAttribute(
+                FLASH_ERROR,
+                "Trạng thái đơn hàng không hợp lệ."
+        );
+
         return REDIRECT_ORDERS;
     }
+
+    // Lấy trạng thái hiện tại của đơn hàng
+    List<String> currentStatuses = jdbc.query("""
+        SELECT status
+        FROM dbo.fitfood_orders WITH (UPDLOCK, HOLDLOCK)
+        WHERE id = ?
+        """,
+        (rs, rowNum) -> rs.getString("status"),
+        id
+    );
+
+    // Kiểm tra đơn hàng có tồn tại không
+    if (currentStatuses.isEmpty()) {
+        redirect.addFlashAttribute(
+                FLASH_ERROR,
+                "Không tìm thấy đơn hàng."
+        );
+
+        return REDIRECT_ORDERS;
+    }
+
+    String currentStatus = currentStatuses.get(0);
+
+    // Kiểm tra trạng thái có được phép thay đổi không
+    if (!canUpdateStatus(currentStatus, status)) {
+        redirect.addFlashAttribute(
+                FLASH_ERROR,
+                "Không thể chuyển trạng thái từ "
+                + currentStatus + " sang " + status + "."
+        );
+
+        return REDIRECT_ORDERS;
+    }
+
+    // Cập nhật trạng thái đơn hàng
+    jdbc.update("""
+        UPDATE dbo.fitfood_orders
+        SET status = ?
+        WHERE id = ?
+        """, status, id);
+
+    // Đồng bộ trạng thái giao hàng
+    if ("Đang giao".equals(status)) {
+
+        jdbc.update("""
+            UPDATE dbo.fitfood_deliveries
+            SET status = N'Đang giao',
+                sent_at = COALESCE(sent_at, SYSDATETIME())
+            WHERE order_id = ?
+              AND status <> N'Đã giao'
+            """, id);
+
+    } else if ("Hoàn thành".equals(status)) {
+
+        jdbc.update("""
+            UPDATE dbo.fitfood_deliveries
+            SET status = N'Đã giao',
+                sent_at = COALESCE(sent_at, SYSDATETIME()),
+                delivered_at = COALESCE(
+                    delivered_at, SYSDATETIME()
+                )
+            WHERE order_id = ?
+            """, id);
+
+    } else if ("Đã hủy".equals(status)) {
+
+        jdbc.update("""
+            UPDATE dbo.fitfood_deliveries
+            SET status = N'Giao thất bại'
+            WHERE order_id = ?
+              AND status <> N'Đã giao'
+            """, id);
+
+    } else if ("Đang xử lý".equals(status)) {
+
+        jdbc.update("""
+            UPDATE dbo.fitfood_deliveries
+            SET status = N'Chờ giao',
+                delivered_at = NULL
+            WHERE order_id = ?
+              AND status NOT IN (
+                  N'Đã giao', N'Giao thất bại'
+              )
+            """, id);
+    }
+
+    redirect.addFlashAttribute(
+            FLASH_SUCCESS,
+            "Cập nhật trạng thái đơn hàng thành công."
+    );
+
+    return REDIRECT_ORDERS;
+}
+
 
     /**
      * POST /admin/orders/{id}/delete
@@ -361,11 +472,12 @@ public String detail(@PathVariable long id, Model model) {
         if (checks.isEmpty()) {
             error = "Không tìm thấy đơn hàng cần xóa.";
         } else if (!DELETABLE_STATUSES.contains(checks.get(0).status())) {
-            error = "Chỉ được xóa đơn hàng ở trạng thái \"Chờ xác nhận\" hoặc \"Đã hủy\".";
+            error = "Chỉ được xóa đơn hàng ở trạng thái Chờ xác nhận, Đã hủy hoặc Hoàn thành.";
         } else if (checks.get(0).invoiceCount() > 0) {
             error = "Không thể xóa: đơn hàng đã được xuất hóa đơn.";
-        } else if (checks.get(0).paidCount() > 0) {
-            error = "Không thể xóa: đơn hàng đã được thanh toán.";
+        } else if (checks.get(0).paidCount() > 0
+        && !"Đã hủy".equals(checks.get(0).status())) {
+            error = "Đơn hàng đã thanh toán phải được hủy trước khi xóa.";
         } else if (checks.get(0).shippingCount() > 0) {
             error = "Không thể xóa: phiếu giao của đơn hàng đang giao hoặc đã giao.";
         }
