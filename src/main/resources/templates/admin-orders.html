@@ -1210,7 +1210,12 @@
                                                         <option th:if="${order.status == 'Chờ xác nhận'}" value="Đang xử lý">Đang xử lý</option>
                                                         <option th:if="${order.status == 'Đang xử lý'}" value="Đang giao">Đang giao</option>
                                                         <option th:if="${order.status == 'Đang giao'}" value="Hoàn thành">Hoàn thành</option>
-                                                        <option th:if="${order.status == 'Chờ xác nhận' or order.status == 'Đang xử lý'}" value="Đã hủy">Đã hủy</option>
+                                                        <option th:if="${order.status == 'Chờ xác nhận'
+                                                                or order.status == 'Đang xử lý'
+                                                                or order.status == 'Đang giao'}"
+                                                                value="Đã hủy">
+                                                            Đã hủy
+                                                        </option>
                                                     </select>
                                                     <button type="submit">Lưu</button>
 

@@ -60,7 +60,8 @@ public class OrderController {
             || "Đã hủy".equals(newStatus);
 
         case "Đang giao" ->
-            "Hoàn thành".equals(newStatus);
+            "Hoàn thành".equals(newStatus)
+            || "Đã hủy".equals(newStatus);
 
         case "Hoàn thành", "Đã hủy" ->
             false;
